@@ -221,13 +221,13 @@
           span Size
           span Qualities
         +fieldset({name: 'weapon'})
-          //- Roll mechanics not implemented yet - this button doesn't do
-          //- anything when clicked (no trigger wired up). It's here as a
-          //- placeholder so the row's layout/styling is ready once weapon
-          //- rolls are built.
+          //- Triggers a Fighting roll using this row's Focus/Damage &
+          //- Effects (see initiateWeaponRoll), chaining into a damage roll
+          //- automatically on a success.
           +action({
             name: 'weapon roll',
-            class: 'cc-weapon-roll roller'
+            class: 'cc-weapon-roll roller',
+            trigger: {triggeredFuncs: ['initiateWeaponRoll']}
           })
           //- Options are written out individually rather than generated
           //- from ccWeaponProfiles via an `each` loop - see the comment
@@ -760,6 +760,8 @@
         roll1.dice :
         (roll1.rolls && roll1.rolls[0] && roll1.rolls[0].results || []).map((r) => r.v);
 
+      console.log(`[CC] ${skillLabel}${focusLabel ? ` (${focusLabel})` : ''} roll - d20s:`, dice);
+
       if (!dice.length) {
         finishRoll(roll.rollId, {
           target_number: '?',
@@ -793,7 +795,12 @@
         complications: complicationCount,
       };
 
+      console.log(`[CC] ${skillLabel} outcome:`, {
+        targetNumber, critMax, difficulty, successCount, complicationCount, passed,
+      });
+
       finishRoll(roll.rollId, overrides);
+      return passed;
     } catch (err) {
       // Surface failures in chat instead of leaving the template blank
       // with no clue why.
@@ -804,6 +811,7 @@
         outcome: 0,
         complications: 0,
       });
+      return false;
     }
   };
 
@@ -861,3 +869,146 @@
     });
   };
   k.registerFuncs({initiateFocusRoll});
+
+  // Weapon "Damage & Effects" fields are stored as free text like
+  // "4, Piercing 1" or "3, Vicious" (see ccWeaponProfiles above) - first
+  // comma-separated token is the weapon's base Damage rating (in Challenge
+  // Dice), everything after that is its list of Damage Effects (Piercing N,
+  // Vicious, Stun, etc, per the rulebook's Chapter 7).
+  const ccParseDamageEffects = (text) => {
+    const parts = String(text || '').split(',').map((s) => s.trim()).filter(Boolean);
+    return {
+      baseRating: Number(parts[0]) || 0,
+      effects: parts.slice(1),
+    };
+  };
+
+  // Cohors Cthulhu damage is rolled with special 6-sided Challenge Dice.
+  // This sheet has no access to physical Challenge Dice, so damage is
+  // rolled as plain d6s and converted face-by-face using the rulebook's
+  // own "If you don't have Challenge Dice" fallback table: 1->1 pip,
+  // 2->2 pips, 3/4->blank, 5/6->1 pip plus an Effect symbol.
+  const ccChallengeDieFromD6 = (d6) => {
+    switch (Number(d6)) {
+      case 1: return {pips: 1, effect: false, symbol: '●'};
+      case 2: return {pips: 2, effect: false, symbol: '●●'};
+      case 5: return {pips: 1, effect: true, symbol: '●✦'};
+      case 6: return {pips: 1, effect: true, symbol: '●✦'};
+      default: return {pips: 0, effect: false, symbol: '○'};
+    }
+  };
+
+  // Damage roll, triggered only after a successful attack roll (see
+  // initiateWeaponRoll below). Rolls the weapon's Challenge Dice (base
+  // Damage rating + the attacker's relevant Bonus Damage), converts each
+  // d6 to its Challenge Die face, totals the pips (Vicious adds +1 total
+  // damage per Effect rolled, since it's a flat/simple modifier per RAW),
+  // and lists which other Damage Effects triggered for the player/GM to
+  // resolve (Piercing/Stun/Snare/etc depend on the target, which this
+  // single-character sheet has no data on).
+  const runCcDamageRoll = async ({weaponName, damageEffects, bonusDamage}) => {
+    const {baseRating, effects} = ccParseDamageEffects(damageEffects);
+    const diceCount = Math.max(1, baseRating + bonusDamage);
+
+    const rollString = '&{template:ccdamage} ' +
+      `{{character_name=@{character_name}}} ` +
+      `{{weapon=${weaponName}}} ` +
+      `{{effects_list=${effects.join(', ') || 'None'}}} ` +
+      `{{dice_count=${diceCount}}} ` +
+      `{{damage_dice=[[${diceCount}d6]]}} ` +
+      `{{total_damage=[[0]]}} ` +
+      `{{effect_count=[[0]]}} ` +
+      `{{dice_text=[[0]]}} ` +
+      `{{effects_summary=[[0]]}}`;
+
+    const roll = await startRoll(rollString);
+
+    try {
+      const damageDice = roll.results.damage_dice;
+      const rawDice = Array.isArray(damageDice.dice) ?
+        damageDice.dice :
+        (damageDice.rolls && damageDice.rolls[0] && damageDice.rolls[0].results || []).map((r) => r.v);
+
+      console.log(`[CC] ${weaponName} damage roll - raw d6s:`, rawDice);
+
+      if (!rawDice.length) {
+        finishRoll(roll.rollId, {
+          total_damage: '?',
+          effect_count: '?',
+          dice_text: `error: could not read dice from ${JSON.stringify(damageDice)}`,
+          effects_summary: '',
+        });
+        return;
+      }
+
+      const converted = rawDice.map(ccChallengeDieFromD6);
+      console.log(`[CC] ${weaponName} Challenge Dice faces:`, converted);
+
+      const isVicious = effects.some((e) => /vicious/i.test(e));
+      const effectCount = converted.filter((c) => c.effect).length;
+      const totalDamage = converted.reduce((sum, c) => sum + c.pips, 0) +
+        (isVicious ? effectCount : 0);
+
+      const effectsSummary = effectCount > 0 ?
+        `${effectCount}x Effect${effects.length ? ` - ${effects.join(', ')}` : ''}` :
+        'No Effects triggered';
+
+      console.log(`[CC] ${weaponName} damage result:`, {totalDamage, effectCount, effectsSummary});
+
+      finishRoll(roll.rollId, {
+        total_damage: totalDamage,
+        effect_count: effectCount,
+        dice_text: converted.map((c) => c.symbol).join(' '),
+        effects_summary: effectsSummary,
+      });
+    } catch (err) {
+      finishRoll(roll.rollId, {
+        total_damage: '?',
+        effect_count: '?',
+        dice_text: `error: ${err.message}`,
+        effects_summary: '',
+      });
+    }
+  };
+
+  // Weapon roll: a Fighting roll using the weapon's own Focus (Melee
+  // Weapons/Archery/Thrown Weapons/Unarmed), same as a Focus roller
+  // (initiateFocusRoll) except the Focus comes from the weapon row instead
+  // of a fixed button, and known-focus status is checked explicitly since
+  // clicking a weapon's roll button isn't itself a declaration that the
+  // Focus is known (unlike the Skills table's per-focus buttons, which
+  // only exist for focuses the sheet lists) - crit range only opens up to
+  // the skill's ranks when that specific focus checkbox is checked, else
+  // it stays a natural-1-only crit like a plain Skill roll. On success,
+  // chains directly into a damage roll using the row's Damage & Effects
+  // and the attacker's Bonus Damage (Brawn for melee/unarmed, Insight for
+  // ranged/thrown, per RAW).
+  const initiateWeaponRoll = async ({trigger, attributes}) => {
+    const [section, rowID] = k.parseRepeatName(trigger.name);
+    const prefix = `${section}_${rowID}_`;
+    const weaponName = attributes[`${prefix}name`] || 'Weapon';
+    const focus = attributes[`${prefix}focus`] || '';
+    const damageEffects = attributes[`${prefix}damage_effects`] || '';
+
+    const fightingRanks = Number(attributes.fighting_ranks) || 0;
+    const focusSlug = focus.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
+    const knownFocus = Boolean(focusSlug && attributes[`fighting_focus_${focusSlug}_known`]);
+
+    console.log('[CC] Weapon roll:', {weaponName, focus, damageEffects, fightingRanks, knownFocus});
+
+    const passed = await runCcRoll({
+      skillLabel: weaponName,
+      focusLabel: focus,
+      attributeExpr: ccAttributeQuery,
+      skillRanks: fightingRanks,
+      critMax: knownFocus ? fightingRanks : 1,
+    });
+
+    if (!passed) { return; }
+
+    const isRanged = focus.toLowerCase() === 'archery' || focus.toLowerCase() === 'thrown weapons';
+    const bonusDamage = Number(attributes[isRanged ? 'insight_bonus_damage' : 'brawn_bonus_damage']) || 0;
+
+    await runCcDamageRoll({weaponName, damageEffects, bonusDamage});
+  };
+  k.registerFuncs({initiateWeaponRoll});

@@ -51,6 +51,29 @@
       .cc-roll-outcome.cc-roll-fail
         span Failed
 
+//- Chat output for a weapon damage roll (see initiateWeaponRoll/
+//- runCcDamageRoll in views/_character.pug). Shows the Challenge Dice
+//- faces (converted from plain d6s per the rulebook's own fallback table),
+//- the total damage, and any Damage Effects that triggered.
++rolltemplate('ccdamage')
+  .cc-roll-card
+    +characterLink
+    .cc-roll-header
+      span.cc-roll-skill {{weapon}} Damage
+    .cc-roll-body
+      .cc-roll-row
+        span Challenge Dice:
+        span {{computed::dice_text}}
+      .cc-roll-row
+        span Total Damage:
+        span {{computed::total_damage}}
+      +rollGreater({values: 'computed::effect_count 0'})
+        .cc-roll-row.cc-roll-complication
+          span {{computed::effects_summary}}
+      .cc-roll-row
+        span Weapon Effects:
+        span {{effects_list}}
+
 +scss('roll').
   // Roll templates render inside Roll20's chat pane, which sanitizes their
   // CSS through a stricter, older filter than the main sheet - CSS custom
@@ -145,5 +168,54 @@
     .sheet-cc-roll-fail {
       background: #4a1414;
       color: #f0e0e0;
+    }
+  }
+
+  // Same card styling as .sheet-rolltemplate-ccskill above, duplicated
+  // under this template's own root wrapper class - each rolltemplate's
+  // root selector is different, so the nested rules have to be repeated
+  // per-template even though the inner class names (.cc-roll-card,
+  // .cc-roll-row, etc) are shared.
+  .sheet-rolltemplate-ccdamage .sheet-cc-roll-card {
+    font-family: Georgia, serif;
+    background: #ece3cd;
+    color: #2b2018;
+    border: 1px solid #8a1c2b;
+    border-radius: 3px;
+    padding: 0.4rem 0.6rem;
+    min-width: 220px;
+
+    .sheet-character_name {
+      margin: 0 0 0.2rem;
+      font-size: 1rem;
+    }
+
+    .inlinerollresult {
+      background-color: transparent !important;
+      border: 0 transparent !important;
+      font-weight: inherit;
+      font-size: inherit;
+      padding: 0 !important;
+      pointer-events: none;
+    }
+
+    .sheet-cc-roll-header {
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      color: #8a1c2b;
+      margin-bottom: 0.2rem;
+    }
+
+    .sheet-cc-roll-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 0.5rem;
+      font-size: 0.9rem;
+    }
+
+    .sheet-cc-roll-complication {
+      color: #8a1c2b;
+      font-weight: bold;
     }
   }
