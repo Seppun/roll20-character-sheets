@@ -1,5 +1,7 @@
 //- views/_notes.pug
-//- Page 4 of the official sheet: Traits, History, Personal Agenda, Journal/Notes.
+//- Page 4 of the official sheet (Traits, History, Personal Agenda,
+//- Journal/Notes) plus Belongings and Talents from page 2, merged here
+//- since Combat otherwise held very little on its own.
 +tab({name: 'notes', container: 'article'})
   .cc-page.cc-notes
 
@@ -12,6 +14,22 @@
         +textarea({name: 'history'})
         .cc-banner(data-i18n='personal agenda') Personal Agenda
         +textarea({name: 'personal agenda'})
+
+    .cc-panel.cc-belongings
+      .cc-banner(data-i18n='belongings') Belongings
+      +textarea({name: 'belongings'})
+
+    .cc-panel.cc-talents
+      .cc-banner(data-i18n='talents') Talents
+      .cc-rep-table.cc-rep-talents
+        .cc-rep-header
+          span(data-i18n='name') Name
+          span(data-i18n='keywords') Keywords
+          span(data-i18n='description') Description
+        +fieldset({name: 'talent'})
+          +text({name: 'name'})
+          +text({name: 'keywords'})
+          +textarea({name: 'description'})
 
     .cc-panel.cc-journal
       .cc-banner(data-i18n='journal and notes') Journal/Notes
@@ -35,5 +53,25 @@
 
     .cc-journal textarea {
       min-height: 14rem;
+    }
+
+    .cc-rep-talents {
+      .cc-rep-header,
+      fieldset,
+      .repcontainer .repitem {
+        grid-template-columns: 1fr 1fr 3fr;
+      }
+
+      textarea {
+        min-height: 3rem;
+      }
+    }
+
+    .cc-belongings textarea {
+      min-height: 6rem;
+      width: 100%;
+      background: transparent;
+      border: 1px solid var(--cc-rule);
+      color: var(--cc-ink);
     }
   }

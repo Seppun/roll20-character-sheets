@@ -67,16 +67,30 @@
         .cc-banner(data-i18n='injuries') Injuries
         +textarea({name: 'injuries'}).cc-injuries
 
+    - const ccAttributes = ['agility', 'brawn', 'coordination', 'gravitas', 'insight', 'reason', 'will']
+    - const ccBonusDamageAttributes = ['brawn', 'insight', 'will']
     .cc-panel.cc-attributes
       .cc-banner(data-i18n='attributes') Attributes
-      .cc-attribute-row
-        +attribute('agility', false)
-        +attribute('brawn', true)
-        +attribute('coordination', false)
-        +attribute('gravitas', false)
-        +attribute('insight', true)
-        +attribute('reason', false)
-        +attribute('will', true)
+      table.cc-table.cc-attributes-table
+        thead
+          tr
+            th
+            each attr in ccAttributes
+              th(data-i18n=attr)= attr
+        tbody
+          tr
+            th(data-i18n='rating') Rating
+            each attr in ccAttributes
+              td
+                +number({name: `${attr} rating`}).cc-attribute-rating
+          tr
+            th(data-i18n='bonus damage') Bonus Damage
+            each attr in ccAttributes
+              td
+                if ccBonusDamageAttributes.includes(attr)
+                  +number({name: `${attr} bonus damage`, readonly: true}).cc-attribute-bonus-damage
+                else
+                  span.cc-attribute-bonus-damage.cc-disabled
 
     .cc-panel.cc-skills
       .cc-banner(data-i18n='skills') Skills
@@ -214,35 +228,33 @@
       }
     }
 
-    .cc-attribute-row {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 0.5rem;
-      text-align: center;
-    }
+    .cc-attributes-table {
+      th,
+      td {
+        text-align: center;
+        vertical-align: middle;
+      }
 
-    .cc-attribute {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.3rem;
-    }
+      th:first-child {
+        text-align: left;
+      }
 
-    .cc-attribute-rating,
-    .cc-attribute-bonus-damage {
-      width: 3rem;
-      text-align: center;
-      background: transparent;
-      border: 1px solid var(--cc-rule);
-      color: var(--cc-ink);
-      border-radius: 2px;
-    }
+      .cc-attribute-rating,
+      .cc-attribute-bonus-damage {
+        width: 3rem;
+        text-align: center;
+        background: transparent;
+        border: 1px solid var(--cc-rule);
+        color: var(--cc-ink);
+        border-radius: 2px;
+      }
 
-    .cc-attribute-bonus-damage.cc-disabled {
-      display: block;
-      width: 3rem;
-      height: 1.6rem;
-      border: 1px dashed var(--cc-parchment-dark);
+      .cc-attribute-bonus-damage.cc-disabled {
+        display: inline-block;
+        width: 3rem;
+        height: 1.6rem;
+        border: 1px dashed var(--cc-parchment-dark);
+      }
     }
 
     .cc-skills-table {

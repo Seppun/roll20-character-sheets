@@ -9,6 +9,7 @@
   "base armour": "Base Armour",
   "base power": "Base Power",
   "belongings": "Belongings",
+  "bonus damage": "Bonus Damage",
   "brawn": "brawn",
   "caste": "Caste",
   "category": "Category",
@@ -47,6 +48,7 @@
   "power rating": "Power Rating",
   "qualities": "Qualities",
   "ranks": "Ranks",
+  "rating": "Rating",
   "reach or range": "Reach or Range",
   "reason": "reason",
   "resilience": "resilience",
@@ -63,7 +65,6 @@
   "stress": "Stress",
   "survival": "survival",
   "tabs-cohors-cthulhu-character": "tabs-cohors-cthulhu-character",
-  "tabs-cohors-cthulhu-combat": "tabs-cohors-cthulhu-combat",
   "tabs-cohors-cthulhu-notes": "tabs-cohors-cthulhu-notes",
   "tabs-cohors-cthulhu-spells": "tabs-cohors-cthulhu-spells",
   "tactics": "tactics",
@@ -75,5 +76,6 @@
   "will": "will",
   "xp available": "Available",
   "xp earned": "Earned",
-  "xp spent": "Spent"
+  "xp spent": "Spent",
+  "tabs-cohors-cthulhu-combat": "tabs-cohors-cthulhu-combat"
 }

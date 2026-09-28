@@ -1305,20 +1305,16 @@ body .ui-dialog .tab-content .charsheet .cc-character .cc-injuries .cc-injuries 
   flex: 1;
   min-height: 4rem;
 }
-body .ui-dialog .tab-content .charsheet .cc-character .cc-attribute-row {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 0.5rem;
+body .ui-dialog .tab-content .charsheet .cc-character .cc-attributes-table th,
+body .ui-dialog .tab-content .charsheet .cc-character .cc-attributes-table td {
   text-align: center;
+  vertical-align: middle;
 }
-body .ui-dialog .tab-content .charsheet .cc-character .cc-attribute {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.3rem;
+body .ui-dialog .tab-content .charsheet .cc-character .cc-attributes-table th:first-child {
+  text-align: left;
 }
-body .ui-dialog .tab-content .charsheet .cc-character .cc-attribute-rating,
-body .ui-dialog .tab-content .charsheet .cc-character .cc-attribute-bonus-damage {
+body .ui-dialog .tab-content .charsheet .cc-character .cc-attributes-table .cc-attribute-rating,
+body .ui-dialog .tab-content .charsheet .cc-character .cc-attributes-table .cc-attribute-bonus-damage {
   width: 3rem;
   text-align: center;
   background: transparent;
@@ -1326,8 +1322,8 @@ body .ui-dialog .tab-content .charsheet .cc-character .cc-attribute-bonus-damage
   color: var(--cc-ink);
   border-radius: 2px;
 }
-body .ui-dialog .tab-content .charsheet .cc-character .cc-attribute-bonus-damage.cc-disabled {
-  display: block;
+body .ui-dialog .tab-content .charsheet .cc-character .cc-attributes-table .cc-attribute-bonus-damage.cc-disabled {
+  display: inline-block;
   width: 3rem;
   height: 1.6rem;
   border: 1px dashed var(--cc-parchment-dark);
@@ -1402,21 +1398,6 @@ body .ui-dialog .tab-content .charsheet .cc-character .cc-rep-armor fieldset,
 body .ui-dialog .tab-content .charsheet .cc-character .cc-rep-armor .repcontainer .repitem {
   grid-template-columns: 1.5fr 1fr 2.5fr;
 }
-body .ui-dialog .tab-content .charsheet .cc-combat .cc-rep-talents .cc-rep-header,
-body .ui-dialog .tab-content .charsheet .cc-combat .cc-rep-talents fieldset,
-body .ui-dialog .tab-content .charsheet .cc-combat .cc-rep-talents .repcontainer .repitem {
-  grid-template-columns: 1fr 1fr 3fr;
-}
-body .ui-dialog .tab-content .charsheet .cc-combat .cc-rep-talents textarea {
-  min-height: 3rem;
-}
-body .ui-dialog .tab-content .charsheet .cc-combat .cc-belongings textarea {
-  min-height: 6rem;
-  width: 100%;
-  background: transparent;
-  border: 1px solid var(--cc-rule);
-  color: var(--cc-ink);
-}
 body .ui-dialog .tab-content .charsheet .cc-spells .cc-spell-block {
   border: 1px solid var(--cc-rule);
   border-radius: 3px;
@@ -1440,6 +1421,21 @@ body .ui-dialog .tab-content .charsheet .cc-notes textarea {
 }
 body .ui-dialog .tab-content .charsheet .cc-notes .cc-journal textarea {
   min-height: 14rem;
+}
+body .ui-dialog .tab-content .charsheet .cc-notes .cc-rep-talents .cc-rep-header,
+body .ui-dialog .tab-content .charsheet .cc-notes .cc-rep-talents fieldset,
+body .ui-dialog .tab-content .charsheet .cc-notes .cc-rep-talents .repcontainer .repitem {
+  grid-template-columns: 1fr 1fr 3fr;
+}
+body .ui-dialog .tab-content .charsheet .cc-notes .cc-rep-talents textarea {
+  min-height: 3rem;
+}
+body .ui-dialog .tab-content .charsheet .cc-notes .cc-belongings textarea {
+  min-height: 6rem;
+  width: 100%;
+  background: transparent;
+  border: 1px solid var(--cc-rule);
+  color: var(--cc-ink);
 }
 body.sheet-darkmode {
   --cc-parchment: #2a2620;
