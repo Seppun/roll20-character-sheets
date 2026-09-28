@@ -1445,3 +1445,241 @@ body.sheet-darkmode {
   --cc-banner-text: #f2e9d8;
   --cc-rule: #7a1a28;
 }
+
+.cc-character .cc-truths-scars-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.3rem;
+}
+.cc-character .cc-truths-scars-grid .cc-truth,
+.cc-character .cc-truths-scars-grid .cc-scar {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--cc-rule);
+  color: var(--cc-ink);
+  padding: 0.15rem 0.1rem;
+}
+.cc-character .cc-vitals {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr 1fr 1.4fr;
+  gap: 0.75rem;
+  align-items: start;
+}
+.cc-character .cc-vitals-courage-fortune,
+.cc-character .cc-vitals-armor {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.cc-character .cc-stress-track {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 0.15rem;
+  --fillLeftSelectedColor: var(--cc-parchment);
+  --fillLeftUnselectedColor: var(--cc-rule);
+}
+.cc-character .cc-stress-track .fill-left__radio {
+  width: 0.9rem;
+  height: 0.9rem;
+  border: 1px solid var(--cc-rule);
+}
+.cc-character .cc-fortune-track {
+  --fillLeftSelectedColor: var(--cc-parchment);
+  --fillLeftUnselectedColor: var(--cc-rule);
+}
+.cc-character .cc-fortune-track .fill-left__radio {
+  width: 0.9rem;
+  height: 0.9rem;
+  border: 1px solid var(--cc-rule);
+}
+.cc-character .cc-injuries {
+  display: flex;
+  flex-direction: column;
+}
+.cc-character .cc-injuries .cc-injuries {
+  flex: 1;
+  min-height: 4rem;
+}
+.cc-character .cc-attributes-table th,
+.cc-character .cc-attributes-table td {
+  text-align: center;
+  vertical-align: middle;
+}
+.cc-character .cc-attributes-table th:first-child {
+  text-align: left;
+}
+.cc-character .cc-attributes-table .cc-attribute-rating,
+.cc-character .cc-attributes-table .cc-attribute-bonus-damage {
+  width: 3rem;
+  text-align: center;
+  background: transparent;
+  border: 1px solid var(--cc-rule);
+  color: var(--cc-ink);
+  border-radius: 2px;
+}
+.cc-character .cc-attributes-table .cc-attribute-bonus-damage.cc-disabled {
+  display: inline-block;
+  width: 3rem;
+  height: 1.6rem;
+  border: 1px dashed var(--cc-parchment-dark);
+}
+.cc-character .cc-skills-table th,
+.cc-character .cc-skills-table td {
+  vertical-align: middle;
+  min-height: 2.6rem;
+}
+.cc-character .cc-skills-table td.cc-skill-ranks-cell {
+  border-bottom: none;
+}
+.cc-character .cc-skills-table .cc-skill-ranks {
+  width: 3rem;
+  text-align: center;
+  background: transparent;
+  border: 1px solid var(--cc-rule);
+  color: var(--cc-ink);
+}
+.cc-character .cc-skills-table td.cc-skill-focuses {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: center;
+  align-items: center;
+  gap: 0.15rem 0.6rem;
+}
+.cc-character .cc-focus-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  font-size: 0.8rem;
+  font-style: italic;
+  white-space: nowrap;
+}
+.cc-character .cc-focus-item .cc-focus-checkbox {
+  margin: 0;
+  width: 0.8rem !important;
+  height: 0.8rem !important;
+  min-width: 0.8rem !important;
+  min-height: 0.8rem !important;
+  border: 1px solid var(--cc-rule) !important;
+  background: var(--cc-parchment) !important;
+}
+.cc-character .cc-focus-item .cc-focus-roll {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--cc-ink);
+  font-style: italic;
+  font-size: inherit;
+  font-family: inherit;
+  cursor: pointer;
+}
+.cc-character .cc-focus-item .cc-focus-roll:hover {
+  color: var(--cc-rule);
+  text-decoration: underline;
+}
+.cc-character .cc-focus-item .cc-focus-roll:before {
+  font-size: 0.75em;
+  opacity: 0.6;
+}
+.cc-character .cc-languages textarea {
+  min-height: 4rem;
+}
+.cc-character .cc-rep-weapons .cc-rep-header,
+.cc-character .cc-rep-weapons fieldset,
+.cc-character .cc-rep-weapons .repcontainer .repitem {
+  grid-template-columns: 1fr 1fr 1fr 2fr 0.6fr 1.4fr;
+}
+.cc-character .cc-rep-armor .cc-rep-header,
+.cc-character .cc-rep-armor fieldset,
+.cc-character .cc-rep-armor .repcontainer .repitem {
+  grid-template-columns: 1.5fr 1fr 2.5fr;
+}
+
+.cc-spells .cc-spell-block {
+  border: 1px solid var(--cc-rule);
+  border-radius: 3px;
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+.cc-spells .cc-spell-block textarea {
+  min-height: 3rem;
+  width: 100%;
+}
+
+.cc-notes .cc-field-group {
+  align-items: stretch;
+}
+.cc-notes .cc-traits,
+.cc-notes .cc-history-agenda {
+  flex: 1 1 45%;
+}
+.cc-notes textarea {
+  width: 100%;
+  min-height: 6rem;
+}
+.cc-notes .cc-journal textarea {
+  min-height: 14rem;
+}
+.cc-notes .cc-rep-talents .cc-rep-header,
+.cc-notes .cc-rep-talents fieldset,
+.cc-notes .cc-rep-talents .repcontainer .repitem {
+  grid-template-columns: 1fr 1fr 3fr;
+}
+.cc-notes .cc-rep-talents textarea {
+  min-height: 3rem;
+}
+.cc-notes .cc-belongings textarea {
+  min-height: 6rem;
+  width: 100%;
+  background: transparent;
+  border: 1px solid var(--cc-rule);
+  color: var(--cc-ink);
+}
+
+.sheet-rolltemplate-cc-skill {
+  font-family: var(--cc-body-font, Georgia, serif);
+  background: var(--cc-parchment, #ece3cd);
+  color: var(--cc-ink, #2b2018);
+  border: 1px solid var(--cc-rule, #8a1c2b);
+  border-radius: 3px;
+  padding: 0.4rem 0.6rem;
+  min-width: 220px;
+}
+.sheet-rolltemplate-cc-skill .cc-roll-header {
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--cc-rule, #8a1c2b);
+  margin-bottom: 0.2rem;
+}
+.sheet-rolltemplate-cc-skill .cc-roll-header .cc-roll-focus {
+  font-style: italic;
+  text-transform: none;
+  font-weight: normal;
+  margin-left: 0.3rem;
+}
+.sheet-rolltemplate-cc-skill .cc-roll-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+.sheet-rolltemplate-cc-skill .cc-roll-complication {
+  color: #8a1c2b;
+  font-weight: bold;
+}
+.sheet-rolltemplate-cc-skill .cc-roll-outcome {
+  margin-top: 0.3rem;
+  font-weight: bold;
+  text-align: center;
+  padding: 0.15rem;
+  border-radius: 2px;
+}
+.sheet-rolltemplate-cc-skill .cc-roll-pass {
+  background: #2f4a2f;
+  color: #e8f0e8;
+}
+.sheet-rolltemplate-cc-skill .cc-roll-fail {
+  background: #4a1414;
+  color: #f0e0e0;
+}

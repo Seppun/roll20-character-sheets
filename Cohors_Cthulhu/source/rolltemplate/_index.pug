@@ -1,0 +1,90 @@
+//- rolltemplate/_index.pug
+//- Chat output for a Focus roll (see initiateFocusRoll in
+//- views/_character.pug). Shows the dice, target number, successes,
+//- complications (if any), and pass/fail with Momentum generated.
++rolltemplate('cc-skill')
+  +characterLink
+  .cc-roll-header
+    span.cc-roll-skill {{skill}}
+    +templateConditionalDisplay('focus')
+      span.cc-roll-focus ({{focus}})
+  .cc-roll-body
+    +templateConditionalDisplay('dice_text')
+      .cc-roll-row
+        span(data-i18n='dice') Dice:
+        span {{dice_text}}
+    .cc-roll-row
+      span(data-i18n='target number') Target Number:
+      span {{target_number}}
+    .cc-roll-row
+      span(data-i18n='difficulty') Difficulty:
+      span {{difficulty}}
+    .cc-roll-row
+      span(data-i18n='successes') Successes:
+      span {{successes}}
+    +templateConditionalDisplay('complications')
+      .cc-roll-row.cc-roll-complication
+        span(data-i18n='complications') Complications:
+        span {{complications}}
+  +templateConditionalDisplay('passed')
+    .cc-roll-outcome.cc-roll-pass
+      span(data-i18n='roll passed') Passed - Momentum: {{bonus_momentum}}
+  +templateConditionalDisplay('failed')
+    .cc-roll-outcome.cc-roll-fail
+      span(data-i18n='roll failed') Failed
+
++scss('roll').
+  .sheet-rolltemplate-cc-skill {
+    font-family: var(--cc-body-font, Georgia, serif);
+    background: var(--cc-parchment, #ece3cd);
+    color: var(--cc-ink, #2b2018);
+    border: 1px solid var(--cc-rule, #8a1c2b);
+    border-radius: 3px;
+    padding: 0.4rem 0.6rem;
+    min-width: 220px;
+
+    .cc-roll-header {
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      color: var(--cc-rule, #8a1c2b);
+      margin-bottom: 0.2rem;
+
+      .cc-roll-focus {
+        font-style: italic;
+        text-transform: none;
+        font-weight: normal;
+        margin-left: 0.3rem;
+      }
+    }
+
+    .cc-roll-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 0.5rem;
+      font-size: 0.9rem;
+    }
+
+    .cc-roll-complication {
+      color: #8a1c2b;
+      font-weight: bold;
+    }
+
+    .cc-roll-outcome {
+      margin-top: 0.3rem;
+      font-weight: bold;
+      text-align: center;
+      padding: 0.15rem;
+      border-radius: 2px;
+    }
+
+    .cc-roll-pass {
+      background: #2f4a2f;
+      color: #e8f0e8;
+    }
+
+    .cc-roll-fail {
+      background: #4a1414;
+      color: #f0e0e0;
+    }
+  }

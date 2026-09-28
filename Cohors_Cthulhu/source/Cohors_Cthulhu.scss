@@ -26,3 +26,11 @@ body {
     @include scss.dark;
   }
 }
+
+// Roll templates render in the chat pane, outside .ui-dialog .tab-content
+// .charsheet, so their styles must stay unnested - nesting sfc.roll under
+// .charsheet above would scope .sheet-rolltemplate-cc-skill to the sheet
+// only and it would never apply in chat. The roll template's own rules
+// use hardcoded fallback colors (var(--cc-rule, #8a1c2b) etc.) since the
+// --cc-* custom properties are only defined within the sheet's own DOM.
+@include sfc.roll;

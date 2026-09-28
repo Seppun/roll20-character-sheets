@@ -1,10 +1,14 @@
 //- components/_focus.pug
 //- One Focus entry within a skill's Focus list: a checkbox marking whether
-//- the player has learned that focus, plus a roller button (wired to the
-//- roll logic in a later stage) so a known focus can be clicked to roll.
+//- the player has learned that focus, plus a roller button that rolls a
+//- 2d20 test for skill+this focus (see initiateFocusRoll in
+//- views/_character.pug's +module block).
 mixin focusItem(skillName, focusName)
   - const slug = focusName.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
   span.cc-focus-item
     +checkbox({name: `${skillName} focus ${slug} known`}).cc-focus-checkbox
-    +roller({name: `${skillName} focus ${slug} roll`}).cc-focus-roll
+    +roller({
+      name: `${skillName} focus ${slug} roll`,
+      trigger: {triggeredFuncs: ['initiateFocusRoll']}
+    }).cc-focus-roll
       = focusName

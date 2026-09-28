@@ -46,10 +46,13 @@
           radioObj: {name: 'stress'},
           valueArray: Array.from({length: 20}, (_, i) => i + 1)
         }).cc-stress-track
+        .cc-field.cc-stress-max
+          span(data-i18n='stress max') Max
+          +number({name: 'stress max', readonly: true, trigger: {calculation: 'calcStressMax'}})
       .cc-vitals-courage-fortune
         .cc-field
           span(data-i18n='courage') Courage
-          +number({name: 'courage', readonly: true})
+          +number({name: 'courage', readonly: true, trigger: {calculation: 'calcCourage'}})
         .cc-field
           span(data-i18n='fortune') Fortune
           +fillLeft({
@@ -59,16 +62,23 @@
       .cc-vitals-armor
         .cc-field
           span(data-i18n='base armour') Base Armour
-          +number({name: 'base armour', readonly: true})
+          +number({name: 'base armour', readonly: true, trigger: {calculation: 'calcBaseArmour', affects: ['total_armor']}})
         .cc-field
           span(data-i18n='total armor') Total Armor
-          +number({name: 'total armor', readonly: true})
+          +number({name: 'total armor', readonly: true, trigger: {calculation: 'calcTotalArmor'}})
       .cc-vitals-injuries
         .cc-banner(data-i18n='injuries') Injuries
         +textarea({name: 'injuries'}).cc-injuries
 
     - const ccAttributes = ['agility', 'brawn', 'coordination', 'gravitas', 'insight', 'reason', 'will']
     - const ccBonusDamageAttributes = ['brawn', 'insight', 'will']
+    -
+      const ccRatingAffects = {
+        brawn: ['brawn_bonus_damage', 'base_armour', 'total_armor', 'stress_max'],
+        will: ['will_bonus_damage', 'courage', 'stress_max', 'power_rating'],
+        insight: ['insight_bonus_damage', 'power_rating'],
+        reason: ['power_rating'],
+      }
     .cc-panel.cc-attributes
       .cc-banner(data-i18n='attributes') Attributes
       table.cc-table.cc-attributes-table
@@ -82,13 +92,20 @@
             th(data-i18n='rating') Rating
             each attr in ccAttributes
               td
-                +number({name: `${attr} rating`}).cc-attribute-rating
+                +number({
+                  name: `${attr} rating`,
+                  trigger: ccRatingAffects[attr] ? {affects: ccRatingAffects[attr]} : undefined
+                }).cc-attribute-rating
           tr
             th(data-i18n='bonus damage') Bonus Damage
             each attr in ccAttributes
               td
                 if ccBonusDamageAttributes.includes(attr)
-                  +number({name: `${attr} bonus damage`, readonly: true}).cc-attribute-bonus-damage
+                  +number({
+                    name: `${attr} bonus damage`,
+                    readonly: true,
+                    trigger: {calculation: 'calcAttributeBonusDamage'}
+                  }).cc-attribute-bonus-damage
                 else
                   span.cc-attribute-bonus-damage.cc-disabled
 
@@ -109,7 +126,7 @@
           +skill('medicine', ['Contagion', 'Faith Healing', 'Field Treatment', 'Pharmacia', 'Surgery'])
           +skill('observation', ['Hearing', 'Instincts', 'Sight', 'Smell and Taste'])
           +skill('persuasion', ['Charm', 'Deception', 'Innuendo', 'Intimidation', 'Invocation', 'Negotiation', 'Rhetoric'])
-          +skill('resilience', ['Discipline', 'Fortitude', 'Immunity'])
+          +skill('resilience', ['Discipline', 'Fortitude', 'Immunity'], ['stress_max'])
           +skill('stealth', ['Concealment', 'Disguise', 'Escape Artistry', 'Lock Picking', 'Sleight of Hand', 'Sneak'])
           +skill('survival', ['Animal Handling', 'Boating', 'Foraging', 'Hunting', 'Mysticism', 'Navigation', 'Tracking', 'Woodcraft'])
           +skill('tactics', ['Cavalry', 'Infantry', 'Leadership', 'Navy', 'Omen Reading', 'Scouting'])
@@ -141,7 +158,7 @@
           span(data-i18n='qualities') Qualities
         +fieldset({name: 'armor'})
           +text({name: 'name'})
-          +number({name: 'resistance'})
+          +number({name: 'resistance', trigger: {affects: ['total_armor']}})
           +text({name: 'qualities'})
 
     .cc-field-group
@@ -153,13 +170,13 @@
         .cc-field-group
           .cc-field
             span(data-i18n='xp earned') Earned
-            +number({name: 'xp earned'})
+            +number({name: 'xp earned', trigger: {affects: ['xp_available']}})
           .cc-field
             span(data-i18n='xp spent') Spent
-            +number({name: 'xp spent'})
+            +number({name: 'xp spent', trigger: {affects: ['xp_available']}})
           .cc-field
             span(data-i18n='xp available') Available
-            +number({name: 'xp available', readonly: true})
+            +number({name: 'xp available', readonly: true, trigger: {calculation: 'calcXpAvailable'}})
 
 +scss.
   .cc-character {
@@ -352,3 +369,112 @@
       }
     }
   }
+
++module.
+  // Shared lookup table used by Bonus Damage, Base Armour, Courage, and
+  // (in views/_spells.pug) spellcasting Power Rating. Rulebook table:
+  // rating <=8 -> 0, 9 -> +1, 10-11 -> +2, 12-13 -> +3, 14-15 -> +4, 16+ -> +5.
+  const ccAttributeBonus = (rating) => {
+    const r = Number(rating) || 0;
+    return r <= 8 ? 0 : Math.ceil((r - 7) / 2);
+  };
+
+  const calcAttributeBonusDamage = ({trigger, attributes}) => {
+    const attrName = trigger.name.replace(/_bonus_damage$/, '');
+    return ccAttributeBonus(attributes[`${attrName}_rating`]);
+  };
+  k.registerFuncs({calcAttributeBonusDamage});
+
+  const calcBaseArmour = ({attributes}) => ccAttributeBonus(attributes.brawn_rating);
+  k.registerFuncs({calcBaseArmour});
+
+  const calcCourage = ({attributes}) => ccAttributeBonus(attributes.will_rating);
+  k.registerFuncs({calcCourage});
+
+  const calcTotalArmor = ({attributes}) => {
+    const base = ccAttributeBonus(attributes.brawn_rating);
+    const armorRows = attributes.repeating_armor || [];
+    const armorSum = armorRows.reduce((sum, row) => sum + (Number(row.resistance) || 0), 0);
+    return base + armorSum;
+  };
+  k.registerFuncs({calcTotalArmor});
+
+  // "Add your: Brawn + Resilience, or Will + Resilience (whichever is higher)."
+  const calcStressMax = ({attributes}) => {
+    const resilience = Number(attributes.resilience_ranks) || 0;
+    const brawn = Number(attributes.brawn_rating) || 0;
+    const will = Number(attributes.will_rating) || 0;
+    return Math.max(brawn, will) + resilience;
+  };
+  k.registerFuncs({calcStressMax});
+
+  const calcXpAvailable = ({attributes}) => {
+    return (Number(attributes.xp_earned) || 0) - (Number(attributes.xp_spent) || 0);
+  };
+  k.registerFuncs({calcXpAvailable});
+
+  // Rolling a Focus: 2d20 (plus any bought extra dice), target number =
+  // chosen Attribute + this Skill's ranks, crit on a die <= this skill's
+  // ranks (the focus always "applies" since this is a focus-specific
+  // roller), complication on a die within the chosen complication range.
+  const ccCapitalize = (s) => s.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+
+  const initiateFocusRoll = async ({trigger, attributes}) => {
+    const match = trigger.name.match(/^(.+)_focus_(.+)_roll$/);
+    if (!match) { return; }
+    const [, skill, focusSlug] = match;
+    const skillRanks = Number(attributes[`${skill}_ranks`]) || 0;
+
+    const attributeQuery = '?{Attribute' +
+      '|Agility,@{agility_rating}' +
+      '|Brawn,@{brawn_rating}' +
+      '|Coordination,@{coordination_rating}' +
+      '|Gravitas,@{gravitas_rating}' +
+      '|Insight,@{insight_rating}' +
+      '|Reason,@{reason_rating}' +
+      '|Will,@{will_rating}}';
+    const difficultyQuery = '?{Difficulty|1}';
+    const complicationQuery = '?{Complication range (1-5)|1}';
+    const bonusDiceQuery = '?{Additional d20s bought (0-3)|0}';
+
+    const roll = await startRoll(
+      '&{template:cc-skill} ' +
+      `{{character_name=@{character_name}}} ` +
+      `{{skill=${ccCapitalize(skill)}}} ` +
+      `{{focus=${ccCapitalize(focusSlug)}}} ` +
+      `{{attribute_choice=[[0+${attributeQuery}]]}} ` +
+      `{{difficulty=[[0+${difficultyQuery}]]}} ` +
+      `{{complication_range=[[0+${complicationQuery}]]}} ` +
+      `{{roll1=[[(2+${bonusDiceQuery})d20]]}}`
+    );
+
+    const attributeChoice = Number(roll.results.attribute_choice.result) || 0;
+    const difficulty = Number(roll.results.difficulty.result) || 1;
+    const complicationRange = Number(roll.results.complication_range.result) || 1;
+    const dice = roll.results.roll1.dice;
+
+    const targetNumber = attributeChoice + skillRanks;
+    const complicationThreshold = 21 - complicationRange;
+    const successCount = dice.filter((d) => d <= targetNumber).length +
+      dice.filter((d) => d <= skillRanks).length;
+    const complicationCount = dice.filter((d) => d >= complicationThreshold).length;
+    const passed = successCount >= difficulty;
+
+    const overrides = {
+      target_number: targetNumber,
+      successes: successCount,
+      dice_text: dice.join(', '),
+    };
+    if (passed) {
+      overrides.passed = 1;
+      overrides.bonus_momentum = Math.max(0, successCount - difficulty);
+    } else {
+      overrides.failed = 1;
+    }
+    if (complicationCount > 0) {
+      overrides.complications = complicationCount;
+    }
+
+    finishRoll(roll.rollId, overrides);
+  };
+  k.registerFuncs({initiateFocusRoll});

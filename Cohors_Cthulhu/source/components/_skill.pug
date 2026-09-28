@@ -2,11 +2,16 @@
 //- One row of the Skills table: fixed skill name, a Ranks input, and the
 //- rulebook's list of Focuses for that skill, each with a checkbox for
 //- whether the player has learned it and a roller button to roll it.
-mixin skill(name, focuses)
+//- extraAffects lets a specific skill's Ranks feed a derived stat beyond
+//- the roll itself (only Resilience needs this, for Stress Max).
+mixin skill(name, focuses, extraAffects)
   tr.cc-skill-row
     th(data-i18n=name)= name
     td.cc-skill-ranks-cell
-      +number({name: `${name} ranks`}).cc-skill-ranks
+      +number({
+        name: `${name} ranks`,
+        trigger: extraAffects ? {affects: extraAffects} : undefined
+      }).cc-skill-ranks
     td.cc-skill-focuses
       each focus in focuses
         +focusItem(name, focus)

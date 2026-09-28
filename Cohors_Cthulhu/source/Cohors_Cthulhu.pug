@@ -11,6 +11,8 @@ main#main
   +tabs({name: 'cohors-cthulhu', defaultActiveTab: 'character'})
     include ./views/_index.pug
 
+include ./rolltemplate/_index.pug
+
 +kscript
     | k.sheetName = "CohorsCthulhu";
     | k.version = "0.1.0";

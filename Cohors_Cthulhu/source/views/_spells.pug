@@ -10,7 +10,10 @@
       .cc-field-group
         .cc-field
           span(data-i18n='spellcasting type') Spellcasting Type
-          +select({name: 'spellcasting type'})
+          +select({
+            name: 'spellcasting type',
+            trigger: {affects: ['spellcasting_attribute', 'base_power', 'power_rating']}
+          })
             +option({value: ''})
               | Select One
             +option({value: 'traditional'})
@@ -23,19 +26,21 @@
           span(data-i18n='magical tradition') Magical Tradition
           +text({name: 'magical tradition'})
         .cc-field
+          //- Not a free choice: Traditional casters use Insight, Research
+          //- casters use Reason, Dabblers use Will - fixed by RAW, so this
+          //- is derived from Spellcasting Type rather than user-selected.
           span(data-i18n='spellcasting attribute') Spellcasting Attribute
-          +select({name: 'spellcasting attribute'})
-            +option({value: ''})
-              | Select One
-            each attr in ['Agility', 'Brawn', 'Coordination', 'Gravitas', 'Insight', 'Reason', 'Will']
-              +option({value: attr.toLowerCase()})
-                = attr
+          +text({
+            name: 'spellcasting attribute',
+            readonly: true,
+            trigger: {calculation: 'calcSpellcastingAttribute', affects: ['power_rating']}
+          })
         .cc-field
           span(data-i18n='power rating') Power Rating
-          +number({name: 'power rating', readonly: true})
+          +number({name: 'power rating', readonly: true, trigger: {calculation: 'calcPowerRating'}})
         .cc-field
           span(data-i18n='base power') Base Power
-          +number({name: 'base power', readonly: true})
+          +number({name: 'base power', readonly: true, trigger: {calculation: 'calcBasePower', affects: ['power_rating']}})
 
     .cc-panel.cc-spell-list
       .cc-banner(data-i18n='spells') Spells
@@ -81,3 +86,35 @@
       }
     }
   }
+
++module.
+  // Traditional casters use Insight, Research casters use Reason,
+  // Dabblers use Will - fixed by spellcasting type, not a free choice.
+  const calcSpellcastingAttribute = ({attributes}) => {
+    const type = attributes.spellcasting_type;
+    if (type === 'traditional') { return 'Insight'; }
+    if (type === 'research') { return 'Reason'; }
+    if (type === 'dabbling') { return 'Will'; }
+    return '';
+  };
+  k.registerFuncs({calcSpellcastingAttribute});
+
+  // Base Power: 2 for Traditional/Research, 1 for Dabbling.
+  const calcBasePower = ({attributes}) => {
+    const type = attributes.spellcasting_type;
+    if (type === 'dabbling') { return 1; }
+    if (type === 'traditional' || type === 'research') { return 2; }
+    return 0;
+  };
+  k.registerFuncs({calcBasePower});
+
+  // Power Rating = Base Power + ccAttributeBonus(casting attribute rating).
+  // ccAttributeBonus is defined in views/_character.pug's +module block -
+  // both end up in the same sheet-worker script scope.
+  const calcPowerRating = ({attributes}) => {
+    const base = Number(attributes.base_power) || 0;
+    const attr = (attributes.spellcasting_attribute || '').toLowerCase();
+    const rating = attr ? attributes[`${attr}_rating`] : 0;
+    return base + ccAttributeBonus(rating);
+  };
+  k.registerFuncs({calcPowerRating});
