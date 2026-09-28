@@ -697,15 +697,15 @@
   <h4 class="character_name">{{character_name}}</h4>{{/character_id}}{{/character_name}}
   <div class="cc-roll-header"><span class="cc-roll-skill">{{skill}}</span>{{#focus}}<span class="cc-roll-focus">({{focus}})</span>{{/focus}}
   </div>
-  <div class="cc-roll-body">{{#dice_text}}
-    <div class="cc-roll-row"><span>Dice:</span><span>{{dice_text}}</span></div>{{/dice_text}}
-    <div class="cc-roll-row"><span>Target Number:</span><span>{{target_number}}</span></div>
+  <div class="cc-roll-body">{{#computed::dice_text}}
+    <div class="cc-roll-row"><span>Dice:</span><span>{{computed::dice_text}}</span></div>{{/computed::dice_text}}
+    <div class="cc-roll-row"><span>Target Number:</span><span>{{computed::target_number}}</span></div>
     <div class="cc-roll-row"><span>Difficulty:</span><span>{{difficulty}}</span></div>
-    <div class="cc-roll-row"><span>Successes:</span><span>{{successes}}</span></div>{{#complications}}
-    <div class="cc-roll-row cc-roll-complication"><span>Complications:</span><span>{{complications}}</span></div>{{/complications}}
-  </div>{{#passed}}
-  <div class="cc-roll-outcome cc-roll-pass"><span>Passed - Momentum: {{bonus_momentum}}</span></div>{{/passed}}{{#failed}}
-  <div class="cc-roll-outcome cc-roll-fail"><span>Failed</span></div>{{/failed}}
+    <div class="cc-roll-row"><span>Successes:</span><span>{{computed::successes}}</span></div>{{#computed::complications}}
+    <div class="cc-roll-row cc-roll-complication"><span>Complications:</span><span>{{computed::complications}}</span></div>{{/computed::complications}}
+  </div>{{#computed::passed}}
+  <div class="cc-roll-outcome cc-roll-pass"><span>Passed - Momentum: {{computed::bonus_momentum}}</span></div>{{/computed::passed}}{{#computed::failed}}
+  <div class="cc-roll-outcome cc-roll-fail"><span>Failed</span></div>{{/computed::failed}}
 </rolltemplate>
 <script type="text/worker">const k = (function(){
   const kFuncs = {};

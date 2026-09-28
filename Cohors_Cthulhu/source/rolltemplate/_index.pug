@@ -9,27 +9,35 @@
     +templateConditionalDisplay('focus')
       span.cc-roll-focus ({{focus}})
   .cc-roll-body
-    +templateConditionalDisplay('dice_text')
+    //- Fields we only ever set via finishRoll's overrides (never part of
+    //- the initial roll string's dice/query math) must be referenced here
+    //- as computed::fieldname, both in {{}} output and in conditional
+    //- {{#..}} sections - plain {{fieldname}} shows the ORIGINAL value of
+    //- the [[0]] placeholder from startRoll, ignoring the override
+    //- entirely. Confirmed against the proven pattern in this repo's
+    //- Achtung!_Cthulhu_2d20 sheet, which does exactly this. difficulty is
+    //- read from roll.results but never overridden, so it stays plain.
+    +templateConditionalDisplay('computed::dice_text')
       .cc-roll-row
         span Dice:
-        span {{dice_text}}
+        span {{computed::dice_text}}
     .cc-roll-row
       span Target Number:
-      span {{target_number}}
+      span {{computed::target_number}}
     .cc-roll-row
       span Difficulty:
       span {{difficulty}}
     .cc-roll-row
       span Successes:
-      span {{successes}}
-    +templateConditionalDisplay('complications')
+      span {{computed::successes}}
+    +templateConditionalDisplay('computed::complications')
       .cc-roll-row.cc-roll-complication
         span Complications:
-        span {{complications}}
-  +templateConditionalDisplay('passed')
+        span {{computed::complications}}
+  +templateConditionalDisplay('computed::passed')
     .cc-roll-outcome.cc-roll-pass
-      span Passed - Momentum: {{bonus_momentum}}
-  +templateConditionalDisplay('failed')
+      span Passed - Momentum: {{computed::bonus_momentum}}
+  +templateConditionalDisplay('computed::failed')
     .cc-roll-outcome.cc-roll-fail
       span Failed
 
