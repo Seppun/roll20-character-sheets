@@ -1290,7 +1290,7 @@ body .ui-dialog .tab-content .charsheet .cc-character .cc-footer {
   opacity: 0.6;
 }
 body .ui-dialog .tab-content .charsheet .cc-character .cc-build-css::after {
-  content: "CSS build: 2026-09-28 14:47:13 UTC";
+  content: "CSS build: 2026-09-28 14:58:32 UTC";
 }
 body .ui-dialog .tab-content .charsheet .cc-character .cc-truths-scars-grid {
   display: grid;
@@ -1534,7 +1534,7 @@ body.sheet-darkmode {
   opacity: 0.6;
 }
 .cc-character .cc-build-css::after {
-  content: "CSS build: 2026-09-28 14:47:13 UTC";
+  content: "CSS build: 2026-09-28 14:58:32 UTC";
 }
 .cc-character .cc-truths-scars-grid {
   display: grid;
@@ -1769,6 +1769,10 @@ body.sheet-darkmode {
   padding: 0.4rem 0.6rem;
   min-width: 220px;
 }
+.sheet-rolltemplate-ccskill .sheet-character_name {
+  margin: 0 0 0.2rem;
+  font-size: 1rem;
+}
 .sheet-rolltemplate-ccskill .inlinerollresult {
   background-color: transparent !important;
   border: 0 transparent !important;
@@ -1777,41 +1781,41 @@ body.sheet-darkmode {
   padding: 0 !important;
   pointer-events: none;
 }
-.sheet-rolltemplate-ccskill .cc-roll-header {
+.sheet-rolltemplate-ccskill .sheet-cc-roll-header {
   font-weight: bold;
   text-transform: uppercase;
   letter-spacing: 0.03em;
   color: #8a1c2b;
   margin-bottom: 0.2rem;
 }
-.sheet-rolltemplate-ccskill .cc-roll-header .cc-roll-focus {
+.sheet-rolltemplate-ccskill .sheet-cc-roll-header .sheet-cc-roll-focus {
   font-style: italic;
   text-transform: none;
   font-weight: normal;
   margin-left: 0.3rem;
 }
-.sheet-rolltemplate-ccskill .cc-roll-row {
+.sheet-rolltemplate-ccskill .sheet-cc-roll-row {
   display: flex;
   justify-content: space-between;
   gap: 0.5rem;
   font-size: 0.9rem;
 }
-.sheet-rolltemplate-ccskill .cc-roll-complication {
+.sheet-rolltemplate-ccskill .sheet-cc-roll-complication {
   color: #8a1c2b;
   font-weight: bold;
 }
-.sheet-rolltemplate-ccskill .cc-roll-outcome {
+.sheet-rolltemplate-ccskill .sheet-cc-roll-outcome {
   margin-top: 0.3rem;
   font-weight: bold;
   text-align: center;
   padding: 0.15rem;
   border-radius: 2px;
 }
-.sheet-rolltemplate-ccskill .cc-roll-pass {
+.sheet-rolltemplate-ccskill .sheet-cc-roll-pass {
   background: #2f4a2f;
   color: #e8f0e8;
 }
-.sheet-rolltemplate-ccskill .cc-roll-fail {
+.sheet-rolltemplate-ccskill .sheet-cc-roll-fail {
   background: #4a1414;
   color: #f0e0e0;
 }

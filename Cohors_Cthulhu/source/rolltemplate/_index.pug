@@ -52,11 +52,17 @@
   // CSS through a stricter, older filter than the main sheet - CSS custom
   // properties (var()) are not on its allowlist and get the whole
   // declaration silently dropped. Plain hardcoded colors only in here.
-  // Template name is deliberately hyphen-free ("ccskill" not "cc-skill") -
-  // every proven-working roll template in this repo's reference sheets
-  // (Achtung!_Cthulhu_2d20's skill/damage/talent/spell/weapon) uses a
-  // single word, and a hyphenated name is an untested edge case for how
-  // Roll20 builds/matches the sheet-rolltemplate-<name> wrapper class.
+  //
+  // Roll20 also auto-prepends "sheet-" to every class used INSIDE a roll
+  // template at render time - confirmed by inspecting the live rendered
+  // chat DOM, where our own class="cc-roll-header" came out as
+  // class="sheet-cc-roll-header", class="character_name" (from the
+  // characterLink mixin) came out as class="sheet-character_name", etc.
+  // Every selector below other than the rolltemplate's own
+  // sheet-rolltemplate-<name> wrapper (which we author with that prefix
+  // ourselves - Roll20 doesn't add a second one) and .inlinerollresult
+  // (Roll20's own built-in class, never prefixed) needs a matching
+  // "sheet-" prefix or it silently never matches anything.
   .sheet-rolltemplate-ccskill {
     font-family: Georgia, serif;
     background: #ece3cd;
@@ -65,6 +71,11 @@
     border-radius: 3px;
     padding: 0.4rem 0.6rem;
     min-width: 220px;
+
+    .sheet-character_name {
+      margin: 0 0 0.2rem;
+      font-size: 1rem;
+    }
 
     // computed::fieldname values render as Roll20's standard inline-roll
     // spans (hoverable, with their own tooltip breakdown), which come
@@ -80,14 +91,14 @@
       pointer-events: none;
     }
 
-    .cc-roll-header {
+    .sheet-cc-roll-header {
       font-weight: bold;
       text-transform: uppercase;
       letter-spacing: 0.03em;
       color: #8a1c2b;
       margin-bottom: 0.2rem;
 
-      .cc-roll-focus {
+      .sheet-cc-roll-focus {
         font-style: italic;
         text-transform: none;
         font-weight: normal;
@@ -95,19 +106,19 @@
       }
     }
 
-    .cc-roll-row {
+    .sheet-cc-roll-row {
       display: flex;
       justify-content: space-between;
       gap: 0.5rem;
       font-size: 0.9rem;
     }
 
-    .cc-roll-complication {
+    .sheet-cc-roll-complication {
       color: #8a1c2b;
       font-weight: bold;
     }
 
-    .cc-roll-outcome {
+    .sheet-cc-roll-outcome {
       margin-top: 0.3rem;
       font-weight: bold;
       text-align: center;
@@ -115,12 +126,12 @@
       border-radius: 2px;
     }
 
-    .cc-roll-pass {
+    .sheet-cc-roll-pass {
       background: #2f4a2f;
       color: #e8f0e8;
     }
 
-    .cc-roll-fail {
+    .sheet-cc-roll-fail {
       background: #4a1414;
       color: #f0e0e0;
     }
