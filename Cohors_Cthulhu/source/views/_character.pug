@@ -64,6 +64,17 @@
     'Sling': {focus: 'Thrown Weapons', reach_range: 'Long', damage_effects: '3, Stun', size: 'Minor', qualities: 'Inaccurate, Subtle, Special'},
   };
   const ccWeaponProfiles = Object.assign({}, ccMeleeWeapons, ccRangedWeapons);
+
+//- Armor profiles from the rulebook's Chapter 7 (Armor table). Same
+//- single-source-of-truth approach and same "write out +option() calls
+//- individually" caveat as ccWeaponProfiles above.
+-
+  const ccArmorProfiles = {
+    'Chainmail / Lorica Hamata': {resistance: '2', qualities: 'Uncomfortable'},
+    'Leather Armor': {resistance: '1', qualities: ''},
+    'Lorica Segmentata': {resistance: '3', qualities: 'Uncomfortable'},
+    'Lorica Squamata': {resistance: '3', qualities: 'Heavy, Uncomfortable'},
+  };
 +tab({name: 'character', container: 'article', button: {content: 'Character'}})
   .cc-page.cc-character
 
@@ -292,7 +303,22 @@
           span Resistance
           span Qualities
         +fieldset({name: 'armor'})
-          +text({name: 'name'})
+          //- Options written out individually, not via an `each` loop -
+          //- see the comment above ccWeaponProfiles for why.
+          +select({
+            name: 'name',
+            trigger: {triggeredFuncs: ['ccApplyArmorPreset']}
+          })
+            +option({value: ''})
+              | Custom / Other
+            +option({value: 'Chainmail / Lorica Hamata'})
+              | Chainmail / Lorica Hamata
+            +option({value: 'Leather Armor'})
+              | Leather Armor
+            +option({value: 'Lorica Segmentata'})
+              | Lorica Segmentata
+            +option({value: 'Lorica Squamata'})
+              | Lorica Squamata
           +number({name: 'resistance', trigger: {affects: ['total_armor']}})
           +text({name: 'qualities'})
 
@@ -595,9 +621,10 @@
   }
 
 +module.
-  // Embedded from the same ccWeaponProfiles object (declared at the top of
-  // this file, pug compile-time) that generated the Name dropdown's
-  // options, so the two never drift out of sync.
+  // Embedded from the ccWeaponProfiles object declared at the top of this
+  // file (pug compile-time) - the Name dropdown's +option() values below
+  // must be kept matching this object's keys by hand (see the comment
+  // above ccWeaponProfiles for why they can't just be generated from it).
   const ccWeaponProfiles = !{JSON.stringify(ccWeaponProfiles)};
 
   // Selecting a weapon from the Name dropdown fills in its stock Focus/
@@ -615,6 +642,22 @@
     });
   };
   k.registerFuncs({ccApplyWeaponPreset});
+
+  // Same pattern as ccApplyWeaponPreset/ccWeaponProfiles above, for the
+  // Armor table's Name dropdown. Setting resistance here still triggers
+  // its own {affects: ['total_armor']} cascade normally (the attribute
+  // proxy re-checks a field's own cascade whenever it's set, regardless
+  // of what set it), so Total Armor stays correct without extra wiring.
+  const ccArmorProfiles = !{JSON.stringify(ccArmorProfiles)};
+  const ccApplyArmorPreset = ({trigger, attributes}) => {
+    const profile = ccArmorProfiles[attributes[trigger.name]];
+    if (!profile) { return; }
+    const [section, rowID] = k.parseRepeatName(trigger.name);
+    Object.keys(profile).forEach((field) => {
+      attributes[`${section}_${rowID}_${field}`] = profile[field];
+    });
+  };
+  k.registerFuncs({ccApplyArmorPreset});
 
   // Shared lookup table used by Bonus Damage, Base Armour, Courage, and
   // (in views/_spells.pug) spellcasting Power Rating. Rulebook table:
