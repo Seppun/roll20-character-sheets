@@ -2172,15 +2172,19 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
   // Cohors Cthulhu damage is rolled with special 6-sided Challenge Dice.
   // This sheet has no access to physical Challenge Dice, so damage is
   // rolled as plain d6s and converted face-by-face using the rulebook's
-  // own "If you don't have Challenge Dice" fallback table: 1->1 pip,
-  // 2->2 pips, 3/4->blank, 5/6->1 pip plus an Effect symbol.
+  // own "If you don't have Challenge Dice" fallback table: 1->1 pip (a
+  // dagger face), 2->2 pips (a crossed-daggers face), 3/4->blank, 5/6->1
+  // pip plus an Effect (the Cthulhu-face symbol). Symbols here mirror
+  // that table's own iconography (dagger/crossed daggers/dash/Cthulhu
+  // face) rather than a generic pip count, so the roll template reads the
+  // same way the physical dice would.
   const ccChallengeDieFromD6 = (d6) => {
     switch (Number(d6)) {
-      case 1: return {pips: 1, effect: false, symbol: '●'};
-      case 2: return {pips: 2, effect: false, symbol: '●●'};
-      case 5: return {pips: 1, effect: true, symbol: '●✦'};
-      case 6: return {pips: 1, effect: true, symbol: '●✦'};
-      default: return {pips: 0, effect: false, symbol: '○'};
+      case 1: return {pips: 1, effect: false, symbol: '†'};
+      case 2: return {pips: 2, effect: false, symbol: '‡'};
+      case 5: return {pips: 1, effect: true, symbol: '🐙'};
+      case 6: return {pips: 1, effect: true, symbol: '🐙'};
+      default: return {pips: 0, effect: false, symbol: '–'};
     }
   };
   
