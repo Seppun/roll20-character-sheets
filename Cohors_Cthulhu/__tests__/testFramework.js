@@ -1891,7 +1891,7 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
   // rating <=8 -> 0, 9 -> +1, 10-11 -> +2, 12-13 -> +3, 14-15 -> +4, 16+ -> +5.
   const ccAttributeBonus = (rating) => {
     const r = Number(rating) || 0;
-    return r <= 8 ? 0 : Math.ceil((r - 7) / 2);
+    return r <= 8 ? 0 : Math.min(5, Math.ceil((r - 7) / 2));
   };
   
   const calcAttributeBonusDamage = ({trigger, attributes}) => {

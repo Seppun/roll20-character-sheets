@@ -252,8 +252,15 @@
       display: grid;
       grid-template-columns: repeat(10, 1fr);
       gap: 0.15rem;
-      --fillLeftSelectedColor: var(--cc-parchment);
-      --fillLeftUnselectedColor: var(--cc-rule);
+      // k-scaffold's fillLeft mixin colors every box --fillLeftSelectedColor
+      // by default, then overrides everything AFTER the checked box (in DOM/
+      // numeric order) to --fillLeftUnselectedColor - so the checked box and
+      // everything below it stays "selected"-colored, and everything above
+      // it becomes "unselected"-colored. --cc-rule (dark) must be the
+      // selected color and --cc-parchment (light) the unselected one, or the
+      // filled/empty look is inverted.
+      --fillLeftSelectedColor: var(--cc-rule);
+      --fillLeftUnselectedColor: var(--cc-parchment);
 
       .fill-left__radio {
         width: 0.9rem;
@@ -263,8 +270,8 @@
     }
 
     .cc-fortune-track {
-      --fillLeftSelectedColor: var(--cc-parchment);
-      --fillLeftUnselectedColor: var(--cc-rule);
+      --fillLeftSelectedColor: var(--cc-rule);
+      --fillLeftUnselectedColor: var(--cc-parchment);
 
       .fill-left__radio {
         width: 0.9rem;
@@ -454,7 +461,7 @@
   // rating <=8 -> 0, 9 -> +1, 10-11 -> +2, 12-13 -> +3, 14-15 -> +4, 16+ -> +5.
   const ccAttributeBonus = (rating) => {
     const r = Number(rating) || 0;
-    return r <= 8 ? 0 : Math.ceil((r - 7) / 2);
+    return r <= 8 ? 0 : Math.min(5, Math.ceil((r - 7) / 2));
   };
 
   const calcAttributeBonusDamage = ({trigger, attributes}) => {
