@@ -1,22 +1,437 @@
 
 <button name="act_k-network-call" hidden="" type="action">
 </button>
-<div class="cohors-cthulhu-sheet">
-  <h1>Cohors Cthulhu</h1>
-  <p>Scaffold stage 1 - build pipeline check.</p>
-</div><!-- Sheet Worker Scripts -->
+<input name="attr_sheet_version" value="0.1.0" type="hidden" title="@{sheet_version}"/>
+<main id="main"><!-- sectionName:cohors-cthulhu -->
+  <input name="attr_cohors_cthulhu_tab" value="nav-tabs-cohors-cthulhu--character" type="hidden" title="@{cohors_cthulhu_tab}"/>
+  <div class="tabs tabs--cohors-cthulhu">
+    <nav class="tabs__header tabs--cohors-cthulhu__header">
+      <ul class="tabs__nav-list">
+        <li class="tabs__nav-item">
+          <button class="tabs__button tabs--cohors-cthulhu__button tabs--cohors-cthulhu__button--character" name="act_nav-tabs-cohors-cthulhu--character" data-container-button="cohors-cthulhu" data-button="character" data-i18n="tabs-cohors-cthulhu-character" type="action" data-container-tab="cohors-cthulhu" data-tab="character">
+          </button>
+        </li>
+        <li class="tabs__nav-item">
+          <button class="tabs__button tabs--cohors-cthulhu__button tabs--cohors-cthulhu__button--combat" name="act_nav-tabs-cohors-cthulhu--combat" data-container-button="cohors-cthulhu" data-button="combat" data-i18n="tabs-cohors-cthulhu-combat" type="action" data-container-tab="cohors-cthulhu" data-tab="combat">
+          </button>
+        </li>
+        <li class="tabs__nav-item">
+          <button class="tabs__button tabs--cohors-cthulhu__button tabs--cohors-cthulhu__button--spells" name="act_nav-tabs-cohors-cthulhu--spells" data-container-button="cohors-cthulhu" data-button="spells" data-i18n="tabs-cohors-cthulhu-spells" type="action" data-container-tab="cohors-cthulhu" data-tab="spells">
+          </button>
+        </li>
+        <li class="tabs__nav-item">
+          <button class="tabs__button tabs--cohors-cthulhu__button tabs--cohors-cthulhu__button--notes" name="act_nav-tabs-cohors-cthulhu--notes" data-container-button="cohors-cthulhu" data-button="notes" data-i18n="tabs-cohors-cthulhu-notes" type="action" data-container-tab="cohors-cthulhu" data-tab="notes">
+          </button>
+        </li>
+      </ul>
+    </nav>
+    <div class="tabs__body tabs--cohors-cthulhu__body">
+      <article class="tabs__container tabs--cohors-cthulhu__container tabs--cohors-cthulhu__container--character" data-container-tab="cohors-cthulhu" data-tab="character">
+  <div class="cc-page cc-character">
+    <div class="cc-banner">Cohors Cthulhu</div>
+    <div class="cc-field-group">
+      <div class="cc-field"><span data-i18n="name &amp; pronoun">Name & Pronoun</span>
+        <input name="attr_name_pronoun" type="text" title="@{name_pronoun}"/>
+      </div>
+      <div class="cc-field"><span data-i18n="culture">Culture</span>
+        <input name="attr_culture" type="text" title="@{culture}"/>
+      </div>
+      <div class="cc-field"><span data-i18n="caste">Caste</span>
+        <input name="attr_caste" type="text" title="@{caste}"/>
+      </div>
+      <div class="cc-field"><span data-i18n="wealth">Wealth</span>
+        <input name="attr_wealth" type="text" title="@{wealth}"/>
+      </div>
+    </div>
+    <div class="cc-field-group">
+      <div class="cc-field"><span data-i18n="archetype">Archetype</span>
+        <input name="attr_archetype" type="text" title="@{archetype}"/>
+      </div>
+      <div class="cc-field"><span data-i18n="background">Background</span>
+        <input name="attr_background" type="text" title="@{background}"/>
+      </div>
+      <div class="cc-field"><span data-i18n="characteristic">Characteristic</span>
+        <input name="attr_characteristic" type="text" title="@{characteristic}"/>
+      </div>
+    </div>
+    <div class="cc-panel cc-truths-scars">
+      <div class="cc-banner" data-i18n="personal truths and scars">Personal Truths &amp; Scars</div>
+      <div class="cc-truths-scars-grid">
+        <input class="cc-truth" name="attr_truth_1" type="text" title="@{truth_1}"/>
+        <input class="cc-truth" name="attr_truth_2" type="text" title="@{truth_2}"/>
+        <input class="cc-truth" name="attr_truth_3" type="text" title="@{truth_3}"/>
+        <input class="cc-truth" name="attr_truth_4" type="text" title="@{truth_4}"/>
+        <input class="cc-truth" name="attr_truth_5" type="text" title="@{truth_5}"/>
+        <input class="cc-scar" name="attr_scar_1" type="text" title="@{scar_1}"/>
+        <input class="cc-scar" name="attr_scar_2" type="text" title="@{scar_2}"/>
+        <input class="cc-scar" name="attr_scar_3" type="text" title="@{scar_3}"/>
+        <input class="cc-scar" name="attr_scar_4" type="text" title="@{scar_4}"/>
+        <input class="cc-scar" name="attr_scar_5" type="text" title="@{scar_5}"/>
+      </div>
+    </div>
+    <div class="cc-panel cc-vitals">
+      <div class="cc-vitals-stress">
+        <div class="cc-banner" data-i18n="stress">Stress</div>
+        <div class="fill-left cc-stress-track">
+          <input class="fill-left__radio" name="attr_stress" value="0" type="hidden" title="@{stress}"/>
+          <input class="fill-left__radio" name="attr_stress" value="1" type="checkbox" title="@{stress}"/>
+          <input class="fill-left__radio" name="attr_stress" value="2" type="checkbox" title="@{stress}"/>
+          <input class="fill-left__radio" name="attr_stress" value="3" type="checkbox" title="@{stress}"/>
+          <input class="fill-left__radio" name="attr_stress" value="4" type="checkbox" title="@{stress}"/>
+          <input class="fill-left__radio" name="attr_stress" value="5" type="checkbox" title="@{stress}"/>
+          <input class="fill-left__radio" name="attr_stress" value="6" type="checkbox" title="@{stress}"/>
+          <input class="fill-left__radio" name="attr_stress" value="7" type="checkbox" title="@{stress}"/>
+          <input class="fill-left__radio" name="attr_stress" value="8" type="checkbox" title="@{stress}"/>
+          <input class="fill-left__radio" name="attr_stress" value="9" type="checkbox" title="@{stress}"/>
+          <input class="fill-left__radio" name="attr_stress" value="10" type="checkbox" title="@{stress}"/>
+          <input class="fill-left__radio" name="attr_stress" value="11" type="checkbox" title="@{stress}"/>
+          <input class="fill-left__radio" name="attr_stress" value="12" type="checkbox" title="@{stress}"/>
+          <input class="fill-left__radio" name="attr_stress" value="13" type="checkbox" title="@{stress}"/>
+          <input class="fill-left__radio" name="attr_stress" value="14" type="checkbox" title="@{stress}"/>
+          <input class="fill-left__radio" name="attr_stress" value="15" type="checkbox" title="@{stress}"/>
+          <input class="fill-left__radio" name="attr_stress" value="16" type="checkbox" title="@{stress}"/>
+          <input class="fill-left__radio" name="attr_stress" value="17" type="checkbox" title="@{stress}"/>
+          <input class="fill-left__radio" name="attr_stress" value="18" type="checkbox" title="@{stress}"/>
+          <input class="fill-left__radio" name="attr_stress" value="19" type="checkbox" title="@{stress}"/>
+          <input class="fill-left__radio" name="attr_stress" value="20" type="checkbox" title="@{stress}"/>
+        </div>
+      </div>
+      <div class="cc-vitals-side">
+        <div class="cc-field"><span data-i18n="base armour">Base Armour</span>
+          <input name="attr_base_armour" readonly="readonly" type="number" title="@{base_armour}"/>
+        </div>
+        <div class="cc-field"><span data-i18n="total armor">Total Armor</span>
+          <input name="attr_total_armor" readonly="readonly" type="number" title="@{total_armor}"/>
+        </div>
+        <div class="cc-field"><span data-i18n="courage">Courage</span>
+          <input name="attr_courage" readonly="readonly" type="number" title="@{courage}"/>
+        </div>
+        <div class="cc-field"><span data-i18n="fortune">Fortune</span>
+          <div class="fill-left cc-fortune-track">
+            <input class="fill-left__radio" name="attr_fortune" value="0" type="hidden" title="@{fortune}"/>
+            <input class="fill-left__radio" name="attr_fortune" value="1" type="checkbox" title="@{fortune}"/>
+            <input class="fill-left__radio" name="attr_fortune" value="2" type="checkbox" title="@{fortune}"/>
+            <input class="fill-left__radio" name="attr_fortune" value="3" type="checkbox" title="@{fortune}"/>
+            <input class="fill-left__radio" name="attr_fortune" value="4" type="checkbox" title="@{fortune}"/>
+            <input class="fill-left__radio" name="attr_fortune" value="5" type="checkbox" title="@{fortune}"/>
+          </div>
+        </div>
+      </div>
+      <div class="cc-vitals-injuries">
+        <div class="cc-banner" data-i18n="injuries">Injuries</div>
+        <textarea class="cc-injuries" name="attr_injuries" title="@{injuries}"></textarea>
+      </div>
+    </div>
+    <div class="cc-panel cc-attributes">
+      <div class="cc-banner" data-i18n="attributes">Attributes</div>
+      <div class="cc-attribute-row">
+        <div class="cc-attribute"><span class="cc-attribute-label" data-i18n="agility">agility</span>
+          <input class="cc-attribute-rating" name="attr_agility_rating" type="number" title="@{agility_rating}"/><span class="cc-attribute-bonus-damage cc-disabled"></span>
+        </div>
+        <div class="cc-attribute"><span class="cc-attribute-label" data-i18n="brawn">brawn</span>
+          <input class="cc-attribute-rating" name="attr_brawn_rating" type="number" title="@{brawn_rating}"/>
+          <input class="cc-attribute-bonus-damage" name="attr_brawn_bonus_damage" readonly="readonly" type="number" title="@{brawn_bonus_damage}"/>
+        </div>
+        <div class="cc-attribute"><span class="cc-attribute-label" data-i18n="coordination">coordination</span>
+          <input class="cc-attribute-rating" name="attr_coordination_rating" type="number" title="@{coordination_rating}"/><span class="cc-attribute-bonus-damage cc-disabled"></span>
+        </div>
+        <div class="cc-attribute"><span class="cc-attribute-label" data-i18n="gravitas">gravitas</span>
+          <input class="cc-attribute-rating" name="attr_gravitas_rating" type="number" title="@{gravitas_rating}"/><span class="cc-attribute-bonus-damage cc-disabled"></span>
+        </div>
+        <div class="cc-attribute"><span class="cc-attribute-label" data-i18n="insight">insight</span>
+          <input class="cc-attribute-rating" name="attr_insight_rating" type="number" title="@{insight_rating}"/>
+          <input class="cc-attribute-bonus-damage" name="attr_insight_bonus_damage" readonly="readonly" type="number" title="@{insight_bonus_damage}"/>
+        </div>
+        <div class="cc-attribute"><span class="cc-attribute-label" data-i18n="reason">reason</span>
+          <input class="cc-attribute-rating" name="attr_reason_rating" type="number" title="@{reason_rating}"/><span class="cc-attribute-bonus-damage cc-disabled"></span>
+        </div>
+        <div class="cc-attribute"><span class="cc-attribute-label" data-i18n="will">will</span>
+          <input class="cc-attribute-rating" name="attr_will_rating" type="number" title="@{will_rating}"/>
+          <input class="cc-attribute-bonus-damage" name="attr_will_bonus_damage" readonly="readonly" type="number" title="@{will_bonus_damage}"/>
+        </div>
+      </div>
+    </div>
+    <div class="cc-panel cc-skills">
+      <div class="cc-banner" data-i18n="skills">Skills</div>
+      <table class="cc-table cc-skills-table">
+        <thead>
+          <tr>
+            <th data-i18n="skill">Skill</th>
+            <th data-i18n="ranks">Ranks</th>
+            <th data-i18n="focuses">Focuses</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="cc-skill-row">
+            <th data-i18n="academia">academia</th>
+            <td>
+              <input class="cc-skill-ranks" name="attr_academia_ranks" type="number" title="@{academia_ranks}"/>
+            </td>
+            <td class="cc-skill-focuses">Finance, History, Linguistics, Philosophy, Religion</td>
+          </tr>
+          <tr class="cc-skill-row">
+            <th data-i18n="athletics">athletics</th>
+            <td>
+              <input class="cc-skill-ranks" name="attr_athletics_ranks" type="number" title="@{athletics_ranks}"/>
+            </td>
+            <td class="cc-skill-focuses">Climbing, Lifting, Physical Training, Running, Swimming</td>
+          </tr>
+          <tr class="cc-skill-row">
+            <th data-i18n="crafting">crafting</th>
+            <td>
+              <input class="cc-skill-ranks" name="attr_crafting_ranks" type="number" title="@{crafting_ranks}"/>
+            </td>
+            <td class="cc-skill-focuses">Armorsmithing, Cooking, Tailoring, Weaponsmithing</td>
+          </tr>
+          <tr class="cc-skill-row">
+            <th data-i18n="engineering">engineering</th>
+            <td>
+              <input class="cc-skill-ranks" name="attr_engineering_ranks" type="number" title="@{engineering_ranks}"/>
+            </td>
+            <td class="cc-skill-focuses">Architecture, Defenses, Demolition, Infrastructure, Siege Engines</td>
+          </tr>
+          <tr class="cc-skill-row">
+            <th data-i18n="fighting">fighting</th>
+            <td>
+              <input class="cc-skill-ranks" name="attr_fighting_ranks" type="number" title="@{fighting_ranks}"/>
+            </td>
+            <td class="cc-skill-focuses">Archery, Melee Weapons, Thrown Weapons, Unarmed, War Magic</td>
+          </tr>
+          <tr class="cc-skill-row">
+            <th data-i18n="medicine">medicine</th>
+            <td>
+              <input class="cc-skill-ranks" name="attr_medicine_ranks" type="number" title="@{medicine_ranks}"/>
+            </td>
+            <td class="cc-skill-focuses">Contagion, Faith Healing, Field Treatment, Pharmacia, Surgery</td>
+          </tr>
+          <tr class="cc-skill-row">
+            <th data-i18n="observation">observation</th>
+            <td>
+              <input class="cc-skill-ranks" name="attr_observation_ranks" type="number" title="@{observation_ranks}"/>
+            </td>
+            <td class="cc-skill-focuses">Hearing, Instincts, Sight, Smell and Taste</td>
+          </tr>
+          <tr class="cc-skill-row">
+            <th data-i18n="persuasion">persuasion</th>
+            <td>
+              <input class="cc-skill-ranks" name="attr_persuasion_ranks" type="number" title="@{persuasion_ranks}"/>
+            </td>
+            <td class="cc-skill-focuses">Charm, Deception, Innuendo, Intimidation, Invocation, Negotiation, Rhetoric</td>
+          </tr>
+          <tr class="cc-skill-row">
+            <th data-i18n="resilience">resilience</th>
+            <td>
+              <input class="cc-skill-ranks" name="attr_resilience_ranks" type="number" title="@{resilience_ranks}"/>
+            </td>
+            <td class="cc-skill-focuses">Discipline, Fortitude, Immunity</td>
+          </tr>
+          <tr class="cc-skill-row">
+            <th data-i18n="stealth">stealth</th>
+            <td>
+              <input class="cc-skill-ranks" name="attr_stealth_ranks" type="number" title="@{stealth_ranks}"/>
+            </td>
+            <td class="cc-skill-focuses">Concealment, Disguise, Escape Artistry, Lock Picking, Sleight of Hand, Sneak</td>
+          </tr>
+          <tr class="cc-skill-row">
+            <th data-i18n="survival">survival</th>
+            <td>
+              <input class="cc-skill-ranks" name="attr_survival_ranks" type="number" title="@{survival_ranks}"/>
+            </td>
+            <td class="cc-skill-focuses">Animal Handling, Boating, Foraging, Hunting, Mysticism, Navigation, Tracking, Woodcraft</td>
+          </tr>
+          <tr class="cc-skill-row">
+            <th data-i18n="tactics">tactics</th>
+            <td>
+              <input class="cc-skill-ranks" name="attr_tactics_ranks" type="number" title="@{tactics_ranks}"/>
+            </td>
+            <td class="cc-skill-focuses">Cavalry, Infantry, Leadership, Navy, Omen Reading, Scouting</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="cc-field-group">
+      <div class="cc-field cc-languages"><span data-i18n="languages">Languages</span>
+        <textarea name="attr_languages" title="@{languages}"></textarea>
+      </div>
+      <div class="cc-panel cc-experience">
+        <div class="cc-banner" data-i18n="experience">Experience</div>
+        <div class="cc-field-group">
+          <div class="cc-field"><span data-i18n="xp earned">Earned</span>
+            <input name="attr_xp_earned" type="number" title="@{xp_earned}"/>
+          </div>
+          <div class="cc-field"><span data-i18n="xp spent">Spent</span>
+            <input name="attr_xp_spent" type="number" title="@{xp_spent}"/>
+          </div>
+          <div class="cc-field"><span data-i18n="xp available">Available</span>
+            <input name="attr_xp_available" readonly="readonly" type="number" title="@{xp_available}"/>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+      </article>
+      <article class="tabs__container tabs--cohors-cthulhu__container tabs--cohors-cthulhu__container--combat" data-container-tab="cohors-cthulhu" data-tab="combat">
+  <div class="cc-page cc-combat">
+    <div class="cc-panel cc-weapons">
+      <div class="cc-banner" data-i18n="weapons">Weapons</div>
+      <div class="cc-rep-table">
+        <div class="cc-rep-header"><span data-i18n="name">Name</span><span data-i18n="focus">Focus</span><span data-i18n="reach or range">Reach or Range</span><span data-i18n="damage and effects">Damage &amp; Effects</span><span data-i18n="size">Size</span><span data-i18n="qualities">Qualities</span></div>
+        <fieldset class="repeating_weapon">
+          <input name="attr_name" type="text" title="@{repeating_weapon_$X_name}"/>
+          <input name="attr_focus" type="text" title="@{repeating_weapon_$X_focus}"/>
+          <input name="attr_reach_range" type="text" title="@{repeating_weapon_$X_reach_range}"/>
+          <input name="attr_damage_effects" type="text" title="@{repeating_weapon_$X_damage_effects}"/>
+          <input name="attr_size" type="text" title="@{repeating_weapon_$X_size}"/>
+          <input name="attr_qualities" type="text" title="@{repeating_weapon_$X_qualities}"/>
+        </fieldset>
+      </div>
+    </div>
+    <div class="cc-panel cc-armor">
+      <div class="cc-banner" data-i18n="armor">Armor</div>
+      <div class="cc-rep-table cc-rep-armor">
+        <div class="cc-rep-header"><span data-i18n="name">Name</span><span data-i18n="resistance">Resistance</span><span data-i18n="qualities">Qualities</span></div>
+        <fieldset class="repeating_armor">
+          <input name="attr_name" type="text" title="@{repeating_armor_$X_name}"/>
+          <input name="attr_resistance" type="number" title="@{repeating_armor_$X_resistance}"/>
+          <input name="attr_qualities" type="text" title="@{repeating_armor_$X_qualities}"/>
+        </fieldset>
+      </div>
+    </div>
+    <div class="cc-panel cc-belongings">
+      <div class="cc-banner" data-i18n="belongings">Belongings</div>
+      <textarea name="attr_belongings" title="@{belongings}"></textarea>
+    </div>
+    <div class="cc-panel cc-talents">
+      <div class="cc-banner" data-i18n="talents">Talents</div>
+      <div class="cc-rep-table cc-rep-talents">
+        <div class="cc-rep-header"><span data-i18n="name">Name</span><span data-i18n="keywords">Keywords</span><span data-i18n="description">Description</span></div>
+        <fieldset class="repeating_talent">
+          <input name="attr_name" type="text" title="@{repeating_talent_$X_name}"/>
+          <input name="attr_keywords" type="text" title="@{repeating_talent_$X_keywords}"/>
+          <textarea name="attr_description" title="@{repeating_talent_$X_description}"></textarea>
+        </fieldset>
+      </div>
+    </div>
+  </div>
+      </article>
+      <article class="tabs__container tabs--cohors-cthulhu__container tabs--cohors-cthulhu__container--spells" data-container-tab="cohors-cthulhu" data-tab="spells">
+  <div class="cc-page cc-spells">
+    <div class="cc-panel cc-spellcasting-header">
+      <div class="cc-banner" data-i18n="spellcasting">Spellcasting</div>
+      <div class="cc-field-group">
+        <div class="cc-field"><span data-i18n="spellcasting type">Spellcasting Type</span>
+          <select name="attr_spellcasting_type" title="@{spellcasting_type}">
+            <option value="">Select One
+            </option>
+            <option value="traditional">Traditional
+            </option>
+            <option value="research">Research
+            </option>
+            <option value="dabbling">Dabbling
+            </option>
+          </select>
+        </div>
+        <div class="cc-field"><span data-i18n="magical tradition">Magical Tradition</span>
+          <input name="attr_magical_tradition" type="text" title="@{magical_tradition}"/>
+        </div>
+        <div class="cc-field"><span data-i18n="spellcasting attribute">Spellcasting Attribute</span>
+          <select name="attr_spellcasting_attribute" title="@{spellcasting_attribute}">
+            <option value="">Select One
+            </option>
+            <option value="agility">Will
+            </option>
+            <option value="brawn">Will
+            </option>
+            <option value="coordination">Will
+            </option>
+            <option value="gravitas">Will
+            </option>
+            <option value="insight">Will
+            </option>
+            <option value="reason">Will
+            </option>
+            <option value="will">Will
+            </option>
+          </select>
+        </div>
+        <div class="cc-field"><span data-i18n="power rating">Power Rating</span>
+          <input name="attr_power_rating" readonly="readonly" type="number" title="@{power_rating}"/>
+        </div>
+        <div class="cc-field"><span data-i18n="base power">Base Power</span>
+          <input name="attr_base_power" readonly="readonly" type="number" title="@{base_power}"/>
+        </div>
+      </div>
+    </div>
+    <div class="cc-panel cc-spell-list">
+      <div class="cc-banner" data-i18n="spells">Spells</div>
+      <fieldset class="repeating_spell">
+        <div class="cc-spell-block">
+          <div class="cc-field-group">
+            <div class="cc-field"><span data-i18n="name">Name</span>
+              <input name="attr_name" type="text" title="@{repeating_spell_$X_name}"/>
+            </div>
+            <div class="cc-field"><span data-i18n="skill">Skill</span>
+              <input name="attr_skill" type="text" title="@{repeating_spell_$X_skill}"/>
+            </div>
+            <div class="cc-field"><span data-i18n="difficulty">Difficulty</span>
+              <input name="attr_difficulty" type="number" title="@{repeating_spell_$X_difficulty}"/>
+            </div>
+            <div class="cc-field"><span data-i18n="cost">Cost</span>
+              <input name="attr_cost" type="text" title="@{repeating_spell_$X_cost}"/>
+            </div>
+            <div class="cc-field"><span data-i18n="duration">Duration</span>
+              <input name="attr_duration" type="text" title="@{repeating_spell_$X_duration}"/>
+            </div>
+            <div class="cc-field"><span data-i18n="category">Category</span>
+              <input name="attr_category" type="text" title="@{repeating_spell_$X_category}"/>
+            </div>
+          </div>
+          <div class="cc-field"><span data-i18n="spell effect">Spell Effect</span>
+            <textarea name="attr_effect" title="@{repeating_spell_$X_effect}"></textarea>
+          </div>
+          <div class="cc-field"><span data-i18n="momentum">Momentum</span>
+            <textarea name="attr_momentum" title="@{repeating_spell_$X_momentum}"></textarea>
+          </div>
+        </div>
+      </fieldset>
+    </div>
+  </div>
+      </article>
+      <article class="tabs__container tabs--cohors-cthulhu__container tabs--cohors-cthulhu__container--notes" data-container-tab="cohors-cthulhu" data-tab="notes">
+  <div class="cc-page cc-notes">
+    <div class="cc-field-group">
+      <div class="cc-panel cc-traits">
+        <div class="cc-banner" data-i18n="traits">Traits</div>
+        <textarea name="attr_traits" title="@{traits}"></textarea>
+      </div>
+      <div class="cc-panel cc-history-agenda">
+        <div class="cc-banner" data-i18n="history">History</div>
+        <textarea name="attr_history" title="@{history}"></textarea>
+        <div class="cc-banner" data-i18n="personal agenda">Personal Agenda</div>
+        <textarea name="attr_personal_agenda" title="@{personal_agenda}"></textarea>
+      </div>
+    </div>
+    <div class="cc-panel cc-journal">
+      <div class="cc-banner" data-i18n="journal and notes">Journal/Notes</div>
+      <textarea name="attr_journal_notes" title="@{journal_notes}"></textarea>
+    </div>
+  </div>
+      </article>
+    </div>
+  </div>
+</main>
 <script type="text/worker">const k = (function(){
   const kFuncs = {};
   
-  const cascades = {"attr_character_name":{"name":"character_name","type":"text","defaultValue":"","affects":[],"triggeredFuncs":["setActionCalls"],"listenerFunc":"accessSheet","listener":"change:character_name"},"act_k-network-call":{"name":"k-network-call","type":"action","triggeredFuncs":["kReceive"],"affects":[],"addFuncs":[],"listener":"clicked:k-network-call","listenerFunc":"accessSheet","defaultValue":"","calculation":"","initialFunc":"","formula":""}};
+  const cascades = {"attr_character_name":{"name":"character_name","type":"text","defaultValue":"","affects":[],"triggeredFuncs":["setActionCalls"],"listenerFunc":"accessSheet","listener":"change:character_name"},"act_k-network-call":{"name":"k-network-call","type":"action","triggeredFuncs":["kReceive"],"affects":[],"addFuncs":[],"listener":"clicked:k-network-call","listenerFunc":"accessSheet","defaultValue":"","calculation":"","initialFunc":"","formula":""},"attr_sheet_version":{"name":"sheet_version","type":"hidden","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:sheet_version","listenerFunc":"accessSheet","defaultValue":"0.1.0","calculation":"","initialFunc":"","formula":""},"attr_cohors_cthulhu_tab":{"name":"cohors_cthulhu_tab","type":"hidden","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:cohors_cthulhu_tab","listenerFunc":"accessSheet","defaultValue":"nav-tabs-cohors-cthulhu--character","calculation":"","initialFunc":"","formula":""},"act_nav-tabs-cohors-cthulhu--character":{"name":"nav-tabs-cohors-cthulhu--character","type":"action","triggeredFuncs":["kSwitchTab"],"affects":[],"addFuncs":[],"listener":"clicked:nav-tabs-cohors-cthulhu--character","listenerFunc":"accessSheet","defaultValue":"","calculation":"","initialFunc":"","formula":""},"act_nav-tabs-cohors-cthulhu--combat":{"name":"nav-tabs-cohors-cthulhu--combat","type":"action","triggeredFuncs":["kSwitchTab"],"affects":[],"addFuncs":[],"listener":"clicked:nav-tabs-cohors-cthulhu--combat","listenerFunc":"accessSheet","defaultValue":"","calculation":"","initialFunc":"","formula":""},"act_nav-tabs-cohors-cthulhu--spells":{"name":"nav-tabs-cohors-cthulhu--spells","type":"action","triggeredFuncs":["kSwitchTab"],"affects":[],"addFuncs":[],"listener":"clicked:nav-tabs-cohors-cthulhu--spells","listenerFunc":"accessSheet","defaultValue":"","calculation":"","initialFunc":"","formula":""},"act_nav-tabs-cohors-cthulhu--notes":{"name":"nav-tabs-cohors-cthulhu--notes","type":"action","triggeredFuncs":["kSwitchTab"],"affects":[],"addFuncs":[],"listener":"clicked:nav-tabs-cohors-cthulhu--notes","listenerFunc":"accessSheet","defaultValue":"","calculation":"","initialFunc":"","formula":""},"attr_name_pronoun":{"name":"name_pronoun","type":"text","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:name_pronoun","listenerFunc":"accessSheet","defaultValue":"","calculation":"","initialFunc":"","formula":""},"attr_culture":{"name":"culture","type":"text","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:culture","listenerFunc":"accessSheet","defaultValue":"","calculation":"","initialFunc":"","formula":""},"attr_caste":{"name":"caste","type":"text","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:caste","listenerFunc":"accessSheet","defaultValue":"","calculation":"","initialFunc":"","formula":""},"attr_wealth":{"name":"wealth","type":"text","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:wealth","listenerFunc":"accessSheet","defaultValue":"","calculation":"","initialFunc":"","formula":""},"attr_archetype":{"name":"archetype","type":"text","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:archetype","listenerFunc":"accessSheet","defaultValue":"","calculation":"","initialFunc":"","formula":""},"attr_background":{"name":"background","type":"text","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:background","listenerFunc":"accessSheet","defaultValue":"","calculation":"","initialFunc":"","formula":""},"attr_characteristic":{"name":"characteristic","type":"text","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:characteristic","listenerFunc":"accessSheet","defaultValue":"","calculation":"","initialFunc":"","formula":""},"attr_truth_1":{"name":"truth_1","type":"text","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:truth_1","listenerFunc":"accessSheet","defaultValue":"","calculation":"","initialFunc":"","formula":""},"attr_truth_2":{"name":"truth_2","type":"text","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:truth_2","listenerFunc":"accessSheet","defaultValue":"","calculation":"","initialFunc":"","formula":""},"attr_truth_3":{"name":"truth_3","type":"text","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:truth_3","listenerFunc":"accessSheet","defaultValue":"","calculation":"","initialFunc":"","formula":""},"attr_truth_4":{"name":"truth_4","type":"text","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:truth_4","listenerFunc":"accessSheet","defaultValue":"","calculation":"","initialFunc":"","formula":""},"attr_truth_5":{"name":"truth_5","type":"text","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:truth_5","listenerFunc":"accessSheet","defaultValue":"","calculation":"","initialFunc":"","formula":""},"attr_scar_1":{"name":"scar_1","type":"text","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:scar_1","listenerFunc":"accessSheet","defaultValue":"","calculation":"","initialFunc":"","formula":""},"attr_scar_2":{"name":"scar_2","type":"text","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:scar_2","listenerFunc":"accessSheet","defaultValue":"","calculation":"","initialFunc":"","formula":""},"attr_scar_3":{"name":"scar_3","type":"text","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:scar_3","listenerFunc":"accessSheet","defaultValue":"","calculation":"","initialFunc":"","formula":""},"attr_scar_4":{"name":"scar_4","type":"text","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:scar_4","listenerFunc":"accessSheet","defaultValue":"","calculation":"","initialFunc":"","formula":""},"attr_scar_5":{"name":"scar_5","type":"text","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:scar_5","listenerFunc":"accessSheet","defaultValue":"","calculation":"","initialFunc":"","formula":""},"attr_stress":{"name":"stress","type":"hidden","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:stress","listenerFunc":"accessSheet","defaultValue":0,"calculation":"","initialFunc":"","formula":""},"attr_base_armour":{"name":"base_armour","type":"number","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:base_armour","listenerFunc":"accessSheet","defaultValue":0,"calculation":"","initialFunc":"","formula":""},"attr_total_armor":{"name":"total_armor","type":"number","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:total_armor","listenerFunc":"accessSheet","defaultValue":0,"calculation":"","initialFunc":"","formula":""},"attr_courage":{"name":"courage","type":"number","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:courage","listenerFunc":"accessSheet","defaultValue":0,"calculation":"","initialFunc":"","formula":""},"attr_fortune":{"name":"fortune","type":"hidden","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:fortune","listenerFunc":"accessSheet","defaultValue":0,"calculation":"","initialFunc":"","formula":""},"attr_injuries":{"name":"injuries","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:injuries","listenerFunc":"accessSheet","defaultValue":"","calculation":"","initialFunc":"","formula":""},"attr_agility_rating":{"name":"agility_rating","type":"number","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:agility_rating","listenerFunc":"accessSheet","defaultValue":0,"calculation":"","initialFunc":"","formula":""},"attr_brawn_rating":{"name":"brawn_rating","type":"number","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:brawn_rating","listenerFunc":"accessSheet","defaultValue":0,"calculation":"","initialFunc":"","formula":""},"attr_brawn_bonus_damage":{"name":"brawn_bonus_damage","type":"number","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:brawn_bonus_damage","listenerFunc":"accessSheet","defaultValue":0,"calculation":"","initialFunc":"","formula":""},"attr_coordination_rating":{"name":"coordination_rating","type":"number","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:coordination_rating","listenerFunc":"accessSheet","defaultValue":0,"calculation":"","initialFunc":"","formula":""},"attr_gravitas_rating":{"name":"gravitas_rating","type":"number","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:gravitas_rating","listenerFunc":"accessSheet","defaultValue":0,"calculation":"","initialFunc":"","formula":""},"attr_insight_rating":{"name":"insight_rating","type":"number","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:insight_rating","listenerFunc":"accessSheet","defaultValue":0,"calculation":"","initialFunc":"","formula":""},"attr_insight_bonus_damage":{"name":"insight_bonus_damage","type":"number","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:insight_bonus_damage","listenerFunc":"accessSheet","defaultValue":0,"calculation":"","initialFunc":"","formula":""},"attr_reason_rating":{"name":"reason_rating","type":"number","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:reason_rating","listenerFunc":"accessSheet","defaultValue":0,"calculation":"","initialFunc":"","formula":""},"attr_will_rating":{"name":"will_rating","type":"number","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:will_rating","listenerFunc":"accessSheet","defaultValue":0,"calculation":"","initialFunc":"","formula":""},"attr_will_bonus_damage":{"name":"will_bonus_damage","type":"number","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:will_bonus_damage","listenerFunc":"accessSheet","defaultValue":0,"calculation":"","initialFunc":"","formula":""},"attr_academia_ranks":{"name":"academia_ranks","type":"number","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:academia_ranks","listenerFunc":"accessSheet","defaultValue":0,"calculation":"","initialFunc":"","formula":""},"attr_athletics_ranks":{"name":"athletics_ranks","type":"number","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:athletics_ranks","listenerFunc":"accessSheet","defaultValue":0,"calculation":"","initialFunc":"","formula":""},"attr_crafting_ranks":{"name":"crafting_ranks","type":"number","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:crafting_ranks","listenerFunc":"accessSheet","defaultValue":0,"calculation":"","initialFunc":"","formula":""},"attr_engineering_ranks":{"name":"engineering_ranks","type":"number","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:engineering_ranks","listenerFunc":"accessSheet","defaultValue":0,"calculation":"","initialFunc":"","formula":""},"attr_fighting_ranks":{"name":"fighting_ranks","type":"number","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:fighting_ranks","listenerFunc":"accessSheet","defaultValue":0,"calculation":"","initialFunc":"","formula":""},"attr_medicine_ranks":{"name":"medicine_ranks","type":"number","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:medicine_ranks","listenerFunc":"accessSheet","defaultValue":0,"calculation":"","initialFunc":"","formula":""},"attr_observation_ranks":{"name":"observation_ranks","type":"number","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:observation_ranks","listenerFunc":"accessSheet","defaultValue":0,"calculation":"","initialFunc":"","formula":""},"attr_persuasion_ranks":{"name":"persuasion_ranks","type":"number","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:persuasion_ranks","listenerFunc":"accessSheet","defaultValue":0,"calculation":"","initialFunc":"","formula":""},"attr_resilience_ranks":{"name":"resilience_ranks","type":"number","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:resilience_ranks","listenerFunc":"accessSheet","defaultValue":0,"calculation":"","initialFunc":"","formula":""},"attr_stealth_ranks":{"name":"stealth_ranks","type":"number","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:stealth_ranks","listenerFunc":"accessSheet","defaultValue":0,"calculation":"","initialFunc":"","formula":""},"attr_survival_ranks":{"name":"survival_ranks","type":"number","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:survival_ranks","listenerFunc":"accessSheet","defaultValue":0,"calculation":"","initialFunc":"","formula":""},"attr_tactics_ranks":{"name":"tactics_ranks","type":"number","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:tactics_ranks","listenerFunc":"accessSheet","defaultValue":0,"calculation":"","initialFunc":"","formula":""},"attr_languages":{"name":"languages","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:languages","listenerFunc":"accessSheet","defaultValue":"","calculation":"","initialFunc":"","formula":""},"attr_xp_earned":{"name":"xp_earned","type":"number","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:xp_earned","listenerFunc":"accessSheet","defaultValue":0,"calculation":"","initialFunc":"","formula":""},"attr_xp_spent":{"name":"xp_spent","type":"number","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:xp_spent","listenerFunc":"accessSheet","defaultValue":0,"calculation":"","initialFunc":"","formula":""},"attr_xp_available":{"name":"xp_available","type":"number","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:xp_available","listenerFunc":"accessSheet","defaultValue":0,"calculation":"","initialFunc":"","formula":""},"attr_repeating_weapon_$x_name":{"name":"repeating_weapon_$x_name","type":"text","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:repeating_weapon:name","listenerFunc":"accessSheet","defaultValue":"","calculation":"","initialFunc":"","formula":""},"attr_repeating_weapon_$x_focus":{"name":"repeating_weapon_$x_focus","type":"text","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:repeating_weapon:focus","listenerFunc":"accessSheet","defaultValue":"","calculation":"","initialFunc":"","formula":""},"attr_repeating_weapon_$x_reach_range":{"name":"repeating_weapon_$x_reach_range","type":"text","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:repeating_weapon:reach_range","listenerFunc":"accessSheet","defaultValue":"","calculation":"","initialFunc":"","formula":""},"attr_repeating_weapon_$x_damage_effects":{"name":"repeating_weapon_$x_damage_effects","type":"text","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:repeating_weapon:damage_effects","listenerFunc":"accessSheet","defaultValue":"","calculation":"","initialFunc":"","formula":""},"attr_repeating_weapon_$x_size":{"name":"repeating_weapon_$x_size","type":"text","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:repeating_weapon:size","listenerFunc":"accessSheet","defaultValue":"","calculation":"","initialFunc":"","formula":""},"attr_repeating_weapon_$x_qualities":{"name":"repeating_weapon_$x_qualities","type":"text","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:repeating_weapon:qualities","listenerFunc":"accessSheet","defaultValue":"","calculation":"","initialFunc":"","formula":""},"attr_repeating_armor_$x_name":{"name":"repeating_armor_$x_name","type":"text","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:repeating_armor:name","listenerFunc":"accessSheet","defaultValue":"","calculation":"","initialFunc":"","formula":""},"attr_repeating_armor_$x_resistance":{"name":"repeating_armor_$x_resistance","type":"number","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:repeating_armor:resistance","listenerFunc":"accessSheet","defaultValue":0,"calculation":"","initialFunc":"","formula":""},"attr_repeating_armor_$x_qualities":{"name":"repeating_armor_$x_qualities","type":"text","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:repeating_armor:qualities","listenerFunc":"accessSheet","defaultValue":"","calculation":"","initialFunc":"","formula":""},"attr_belongings":{"name":"belongings","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:belongings","listenerFunc":"accessSheet","defaultValue":"","calculation":"","initialFunc":"","formula":""},"attr_repeating_talent_$x_name":{"name":"repeating_talent_$x_name","type":"text","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:repeating_talent:name","listenerFunc":"accessSheet","defaultValue":"","calculation":"","initialFunc":"","formula":""},"attr_repeating_talent_$x_keywords":{"name":"repeating_talent_$x_keywords","type":"text","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:repeating_talent:keywords","listenerFunc":"accessSheet","defaultValue":"","calculation":"","initialFunc":"","formula":""},"attr_repeating_talent_$x_description":{"name":"repeating_talent_$x_description","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:repeating_talent:description","listenerFunc":"accessSheet","defaultValue":"","calculation":"","initialFunc":"","formula":""},"attr_spellcasting_type":{"name":"spellcasting_type","type":"select","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:spellcasting_type","listenerFunc":"accessSheet","defaultValue":"","calculation":"","initialFunc":"","formula":""},"attr_magical_tradition":{"name":"magical_tradition","type":"text","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:magical_tradition","listenerFunc":"accessSheet","defaultValue":"","calculation":"","initialFunc":"","formula":""},"attr_spellcasting_attribute":{"name":"spellcasting_attribute","type":"select","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:spellcasting_attribute","listenerFunc":"accessSheet","defaultValue":"","calculation":"","initialFunc":"","formula":""},"attr_power_rating":{"name":"power_rating","type":"number","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:power_rating","listenerFunc":"accessSheet","defaultValue":0,"calculation":"","initialFunc":"","formula":""},"attr_base_power":{"name":"base_power","type":"number","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:base_power","listenerFunc":"accessSheet","defaultValue":0,"calculation":"","initialFunc":"","formula":""},"attr_repeating_spell_$x_name":{"name":"repeating_spell_$x_name","type":"text","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:repeating_spell:name","listenerFunc":"accessSheet","defaultValue":"","calculation":"","initialFunc":"","formula":""},"attr_repeating_spell_$x_skill":{"name":"repeating_spell_$x_skill","type":"text","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:repeating_spell:skill","listenerFunc":"accessSheet","defaultValue":"","calculation":"","initialFunc":"","formula":""},"attr_repeating_spell_$x_difficulty":{"name":"repeating_spell_$x_difficulty","type":"number","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:repeating_spell:difficulty","listenerFunc":"accessSheet","defaultValue":0,"calculation":"","initialFunc":"","formula":""},"attr_repeating_spell_$x_cost":{"name":"repeating_spell_$x_cost","type":"text","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:repeating_spell:cost","listenerFunc":"accessSheet","defaultValue":"","calculation":"","initialFunc":"","formula":""},"attr_repeating_spell_$x_duration":{"name":"repeating_spell_$x_duration","type":"text","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:repeating_spell:duration","listenerFunc":"accessSheet","defaultValue":"","calculation":"","initialFunc":"","formula":""},"attr_repeating_spell_$x_category":{"name":"repeating_spell_$x_category","type":"text","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:repeating_spell:category","listenerFunc":"accessSheet","defaultValue":"","calculation":"","initialFunc":"","formula":""},"attr_repeating_spell_$x_effect":{"name":"repeating_spell_$x_effect","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:repeating_spell:effect","listenerFunc":"accessSheet","defaultValue":"","calculation":"","initialFunc":"","formula":""},"attr_repeating_spell_$x_momentum":{"name":"repeating_spell_$x_momentum","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:repeating_spell:momentum","listenerFunc":"accessSheet","defaultValue":"","calculation":"","initialFunc":"","formula":""},"attr_traits":{"name":"traits","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:traits","listenerFunc":"accessSheet","defaultValue":"","calculation":"","initialFunc":"","formula":""},"attr_history":{"name":"history","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:history","listenerFunc":"accessSheet","defaultValue":"","calculation":"","initialFunc":"","formula":""},"attr_personal_agenda":{"name":"personal_agenda","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:personal_agenda","listenerFunc":"accessSheet","defaultValue":"","calculation":"","initialFunc":"","formula":""},"attr_journal_notes":{"name":"journal_notes","triggeredFuncs":[],"affects":[],"addFuncs":[],"listener":"change:journal_notes","listenerFunc":"accessSheet","defaultValue":"","calculation":"","initialFunc":"","formula":""}};
   
   kFuncs.cascades = cascades;
   
-  const repeatingSectionDetails = [];
+  const repeatingSectionDetails = [{"section":"repeating_weapon","fields":["name","focus","reach_range","damage_effects","size","qualities"]},{"section":"repeating_armor","fields":["name","resistance","qualities"]},{"section":"repeating_talent","fields":["name","keywords","description"]},{"section":"repeating_spell","fields":["name","skill","difficulty","cost","duration","category","effect","momentum"]}];
   
   kFuncs.repeatingSectionDetails = repeatingSectionDetails;
   
-  const persistentTabs = [];
+  const persistentTabs = ["cohors_cthulhu_tab"];
   
   kFuncs.persistentTabs = persistentTabs;
   /**
@@ -1623,5 +2038,6 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
   }());
   const actionAttributes = [];
   k.sheetName = "CohorsCthulhu";
-  k.version = "0.0.1";
+  k.version = "0.1.0";
 </script>
+

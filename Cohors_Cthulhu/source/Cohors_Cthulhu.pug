@@ -1,14 +1,16 @@
+//- Cohors_Cthulhu.pug
 include k-scaffold
-//- Object used to store sheet-generation-time state, must be defined first
-- const cc = {};
+include ./components/_index.pug
 
-- k.version = "0.0.1";
+- k.sheetName = "CohorsCthulhu";
+- k.version = "0.1.0";
 
-.cohors-cthulhu-sheet
-    h1 Cohors Cthulhu
-    p Scaffold stage 1 - build pipeline check.
++hidden({name: 'sheet version', value: '0.1.0'})
 
-<!-- Sheet Worker Scripts -->
+main#main
+  +tabs({name: 'cohors-cthulhu', defaultActiveTab: 'character'})
+    include ./views/_index.pug
+
 +kscript
     | k.sheetName = "CohorsCthulhu";
-    | k.version = "0.0.1";
+    | k.version = "0.1.0";

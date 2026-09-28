@@ -1,0 +1,226 @@
+//- views/_character.pug
+//- Page 1 of the official sheet: identity header, truths & scars, stress /
+//- armor / injuries / courage / fortune, attributes, skills, languages, xp.
++tab({name: 'character', container: 'article'})
+  .cc-page.cc-character
+
+    .cc-banner Cohors Cthulhu
+    .cc-field-group
+      .cc-field
+        span(data-i18n='name & pronoun') Name & Pronoun
+        +text({name: 'name pronoun'})
+      .cc-field
+        span(data-i18n='culture') Culture
+        +text({name: 'culture'})
+      .cc-field
+        span(data-i18n='caste') Caste
+        +text({name: 'caste'})
+      .cc-field
+        span(data-i18n='wealth') Wealth
+        +text({name: 'wealth'})
+    .cc-field-group
+      .cc-field
+        span(data-i18n='archetype') Archetype
+        +text({name: 'archetype'})
+      .cc-field
+        span(data-i18n='background') Background
+        +text({name: 'background'})
+      .cc-field
+        span(data-i18n='characteristic') Characteristic
+        +text({name: 'characteristic'})
+
+    .cc-panel.cc-truths-scars
+      .cc-banner(data-i18n='personal truths and scars') Personal Truths &amp; Scars
+      .cc-truths-scars-grid
+        each n in [1, 2, 3, 4, 5]
+          +text({name: `truth ${n}`}).cc-truth
+        each n in [1, 2, 3, 4, 5]
+          +text({name: `scar ${n}`}).cc-scar
+
+    .cc-panel.cc-vitals
+      .cc-vitals-stress
+        .cc-banner(data-i18n='stress') Stress
+        +fillLeft({
+          radioObj: {name: 'stress'},
+          valueArray: Array.from({length: 20}, (_, i) => i + 1)
+        }).cc-stress-track
+      .cc-vitals-side
+        .cc-field
+          span(data-i18n='base armour') Base Armour
+          +number({name: 'base armour', readonly: true})
+        .cc-field
+          span(data-i18n='total armor') Total Armor
+          +number({name: 'total armor', readonly: true})
+        .cc-field
+          span(data-i18n='courage') Courage
+          +number({name: 'courage', readonly: true})
+        .cc-field
+          span(data-i18n='fortune') Fortune
+          +fillLeft({
+            radioObj: {name: 'fortune'},
+            valueArray: [1, 2, 3, 4, 5]
+          }).cc-fortune-track
+      .cc-vitals-injuries
+        .cc-banner(data-i18n='injuries') Injuries
+        +textarea({name: 'injuries'}).cc-injuries
+
+    .cc-panel.cc-attributes
+      .cc-banner(data-i18n='attributes') Attributes
+      .cc-attribute-row
+        +attribute('agility', false)
+        +attribute('brawn', true)
+        +attribute('coordination', false)
+        +attribute('gravitas', false)
+        +attribute('insight', true)
+        +attribute('reason', false)
+        +attribute('will', true)
+
+    .cc-panel.cc-skills
+      .cc-banner(data-i18n='skills') Skills
+      table.cc-table.cc-skills-table
+        thead
+          tr
+            th(data-i18n='skill') Skill
+            th(data-i18n='ranks') Ranks
+            th(data-i18n='focuses') Focuses
+        tbody
+          +skill('academia', ['Finance', 'History', 'Linguistics', 'Philosophy', 'Religion'])
+          +skill('athletics', ['Climbing', 'Lifting', 'Physical Training', 'Running', 'Swimming'])
+          +skill('crafting', ['Armorsmithing', 'Cooking', 'Tailoring', 'Weaponsmithing'])
+          +skill('engineering', ['Architecture', 'Defenses', 'Demolition', 'Infrastructure', 'Siege Engines'])
+          +skill('fighting', ['Archery', 'Melee Weapons', 'Thrown Weapons', 'Unarmed', 'War Magic'])
+          +skill('medicine', ['Contagion', 'Faith Healing', 'Field Treatment', 'Pharmacia', 'Surgery'])
+          +skill('observation', ['Hearing', 'Instincts', 'Sight', 'Smell and Taste'])
+          +skill('persuasion', ['Charm', 'Deception', 'Innuendo', 'Intimidation', 'Invocation', 'Negotiation', 'Rhetoric'])
+          +skill('resilience', ['Discipline', 'Fortitude', 'Immunity'])
+          +skill('stealth', ['Concealment', 'Disguise', 'Escape Artistry', 'Lock Picking', 'Sleight of Hand', 'Sneak'])
+          +skill('survival', ['Animal Handling', 'Boating', 'Foraging', 'Hunting', 'Mysticism', 'Navigation', 'Tracking', 'Woodcraft'])
+          +skill('tactics', ['Cavalry', 'Infantry', 'Leadership', 'Navy', 'Omen Reading', 'Scouting'])
+
+    .cc-field-group
+      .cc-field.cc-languages
+        span(data-i18n='languages') Languages
+        +textarea({name: 'languages'})
+      .cc-panel.cc-experience
+        .cc-banner(data-i18n='experience') Experience
+        .cc-field-group
+          .cc-field
+            span(data-i18n='xp earned') Earned
+            +number({name: 'xp earned'})
+          .cc-field
+            span(data-i18n='xp spent') Spent
+            +number({name: 'xp spent'})
+          .cc-field
+            span(data-i18n='xp available') Available
+            +number({name: 'xp available', readonly: true})
+
++scss.
+  .cc-character {
+    .cc-truths-scars-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0.4rem;
+
+      .cc-truth,
+      .cc-scar {
+        width: 100%;
+        background: transparent;
+        border: none;
+        border-bottom: 1px solid var(--cc-rule);
+        color: var(--cc-ink);
+        padding: 0.15rem 0.1rem;
+      }
+    }
+
+    .cc-vitals {
+      display: grid;
+      grid-template-columns: 2fr 1fr 2fr;
+      gap: 0.75rem;
+      align-items: start;
+    }
+
+    .cc-stress-track {
+      display: grid;
+      grid-template-columns: repeat(10, 1fr);
+      gap: 0.2rem;
+      --fillLeftSelectedColor: var(--cc-parchment);
+      --fillLeftUnselectedColor: var(--cc-rule);
+
+      .fill-left__radio {
+        width: 1.1rem;
+        height: 1.1rem;
+        border: 1px solid var(--cc-rule);
+      }
+    }
+
+    .cc-fortune-track {
+      --fillLeftSelectedColor: var(--cc-parchment);
+      --fillLeftUnselectedColor: var(--cc-rule);
+
+      .fill-left__radio {
+        width: 1.1rem;
+        height: 1.1rem;
+        border: 1px solid var(--cc-rule);
+      }
+    }
+
+    .cc-injuries {
+      display: flex;
+      flex-direction: column;
+
+      .cc-injuries {
+        flex: 1;
+        min-height: 4rem;
+      }
+    }
+
+    .cc-attribute-row {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 0.5rem;
+      text-align: center;
+    }
+
+    .cc-attribute {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .cc-attribute-rating,
+    .cc-attribute-bonus-damage {
+      width: 3rem;
+      text-align: center;
+      background: transparent;
+      border: 1px solid var(--cc-rule);
+      color: var(--cc-ink);
+      border-radius: 2px;
+    }
+
+    .cc-attribute-bonus-damage.cc-disabled {
+      display: block;
+      width: 3rem;
+      height: 1.6rem;
+      border: 1px dashed var(--cc-parchment-dark);
+    }
+
+    .cc-skills-table {
+      .cc-skill-ranks {
+        width: 3rem;
+        text-align: center;
+        background: transparent;
+        border: 1px solid var(--cc-rule);
+        color: var(--cc-ink);
+      }
+
+      td.cc-skill-focuses {
+        font-size: 0.8rem;
+        font-style: italic;
+      }
+    }
+
+    .cc-languages textarea {
+      min-height: 4rem;
+    }
+  }

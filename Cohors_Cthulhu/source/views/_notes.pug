@@ -1,0 +1,39 @@
+//- views/_notes.pug
+//- Page 4 of the official sheet: Traits, History, Personal Agenda, Journal/Notes.
++tab({name: 'notes', container: 'article'})
+  .cc-page.cc-notes
+
+    .cc-field-group
+      .cc-panel.cc-traits
+        .cc-banner(data-i18n='traits') Traits
+        +textarea({name: 'traits'})
+      .cc-panel.cc-history-agenda
+        .cc-banner(data-i18n='history') History
+        +textarea({name: 'history'})
+        .cc-banner(data-i18n='personal agenda') Personal Agenda
+        +textarea({name: 'personal agenda'})
+
+    .cc-panel.cc-journal
+      .cc-banner(data-i18n='journal and notes') Journal/Notes
+      +textarea({name: 'journal notes'})
+
++scss.
+  .cc-notes {
+    .cc-field-group {
+      align-items: stretch;
+    }
+
+    .cc-traits,
+    .cc-history-agenda {
+      flex: 1 1 45%;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 6rem;
+    }
+
+    .cc-journal textarea {
+      min-height: 14rem;
+    }
+  }

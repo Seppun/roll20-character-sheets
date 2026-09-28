@@ -1,13 +1,28 @@
+// Cohors_Cthulhu.scss
 @use 'k-scaffold' as k;
+@use './scss';
+@use 'sfc';
 
 html {
+  font-size: 16px;
   @include k.variables;
 }
 
-.ui-dialog .tab-content .charsheet {
-  @include k.defaultStyles;
-}
+body {
+  @include scss.variables;
+  font-size: 1rem;
 
-.cohors-cthulhu-sheet {
-  font-family: serif;
+  .ui-dialog {
+    .tab-content {
+      .charsheet {
+        @include k.defaultStyles;
+        @include scss.generic;
+        @include sfc.sheet;
+      }
+    }
+  }
+
+  &.sheet-darkmode {
+    @include scss.dark;
+  }
 }

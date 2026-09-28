@@ -1,0 +1,19 @@
+@mixin variables {
+  --cc-parchment: #ece3cd;
+  --cc-parchment-dark: #ddd0ac;
+  --cc-ink: #2b2018;
+  --cc-banner: #6b1420;
+  --cc-banner-text: #f2e9d8;
+  --cc-rule: #8a1c2b;
+  --cc-header-font: Georgia, 'Times New Roman', serif;
+  --cc-body-font: Georgia, 'Times New Roman', serif;
+}
+
+@mixin dark {
+  --cc-parchment: #2a2620;
+  --cc-parchment-dark: #201d18;
+  --cc-ink: #e8ddc8;
+  --cc-banner: #4a0e18;
+  --cc-banner-text: #f2e9d8;
+  --cc-rule: #7a1a28;
+}

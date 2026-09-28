@@ -1,0 +1,10 @@
+//- components/_skill.pug
+//- One row of the Skills table: fixed skill name, a Ranks input, and the
+//- rulebook's reference list of Focuses for that skill (display only -
+//- players note their chosen focuses within this text on the printed sheet).
+mixin skill(name, focuses)
+  tr.cc-skill-row
+    th(data-i18n=name)= name
+    td
+      +number({name: `${name} ranks`}).cc-skill-ranks
+    td.cc-skill-focuses= focuses.join(', ')

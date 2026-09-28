@@ -1,0 +1,83 @@
+//- views/_spells.pug
+//- Page 3 of the official sheet: spellcasting header + spell list.
+//- The printed sheet has 6 fixed spell blocks; built as a repeating
+//- section here instead so casters aren't capped at 6.
++tab({name: 'spells', container: 'article'})
+  .cc-page.cc-spells
+
+    .cc-panel.cc-spellcasting-header
+      .cc-banner(data-i18n='spellcasting') Spellcasting
+      .cc-field-group
+        .cc-field
+          span(data-i18n='spellcasting type') Spellcasting Type
+          +select({name: 'spellcasting type'})
+            +option({value: ''})
+              | Select One
+            +option({value: 'traditional'})
+              | Traditional
+            +option({value: 'research'})
+              | Research
+            +option({value: 'dabbling'})
+              | Dabbling
+        .cc-field
+          span(data-i18n='magical tradition') Magical Tradition
+          +text({name: 'magical tradition'})
+        .cc-field
+          span(data-i18n='spellcasting attribute') Spellcasting Attribute
+          +select({name: 'spellcasting attribute'})
+            +option({value: ''})
+              | Select One
+            each attr in ['Agility', 'Brawn', 'Coordination', 'Gravitas', 'Insight', 'Reason', 'Will']
+              +option({value: attr.toLowerCase()})
+                = attr
+        .cc-field
+          span(data-i18n='power rating') Power Rating
+          +number({name: 'power rating', readonly: true})
+        .cc-field
+          span(data-i18n='base power') Base Power
+          +number({name: 'base power', readonly: true})
+
+    .cc-panel.cc-spell-list
+      .cc-banner(data-i18n='spells') Spells
+      +fieldset({name: 'spell'})
+        .cc-spell-block
+          .cc-field-group
+            .cc-field
+              span(data-i18n='name') Name
+              +text({name: 'name'})
+            .cc-field
+              span(data-i18n='skill') Skill
+              +text({name: 'skill'})
+            .cc-field
+              span(data-i18n='difficulty') Difficulty
+              +number({name: 'difficulty'})
+            .cc-field
+              span(data-i18n='cost') Cost
+              +text({name: 'cost'})
+            .cc-field
+              span(data-i18n='duration') Duration
+              +text({name: 'duration'})
+            .cc-field
+              span(data-i18n='category') Category
+              +text({name: 'category'})
+          .cc-field
+            span(data-i18n='spell effect') Spell Effect
+            +textarea({name: 'effect'})
+          .cc-field
+            span(data-i18n='momentum') Momentum
+            +textarea({name: 'momentum'})
+
++scss.
+  .cc-spells {
+    .cc-spell-block {
+      border: 1px solid var(--cc-rule);
+      border-radius: 3px;
+      padding: 0.5rem;
+      margin-bottom: 0.5rem;
+
+      textarea {
+        min-height: 3rem;
+        width: 100%;
+      }
+    }
+  }
