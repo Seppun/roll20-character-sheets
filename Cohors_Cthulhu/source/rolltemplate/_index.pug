@@ -2,7 +2,7 @@
 //- Chat output for a Focus roll (see initiateFocusRoll in
 //- views/_character.pug). Shows the dice, target number, successes,
 //- complications (if any), and pass/fail with Momentum generated.
-+rolltemplate('cc-skill')
++rolltemplate('ccskill')
   +characterLink
   .cc-roll-header
     span.cc-roll-skill {{skill}}
@@ -52,7 +52,12 @@
   // CSS through a stricter, older filter than the main sheet - CSS custom
   // properties (var()) are not on its allowlist and get the whole
   // declaration silently dropped. Plain hardcoded colors only in here.
-  .sheet-rolltemplate-cc-skill {
+  // Template name is deliberately hyphen-free ("ccskill" not "cc-skill") -
+  // every proven-working roll template in this repo's reference sheets
+  // (Achtung!_Cthulhu_2d20's skill/damage/talent/spell/weapon) uses a
+  // single word, and a hyphenated name is an untested edge case for how
+  // Roll20 builds/matches the sheet-rolltemplate-<name> wrapper class.
+  .sheet-rolltemplate-ccskill {
     font-family: Georgia, serif;
     background: #ece3cd;
     color: #2b2018;

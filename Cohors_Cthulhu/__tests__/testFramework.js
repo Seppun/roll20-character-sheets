@@ -1959,7 +1959,7 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
     // skill/difficulty, which WERE declared upfront, rendered fine; target_
     // number/successes/etc, which were only ever set via finishRoll's second
     // argument, never appeared at all.)
-    const rollString = '&{template:cc-skill} ' +
+    const rollString = '&{template:ccskill} ' +
       `{{character_name=@{character_name}}} ` +
       `{{skill=${skillLabel}}} ` +
       (focusLabel ? `{{focus=${focusLabel}}} ` : '') +

@@ -29,8 +29,9 @@ body {
 
 // Roll templates render in the chat pane, outside .ui-dialog .tab-content
 // .charsheet, so their styles must stay unnested - nesting sfc.roll under
-// .charsheet above would scope .sheet-rolltemplate-cc-skill to the sheet
+// .charsheet above would scope .sheet-rolltemplate-ccskill to the sheet
 // only and it would never apply in chat. The roll template's own rules
-// use hardcoded fallback colors (var(--cc-rule, #8a1c2b) etc.) since the
-// --cc-* custom properties are only defined within the sheet's own DOM.
+// use hardcoded colors (not var(...)) since Roll20's chat-pane CSS
+// sanitizer strips CSS custom properties, and since the --cc-* custom
+// properties are only defined within the sheet's own DOM anyway.
 @include sfc.roll;

@@ -586,7 +586,7 @@
         </div>
       </div>
     </div>
-    <div class="cc-footer"><span class="cc-build-html">HTML build: 2026-09-28 14:32:44 UTC</span><span class="cc-build-css"></span></div>
+    <div class="cc-footer"><span class="cc-build-html">HTML build: 2026-09-28 14:47:13 UTC</span><span class="cc-build-css"></span></div>
   </div>
       </article>
       <article class="tabs__container tabs--cohors-cthulhu__container tabs--cohors-cthulhu__container--spells" data-container-tab="cohors-cthulhu" data-tab="spells">
@@ -693,7 +693,7 @@
     </div>
   </div>
 </main>
-<rolltemplate class="sheet-rolltemplate-cc-skill">{{#character_name}}{{#character_id}}
+<rolltemplate class="sheet-rolltemplate-ccskill">{{#character_name}}{{#character_id}}
   <h4 class="character_name">[{{character_name}}](http://journal.roll20.net/character/{{character_id}})</h4>{{/character_id}}{{^character_id}}
   <h4 class="character_name">{{character_name}}</h4>{{/character_id}}{{/character_name}}
   <div class="cc-roll-header"><span class="cc-roll-skill">{{skill}}</span>{{#focus}}<span class="cc-roll-focus">({{focus}})</span>{{/focus}}
@@ -2402,7 +2402,7 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
     // skill/difficulty, which WERE declared upfront, rendered fine; target_
     // number/successes/etc, which were only ever set via finishRoll's second
     // argument, never appeared at all.)
-    const rollString = '&{template:cc-skill} ' +
+    const rollString = '&{template:ccskill} ' +
       `{{character_name=@{character_name}}} ` +
       `{{skill=${skillLabel}}} ` +
       (focusLabel ? `{{focus=${focusLabel}}} ` : '') +
