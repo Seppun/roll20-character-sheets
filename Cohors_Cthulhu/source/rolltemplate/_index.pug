@@ -1,7 +1,11 @@
 //- rolltemplate/_index.pug
-//- Chat output for a Focus roll (see initiateFocusRoll in
-//- views/_character.pug). Shows the dice, target number, successes,
-//- complications (if any), and pass/fail with Momentum generated.
+//- Chat output for a 2d20 roll (see initiateAttributeRoll/initiateSkillRoll/
+//- initiateFocusRoll/initiateWeaponRoll in views/_character.pug). Shows the
+//- dice, target number, successes, complications (if any), and pass/fail
+//- with Momentum generated. Weapon rolls also set is_weapon, which reveals
+//- a Damage section rolled in the very same message - Cohors Cthulhu attack
+//- rolls are opposed tests, so damage is rolled unconditionally alongside
+//- the attack rather than as a separate, gated follow-up roll.
 +rolltemplate('ccskill')
   //- All visual styling lives on this inner wrapper, not on the
   //- rolltemplate's own root (.sheet-rolltemplate-ccskill) - see the SCSS
@@ -28,6 +32,9 @@
       //- rollGreater() helper functions instead, which do an exact
       //- comparison against the computed value (again mirroring
       //- Achtung!_Cthulhu_2d20's own {{#rollTotal() computed::outcome 1}}).
+      //- is_weapon is different: it's a plain literal set directly in the
+      //- initial roll string (never overridden), so a plain {{#is_weapon}}
+      //- conditional works fine for it.
       .cc-roll-row
         span Dice:
         span {{computed::dice_text}}
@@ -50,29 +57,22 @@
     +rollTotal({values: 'computed::outcome 0'})
       .cc-roll-outcome.cc-roll-fail
         span Failed
-
-//- Chat output for a weapon damage roll (see initiateWeaponRoll/
-//- runCcDamageRoll in views/_character.pug). Shows the Challenge Dice
-//- faces (converted from plain d6s per the rulebook's own fallback table),
-//- the total damage, and any Damage Effects that triggered.
-+rolltemplate('ccdamage')
-  .cc-roll-card
-    +characterLink
-    .cc-roll-header
-      span.cc-roll-skill {{weapon}} Damage
-    .cc-roll-body
-      .cc-roll-row
-        span Challenge Dice:
-        span {{computed::dice_text}}
-      .cc-roll-row
-        span Total Damage:
-        span {{computed::total_damage}}
-      +rollGreater({values: 'computed::effect_count 0'})
-        .cc-roll-row.cc-roll-complication
-          span {{computed::effects_summary}}
-      .cc-roll-row
-        span Weapon Effects:
-        span {{effects_list}}
+    +templateConditionalDisplay('is_weapon')
+      .cc-roll-header.cc-roll-damage-header
+        span.cc-roll-skill Damage
+      .cc-roll-body
+        .cc-roll-row
+          span Challenge Dice:
+          span {{computed::damage_dice_text}}
+        .cc-roll-row
+          span Total Damage:
+          span {{computed::total_damage}}
+        +rollGreater({values: 'computed::effect_count 0'})
+          .cc-roll-row.cc-roll-complication
+            span {{computed::effects_summary}}
+        .cc-roll-row
+          span Weapon Effects:
+          span {{effects_list}}
 
 +scss('roll').
   // Roll templates render inside Roll20's chat pane, which sanitizes their
@@ -140,6 +140,12 @@
       }
     }
 
+    .sheet-cc-roll-damage-header {
+      margin-top: 0.3rem;
+      padding-top: 0.3rem;
+      border-top: 1px dashed #8a1c2b;
+    }
+
     .sheet-cc-roll-row {
       display: flex;
       justify-content: space-between;
@@ -168,54 +174,5 @@
     .sheet-cc-roll-fail {
       background: #4a1414;
       color: #f0e0e0;
-    }
-  }
-
-  // Same card styling as .sheet-rolltemplate-ccskill above, duplicated
-  // under this template's own root wrapper class - each rolltemplate's
-  // root selector is different, so the nested rules have to be repeated
-  // per-template even though the inner class names (.cc-roll-card,
-  // .cc-roll-row, etc) are shared.
-  .sheet-rolltemplate-ccdamage .sheet-cc-roll-card {
-    font-family: Georgia, serif;
-    background: #ece3cd;
-    color: #2b2018;
-    border: 1px solid #8a1c2b;
-    border-radius: 3px;
-    padding: 0.4rem 0.6rem;
-    min-width: 220px;
-
-    .sheet-character_name {
-      margin: 0 0 0.2rem;
-      font-size: 1rem;
-    }
-
-    .inlinerollresult {
-      background-color: transparent !important;
-      border: 0 transparent !important;
-      font-weight: inherit;
-      font-size: inherit;
-      padding: 0 !important;
-      pointer-events: none;
-    }
-
-    .sheet-cc-roll-header {
-      font-weight: bold;
-      text-transform: uppercase;
-      letter-spacing: 0.03em;
-      color: #8a1c2b;
-      margin-bottom: 0.2rem;
-    }
-
-    .sheet-cc-roll-row {
-      display: flex;
-      justify-content: space-between;
-      gap: 0.5rem;
-      font-size: 0.9rem;
-    }
-
-    .sheet-cc-roll-complication {
-      color: #8a1c2b;
-      font-weight: bold;
     }
   }
