@@ -129,7 +129,7 @@
           span Fortune
           +fillLeft({
             radioObj: {name: 'fortune'},
-            valueArray: [1, 2, 3, 4, 5, 6]
+            valueArray: [1, 2, 3, 4, 5]
           }).cc-fortune-track
       .cc-vitals-armor
         .cc-field
@@ -417,7 +417,7 @@
 
     .cc-fortune-track {
       display: grid;
-      grid-template-columns: repeat(6, 1fr);
+      grid-template-columns: repeat(5, 1fr);
       gap: 0.15rem;
       // Without an explicit gap, adjacent checked boxes share the same
       // fill/border color and their touching edges disappear, so what
