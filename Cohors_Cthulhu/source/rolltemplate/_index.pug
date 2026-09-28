@@ -4,10 +4,7 @@
 //- complications (if any), and pass/fail with Momentum generated.
 +rolltemplate('ccskill')
   +characterLink
-  //- TEMPORARY diagnostic - remove once the styling bug is found. Inline
-  //- style bypasses the external CSS file entirely, to test whether
-  //- ANY styling (not just our stylesheet) can reach this roll template.
-  .cc-roll-header(style="background: red !important; border: 5px solid lime !important; padding: 4px !important;")
+  .cc-roll-header
     span.cc-roll-skill {{skill}}
     +templateConditionalDisplay('focus')
       span.cc-roll-focus ({{focus}})
