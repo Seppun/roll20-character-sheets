@@ -246,17 +246,24 @@
     }
 
     .cc-skills-table {
+      th,
+      td {
+        vertical-align: middle;
+      }
+
       .cc-skill-ranks {
         width: 3rem;
         text-align: center;
         background: transparent;
         border: 1px solid var(--cc-rule);
+        border-bottom: none;
         color: var(--cc-ink);
       }
 
       td.cc-skill-focuses {
         display: flex;
         flex-wrap: wrap;
+        align-content: center;
         gap: 0.15rem 0.6rem;
       }
     }
