@@ -1,0 +1,13 @@
+@use 'k-scaffold' as k;
+
+html {
+  @include k.variables;
+}
+
+.ui-dialog .tab-content .charsheet {
+  @include k.defaultStyles;
+}
+
+.cohors-cthulhu-sheet {
+  font-family: serif;
+}

@@ -1,0 +1,14 @@
+include k-scaffold
+//- Object used to store sheet-generation-time state, must be defined first
+- const cc = {};
+
+- k.version = "0.0.1";
+
+.cohors-cthulhu-sheet
+    h1 Cohors Cthulhu
+    p Scaffold stage 1 - build pipeline check.
+
+<!-- Sheet Worker Scripts -->
++kscript
+    | k.sheetName = "CohorsCthulhu";
+    | k.version = "0.0.1";
