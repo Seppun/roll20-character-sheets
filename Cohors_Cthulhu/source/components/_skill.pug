@@ -7,9 +7,9 @@
 mixin skill(name, focuses, extraAffects)
   tr.cc-skill-row
     th
-      +roller({
+      +action({
         name: `${name} skill roll`,
-        class: 'cc-skill-name-roll',
+        class: 'cc-skill-name-roll roller',
         trigger: {triggeredFuncs: ['initiateSkillRoll']}
       })
         = name

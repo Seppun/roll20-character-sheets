@@ -87,9 +87,9 @@
             th
             each attr in ccAttributes
               th
-                +roller({
+                +action({
                   name: `${attr} roll`,
-                  class: 'cc-attribute-roll',
+                  class: 'cc-attribute-roll roller',
                   trigger: {triggeredFuncs: ['initiateAttributeRoll']}
                 })
                   = attr
@@ -548,10 +548,17 @@
     }
   };
 
+  // Action-button trigger.name is normalized with dashes (e.g.
+  // "academia-focus-finance-roll"), not the underscores used everywhere
+  // else on this sheet (attribute/calculation trigger names) - confirmed
+  // by inspecting the compiled sheet's own cascade data. Normalize before
+  // matching so the regexes below (written against underscore form) work.
+  const ccNormalizeName = (name) => name.replace(/-/g, '_');
+
   // Attribute-only roll (no skill): target number is just the attribute's
   // own rating, crit only on a natural 1 (no focus applies).
   const initiateAttributeRoll = async ({trigger, attributes}) => {
-    const attr = trigger.name.replace(/_roll$/, '');
+    const attr = ccNormalizeName(trigger.name).replace(/_roll$/, '');
     const rating = Number(attributes[`${attr}_rating`]) || 0;
     await runCcRoll({
       skillLabel: ccCapitalize(attr),
@@ -567,7 +574,7 @@
   // RAW ("if you don't have a focus that applies, each die that rolls a
   // 1 is a critical success").
   const initiateSkillRoll = async ({trigger, attributes}) => {
-    const skill = trigger.name.replace(/_skill_roll$/, '');
+    const skill = ccNormalizeName(trigger.name).replace(/_skill_roll$/, '');
     const skillRanks = Number(attributes[`${skill}_ranks`]) || 0;
     await runCcRoll({
       skillLabel: ccCapitalize(skill),
@@ -582,7 +589,7 @@
   // Focus roll: crit on a die <= this skill's ranks, since a
   // focus-specific roller always "has the focus" that applies.
   const initiateFocusRoll = async ({trigger, attributes}) => {
-    const match = trigger.name.match(/^(.+)_focus_(.+)_roll$/);
+    const match = ccNormalizeName(trigger.name).match(/^(.+)_focus_(.+)_roll$/);
     if (!match) { return; }
     const [, skill, focusSlug] = match;
     const skillRanks = Number(attributes[`${skill}_ranks`]) || 0;
