@@ -586,7 +586,7 @@
         </div>
       </div>
     </div>
-    <div class="cc-footer"><span class="cc-build-html">HTML build: 2026-09-28 15:59:40 UTC</span><span class="cc-build-css"></span></div>
+    <div class="cc-footer"><span class="cc-build-html">HTML build: 2026-09-28 16:12:31 UTC</span><span class="cc-build-css"></span></div>
   </div>
       </article>
       <article class="tabs__container tabs--cohors-cthulhu__container tabs--cohors-cthulhu__container--spells" data-container-tab="cohors-cthulhu" data-tab="spells">
@@ -693,20 +693,22 @@
     </div>
   </div>
 </main>
-<rolltemplate class="sheet-rolltemplate-ccskill">{{#character_name}}{{#character_id}}
-  <h4 class="character_name">[{{character_name}}](http://journal.roll20.net/character/{{character_id}})</h4>{{/character_id}}{{^character_id}}
-  <h4 class="character_name">{{character_name}}</h4>{{/character_id}}{{/character_name}}
-  <div class="cc-roll-header"><span class="cc-roll-skill">{{skill}}</span>{{#focus}}<span class="cc-roll-focus">({{focus}})</span>{{/focus}}
+<rolltemplate class="sheet-rolltemplate-ccskill">
+  <div class="cc-roll-card">{{#character_name}}{{#character_id}}
+    <h4 class="character_name">[{{character_name}}](http://journal.roll20.net/character/{{character_id}})</h4>{{/character_id}}{{^character_id}}
+    <h4 class="character_name">{{character_name}}</h4>{{/character_id}}{{/character_name}}
+    <div class="cc-roll-header"><span class="cc-roll-skill">{{skill}}</span>{{#focus}}<span class="cc-roll-focus">({{focus}})</span>{{/focus}}
+    </div>
+    <div class="cc-roll-body">
+      <div class="cc-roll-row"><span>Dice:</span><span>{{computed::dice_text}}</span></div>
+      <div class="cc-roll-row"><span>Target Number:</span><span>{{computed::target_number}}</span></div>
+      <div class="cc-roll-row"><span>Difficulty:</span><span>{{difficulty}}</span></div>
+      <div class="cc-roll-row"><span>Successes:</span><span>{{computed::successes}}</span></div>{{#rollGreater() computed::complications 0}}
+      <div class="cc-roll-row cc-roll-complication"><span>Complications:</span><span>{{computed::complications}}</span></div>{{/rollGreater() computed::complications 0}}
+    </div>{{#rollTotal() computed::outcome 1}}
+    <div class="cc-roll-outcome cc-roll-pass"><span>Passed - Momentum: {{computed::bonus_momentum}}</span></div>{{/rollTotal() computed::outcome 1}}{{#rollTotal() computed::outcome 0}}
+    <div class="cc-roll-outcome cc-roll-fail"><span>Failed</span></div>{{/rollTotal() computed::outcome 0}}
   </div>
-  <div class="cc-roll-body">
-    <div class="cc-roll-row"><span>Dice:</span><span>{{computed::dice_text}}</span></div>
-    <div class="cc-roll-row"><span>Target Number:</span><span>{{computed::target_number}}</span></div>
-    <div class="cc-roll-row"><span>Difficulty:</span><span>{{difficulty}}</span></div>
-    <div class="cc-roll-row"><span>Successes:</span><span>{{computed::successes}}</span></div>{{#rollGreater() computed::complications 0}}
-    <div class="cc-roll-row cc-roll-complication"><span>Complications:</span><span>{{computed::complications}}</span></div>{{/rollGreater() computed::complications 0}}
-  </div>{{#rollTotal() computed::outcome 1}}
-  <div class="cc-roll-outcome cc-roll-pass"><span>Passed - Momentum: {{computed::bonus_momentum}}</span></div>{{/rollTotal() computed::outcome 1}}{{#rollTotal() computed::outcome 0}}
-  <div class="cc-roll-outcome cc-roll-fail"><span>Failed</span></div>{{/rollTotal() computed::outcome 0}}
 </rolltemplate>
 <script type="text/worker">const k = (function(){
   const kFuncs = {};

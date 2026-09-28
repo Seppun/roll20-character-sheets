@@ -3,49 +3,53 @@
 //- views/_character.pug). Shows the dice, target number, successes,
 //- complications (if any), and pass/fail with Momentum generated.
 +rolltemplate('ccskill')
-  +characterLink
-  .cc-roll-header
-    span.cc-roll-skill {{skill}}
-    +templateConditionalDisplay('focus')
-      span.cc-roll-focus ({{focus}})
-  .cc-roll-body
-    //- Fields we only ever set via finishRoll's overrides (never part of
-    //- the initial roll string's dice/query math) must be referenced here
-    //- as computed::fieldname - plain {{fieldname}} shows the ORIGINAL
-    //- value of the [[0]] placeholder from startRoll, ignoring the
-    //- override entirely. Confirmed against the proven pattern in this
-    //- repo's Achtung!_Cthulhu_2d20 sheet. difficulty is read from
-    //- roll.results but never overridden, so it stays plain.
-    //-
-    //- A plain {{#field}}/{{#computed::field}} section does NOT respect
-    //- finishRoll overrides either (same underlying quirk - the section's
-    //- truthiness is checked against the pre-override value), so
-    //- conditional display of an overridden field needs the rollTotal()/
-    //- rollGreater() helper functions instead, which do an exact
-    //- comparison against the computed value (again mirroring
-    //- Achtung!_Cthulhu_2d20's own {{#rollTotal() computed::outcome 1}}).
-    .cc-roll-row
-      span Dice:
-      span {{computed::dice_text}}
-    .cc-roll-row
-      span Target Number:
-      span {{computed::target_number}}
-    .cc-roll-row
-      span Difficulty:
-      span {{difficulty}}
-    .cc-roll-row
-      span Successes:
-      span {{computed::successes}}
-    +rollGreater({values: 'computed::complications 0'})
-      .cc-roll-row.cc-roll-complication
-        span Complications:
-        span {{computed::complications}}
-  +rollTotal({values: 'computed::outcome 1'})
-    .cc-roll-outcome.cc-roll-pass
-      span Passed - Momentum: {{computed::bonus_momentum}}
-  +rollTotal({values: 'computed::outcome 0'})
-    .cc-roll-outcome.cc-roll-fail
-      span Failed
+  //- All visual styling lives on this inner wrapper, not on the
+  //- rolltemplate's own root (.sheet-rolltemplate-ccskill) - see the SCSS
+  //- comment below for why.
+  .cc-roll-card
+    +characterLink
+    .cc-roll-header
+      span.cc-roll-skill {{skill}}
+      +templateConditionalDisplay('focus')
+        span.cc-roll-focus ({{focus}})
+    .cc-roll-body
+      //- Fields we only ever set via finishRoll's overrides (never part of
+      //- the initial roll string's dice/query math) must be referenced here
+      //- as computed::fieldname - plain {{fieldname}} shows the ORIGINAL
+      //- value of the [[0]] placeholder from startRoll, ignoring the
+      //- override entirely. Confirmed against the proven pattern in this
+      //- repo's Achtung!_Cthulhu_2d20 sheet. difficulty is read from
+      //- roll.results but never overridden, so it stays plain.
+      //-
+      //- A plain {{#field}}/{{#computed::field}} section does NOT respect
+      //- finishRoll overrides either (same underlying quirk - the section's
+      //- truthiness is checked against the pre-override value), so
+      //- conditional display of an overridden field needs the rollTotal()/
+      //- rollGreater() helper functions instead, which do an exact
+      //- comparison against the computed value (again mirroring
+      //- Achtung!_Cthulhu_2d20's own {{#rollTotal() computed::outcome 1}}).
+      .cc-roll-row
+        span Dice:
+        span {{computed::dice_text}}
+      .cc-roll-row
+        span Target Number:
+        span {{computed::target_number}}
+      .cc-roll-row
+        span Difficulty:
+        span {{difficulty}}
+      .cc-roll-row
+        span Successes:
+        span {{computed::successes}}
+      +rollGreater({values: 'computed::complications 0'})
+        .cc-roll-row.cc-roll-complication
+          span Complications:
+          span {{computed::complications}}
+    +rollTotal({values: 'computed::outcome 1'})
+      .cc-roll-outcome.cc-roll-pass
+        span Passed - Momentum: {{computed::bonus_momentum}}
+    +rollTotal({values: 'computed::outcome 0'})
+      .cc-roll-outcome.cc-roll-fail
+        span Failed
 
 +scss('roll').
   // Roll templates render inside Roll20's chat pane, which sanitizes their
@@ -63,7 +67,14 @@
   // ourselves - Roll20 doesn't add a second one) and .inlinerollresult
   // (Roll20's own built-in class, never prefixed) needs a matching
   // "sheet-" prefix or it silently never matches anything.
-  .sheet-rolltemplate-ccskill {
+  //
+  // Critically: visual styling (background/border/font/padding) does NOT
+  // reliably apply when placed directly on .sheet-rolltemplate-ccskill
+  // itself - it needs to live on a child wrapper div instead. Confirmed
+  // against an old hand-authored prototype of this same sheet that did
+  // get roll template styling working, which put all of its visual rules
+  // on a nested .sheet-template wrapper rather than the rolltemplate root.
+  .sheet-rolltemplate-ccskill .sheet-cc-roll-card {
     font-family: Georgia, serif;
     background: #ece3cd;
     color: #2b2018;
