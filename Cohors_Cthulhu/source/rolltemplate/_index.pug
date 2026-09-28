@@ -34,11 +34,15 @@
       span Failed
 
 +scss('roll').
+  // Roll templates render inside Roll20's chat pane, which sanitizes their
+  // CSS through a stricter, older filter than the main sheet - CSS custom
+  // properties (var()) are not on its allowlist and get the whole
+  // declaration silently dropped. Plain hardcoded colors only in here.
   .sheet-rolltemplate-cc-skill {
-    font-family: var(--cc-body-font, Georgia, serif);
-    background: var(--cc-parchment, #ece3cd);
-    color: var(--cc-ink, #2b2018);
-    border: 1px solid var(--cc-rule, #8a1c2b);
+    font-family: Georgia, serif;
+    background: #ece3cd;
+    color: #2b2018;
+    border: 1px solid #8a1c2b;
     border-radius: 3px;
     padding: 0.4rem 0.6rem;
     min-width: 220px;
@@ -47,7 +51,7 @@
       font-weight: bold;
       text-transform: uppercase;
       letter-spacing: 0.03em;
-      color: var(--cc-rule, #8a1c2b);
+      color: #8a1c2b;
       margin-bottom: 0.2rem;
 
       .cc-roll-focus {

@@ -1733,10 +1733,10 @@ body.sheet-darkmode {
 }
 
 .sheet-rolltemplate-cc-skill {
-  font-family: var(--cc-body-font, Georgia, serif);
-  background: var(--cc-parchment, #ece3cd);
-  color: var(--cc-ink, #2b2018);
-  border: 1px solid var(--cc-rule, #8a1c2b);
+  font-family: Georgia, serif;
+  background: #ece3cd;
+  color: #2b2018;
+  border: 1px solid #8a1c2b;
   border-radius: 3px;
   padding: 0.4rem 0.6rem;
   min-width: 220px;
@@ -1745,7 +1745,7 @@ body.sheet-darkmode {
   font-weight: bold;
   text-transform: uppercase;
   letter-spacing: 0.03em;
-  color: var(--cc-rule, #8a1c2b);
+  color: #8a1c2b;
   margin-bottom: 0.2rem;
 }
 .sheet-rolltemplate-cc-skill .cc-roll-header .cc-roll-focus {

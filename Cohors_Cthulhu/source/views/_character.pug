@@ -483,6 +483,13 @@
     const complicationQuery = '?{Complication range (1-5)|1}';
     const bonusDiceQuery = '?{Additional d20s bought (0-3)|0}';
 
+    // Every field we plan to set via finishRoll must already exist in the
+    // original roll string as a [[0]] placeholder - Roll20's finishRoll can
+    // only update fields that were part of the initial message, it cannot
+    // inject brand new field names. (Confirmed the hard way: character_name/
+    // skill/difficulty, which WERE declared upfront, rendered fine; target_
+    // number/successes/etc, which were only ever set via finishRoll's second
+    // argument, never appeared at all.)
     const rollString = '&{template:cc-skill} ' +
       `{{character_name=@{character_name}}} ` +
       `{{skill=${skillLabel}}} ` +
@@ -490,7 +497,14 @@
       `{{attribute_choice=[[0+${attributeExpr}]]}} ` +
       `{{difficulty=[[0+${difficultyQuery}]]}} ` +
       `{{complication_range=[[0+${complicationQuery}]]}} ` +
-      `{{roll1=[[(2+${bonusDiceQuery})d20]]}}`;
+      `{{roll1=[[(2+${bonusDiceQuery})d20]]}} ` +
+      `{{target_number=[[0]]}} ` +
+      `{{successes=[[0]]}} ` +
+      `{{dice_text=[[0]]}} ` +
+      `{{passed=[[0]]}} ` +
+      `{{failed=[[0]]}} ` +
+      `{{complications=[[0]]}} ` +
+      `{{bonus_momentum=[[0]]}}`;
     log(`CC DEBUG: roll string = ${rollString}`);
 
     const roll = await startRoll(rollString);
@@ -514,6 +528,9 @@
           target_number: '?',
           successes: '?',
           dice_text: `error: could not read dice from ${JSON.stringify(roll1)}`,
+          passed: '',
+          failed: 1,
+          complications: '',
         });
         return;
       }
@@ -525,20 +542,19 @@
       const complicationCount = dice.filter((d) => d >= complicationThreshold).length;
       const passed = successCount >= difficulty;
 
+      // Every key is set explicitly on every path (never omitted), since
+      // the [[0]] placeholder left it as the string "0" - and Roll20
+      // templates treat "0" as non-empty/truthy, so an un-set {{#passed}}
+      // or {{#complications}} would otherwise always show.
       const overrides = {
         target_number: targetNumber,
         successes: successCount,
         dice_text: dice.join(', '),
+        passed: passed ? 1 : '',
+        failed: passed ? '' : 1,
+        bonus_momentum: passed ? Math.max(0, successCount - difficulty) : '',
+        complications: complicationCount > 0 ? complicationCount : '',
       };
-      if (passed) {
-        overrides.passed = 1;
-        overrides.bonus_momentum = Math.max(0, successCount - difficulty);
-      } else {
-        overrides.failed = 1;
-      }
-      if (complicationCount > 0) {
-        overrides.complications = complicationCount;
-      }
 
       log(`CC DEBUG: finishing roll with overrides = ${JSON.stringify(overrides)}`);
       finishRoll(roll.rollId, overrides);
@@ -550,6 +566,9 @@
         target_number: '?',
         successes: '?',
         dice_text: `error: ${err.message}`,
+        passed: '',
+        failed: 1,
+        complications: '',
       });
     }
   };
