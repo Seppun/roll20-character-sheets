@@ -3,6 +3,15 @@
 //- armor / injuries / courage / fortune, attributes, skills, languages, xp)
 //- plus Weapons and Armor from page 2, grouped here with Skills since
 //- these are the sections used most often during play.
+//-
+//- buildVersion is stamped at compile time (npm run build), not at
+//- runtime, so it freezes to whatever moment the HTML/CSS were last
+//- built - one value is printed directly into the page footer's HTML,
+//- the other into the page footer's CSS (as a ::after content string).
+//- If they ever show different values in Roll20, whichever one is
+//- older was pasted from a stale copy of that file (Sheet Layout vs
+//- Sheet Style are two separate paste targets in Game Settings).
+- const buildVersion = new Date().toISOString().replace('T', ' ').slice(0, 19) + ' UTC'
 +tab({name: 'character', container: 'article', button: {content: 'Character'}})
   .cc-page.cc-character
 
@@ -184,8 +193,31 @@
             span Available
             +number({name: 'xp available', readonly: true, trigger: {calculation: 'calcXpAvailable'}})
 
+    .cc-footer
+      span.cc-build-html HTML build: #{buildVersion}
+      span.cc-build-css
+
 +scss.
   .cc-character {
+    .cc-footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 0.5rem;
+      margin-top: 0.4rem;
+      padding-top: 0.2rem;
+      border-top: 1px solid var(--cc-rule);
+      font-size: 0.65rem;
+      color: var(--cc-ink);
+      opacity: 0.6;
+    }
+
+    // If this never appears in Roll20, the Sheet Style paste is stale -
+    // this text lives only in the compiled CSS, not the HTML, so its
+    // absence (or an older-looking value than .cc-build-html) means the
+    // CSS box wasn't updated to match the last HTML paste.
+    .cc-build-css::after {
+      content: "CSS build: #{buildVersion}";
+    }
     .cc-truths-scars-grid {
       display: grid;
       grid-template-columns: repeat(5, 1fr);

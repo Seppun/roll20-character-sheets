@@ -1278,6 +1278,20 @@ body .ui-dialog .tab-content .charsheet .cc-table td textarea {
   color: var(--cc-ink);
   font-family: var(--cc-body-font);
 }
+body .ui-dialog .tab-content .charsheet .cc-character .cc-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: 0.4rem;
+  padding-top: 0.2rem;
+  border-top: 1px solid var(--cc-rule);
+  font-size: 0.65rem;
+  color: var(--cc-ink);
+  opacity: 0.6;
+}
+body .ui-dialog .tab-content .charsheet .cc-character .cc-build-css::after {
+  content: "CSS build: 2026-09-28 14:32:44 UTC";
+}
 body .ui-dialog .tab-content .charsheet .cc-character .cc-truths-scars-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
@@ -1508,6 +1522,20 @@ body.sheet-darkmode {
   --cc-rule: #7a1a28;
 }
 
+.cc-character .cc-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: 0.4rem;
+  padding-top: 0.2rem;
+  border-top: 1px solid var(--cc-rule);
+  font-size: 0.65rem;
+  color: var(--cc-ink);
+  opacity: 0.6;
+}
+.cc-character .cc-build-css::after {
+  content: "CSS build: 2026-09-28 14:32:44 UTC";
+}
 .cc-character .cc-truths-scars-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
