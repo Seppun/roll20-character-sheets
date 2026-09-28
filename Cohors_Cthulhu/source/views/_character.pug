@@ -135,10 +135,28 @@
     .cc-panel.cc-vitals
       .cc-vitals-stress
         .cc-banner Stress
-        +fillLeft({
-          radioObj: {name: 'stress'},
-          valueArray: Array.from({length: 20}, (_, i) => i + 1)
-        }).cc-stress-track
+        //- Hand-expanded from +fillLeft (see the SCSS comment on
+        //- .cc-stress-track below for how its "selected/unselected" fill
+        //- coloring works) so a second, hidden radio group - one radio per
+        //- box, sharing the same 1-20 values - can be interleaved as
+        //- siblings of the visible checkboxes. That hidden group's value
+        //- is kept equal to stress_max by reusing calcStressMax as its own
+        //- calculation, so whichever one of its radios is "checked" marks
+        //- the max-value boundary. Pure CSS can't compare two numbers, but
+        //- it CAN compare checkbox states via sibling selectors - the same
+        //- trick fillLeft itself already uses for the selected/unselected
+        //- split - so putting each box's own hidden radio right after it
+        //- lets `:checked ~ .fill-left__radio` grey out (and, via
+        //- pointer-events, disable) every visible box past the boundary.
+        .cc-stress-track
+          +hidden({name: 'stress', value: 0}).fill-left__radio
+          each value in Array.from({length: 20}, (_, i) => i + 1)
+            +checkbox({name: 'stress', value}).fill-left__radio
+            +radio({
+              name: 'stress max marker',
+              value,
+              trigger: {calculation: 'calcStressMax'}
+            }).cc-stress-max-marker
         .cc-field.cc-stress-max
           span Max
           +number({name: 'stress max', readonly: true, trigger: {calculation: 'calcStressMax'}})
@@ -167,8 +185,8 @@
     - const ccBonusDamageAttributes = ['brawn', 'insight', 'will']
     -
       const ccRatingAffects = {
-        brawn: ['brawn_bonus_damage', 'base_armour', 'total_armor', 'stress_max'],
-        will: ['will_bonus_damage', 'courage', 'stress_max', 'power_rating'],
+        brawn: ['brawn_bonus_damage', 'base_armour', 'total_armor', 'stress_max', 'stress_max_marker'],
+        will: ['will_bonus_damage', 'courage', 'stress_max', 'stress_max_marker', 'power_rating'],
         insight: ['insight_bonus_damage', 'power_rating'],
         reason: ['power_rating'],
       }
@@ -225,7 +243,7 @@
           +skill('medicine', ['Contagion', 'Faith Healing', 'Field Treatment', 'Pharmacia', 'Surgery'])
           +skill('observation', ['Hearing', 'Instincts', 'Sight', 'Smell and Taste'])
           +skill('persuasion', ['Charm', 'Deception', 'Innuendo', 'Intimidation', 'Invocation', 'Negotiation', 'Rhetoric'])
-          +skill('resilience', ['Discipline', 'Fortitude', 'Immunity'], ['stress_max'])
+          +skill('resilience', ['Discipline', 'Fortitude', 'Immunity'], ['stress_max', 'stress_max_marker'])
           +skill('stealth', ['Concealment', 'Disguise', 'Escape Artistry', 'Lock Picking', 'Sleight of Hand', 'Sneak'])
           +skill('survival', ['Animal Handling', 'Boating', 'Foraging', 'Hunting', 'Mysticism', 'Navigation', 'Tracking', 'Woodcraft'])
           +skill('tactics', ['Cavalry', 'Infantry', 'Leadership', 'Navy', 'Omen Reading', 'Scouting'])
@@ -477,6 +495,25 @@
         width: 0.9rem;
         height: 0.9rem;
         border: 1px solid var(--cc-rule);
+      }
+
+      // The hidden stress-max-marker radios (see the pug comment above
+      // .cc-stress-track) never need to be visible themselves - only
+      // their checked state matters, which display:none doesn't affect.
+      .cc-stress-max-marker {
+        display: none;
+      }
+
+      // Grey out and disable every visible box past the checked marker -
+      // i.e. every value greater than stress_max, since the marker with
+      // that same value sits immediately after its matching visible box
+      // (see the pug comment above). pointer-events prevents clicking a
+      // disabled box back to "selected" (a plain visual dim wouldn't stop
+      // that); a real HTML disabled attribute isn't an option since it
+      // can't be toggled at runtime from a sheet worker.
+      .cc-stress-max-marker:checked ~ .fill-left__radio {
+        opacity: 0.35;
+        pointer-events: none;
       }
     }
 
