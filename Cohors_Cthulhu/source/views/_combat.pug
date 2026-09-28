@@ -1,37 +1,9 @@
 //- views/_combat.pug
-//- Page 2 of the official sheet: Weapons, Armor, Belongings, Talents.
+//- Page 2 of the official sheet: Belongings and Talents.
+//- Weapons and Armor moved to the Character tab, alongside Skills, since
+//- those are the sections used most often during play.
 +tab({name: 'combat', container: 'article'})
   .cc-page.cc-combat
-
-    .cc-panel.cc-weapons
-      .cc-banner(data-i18n='weapons') Weapons
-      .cc-rep-table
-        .cc-rep-header
-          span(data-i18n='name') Name
-          span(data-i18n='focus') Focus
-          span(data-i18n='reach or range') Reach or Range
-          span(data-i18n='damage and effects') Damage &amp; Effects
-          span(data-i18n='size') Size
-          span(data-i18n='qualities') Qualities
-        +fieldset({name: 'weapon'})
-          +text({name: 'name'})
-          +text({name: 'focus'})
-          +text({name: 'reach range'})
-          +text({name: 'damage effects'})
-          +text({name: 'size'})
-          +text({name: 'qualities'})
-
-    .cc-panel.cc-armor
-      .cc-banner(data-i18n='armor') Armor
-      .cc-rep-table.cc-rep-armor
-        .cc-rep-header
-          span(data-i18n='name') Name
-          span(data-i18n='resistance') Resistance
-          span(data-i18n='qualities') Qualities
-        +fieldset({name: 'armor'})
-          +text({name: 'name'})
-          +number({name: 'resistance'})
-          +text({name: 'qualities'})
 
     .cc-panel.cc-belongings
       .cc-banner(data-i18n='belongings') Belongings
@@ -51,49 +23,6 @@
 
 +scss.
   .cc-combat {
-    .cc-rep-table {
-      .cc-rep-header,
-      fieldset,
-      .repcontainer .repitem {
-        display: grid;
-        grid-template-columns: 1fr 1fr 1fr 2fr 0.6fr 1.4fr;
-        gap: 0.3rem;
-      }
-
-      .cc-rep-header {
-        background: var(--cc-banner);
-        color: var(--cc-banner-text);
-        font-size: 0.75rem;
-        text-transform: uppercase;
-        padding: 0.2rem 0.4rem;
-      }
-
-      fieldset,
-      .repcontainer .repitem {
-        border: none;
-        border-bottom: 1px solid var(--cc-rule);
-        padding: 0.3rem 0.4rem;
-        margin: 0;
-      }
-
-      input,
-      textarea {
-        width: 100%;
-        background: transparent;
-        border: 1px solid var(--cc-rule);
-        color: var(--cc-ink);
-        border-radius: 2px;
-      }
-    }
-
-    .cc-rep-armor {
-      .cc-rep-header,
-      fieldset,
-      .repcontainer .repitem {
-        grid-template-columns: 1.5fr 1fr 2.5fr;
-      }
-    }
-
     .cc-rep-talents {
       .cc-rep-header,
       fieldset,

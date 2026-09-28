@@ -1,6 +1,8 @@
 //- views/_character.pug
-//- Page 1 of the official sheet: identity header, truths & scars, stress /
-//- armor / injuries / courage / fortune, attributes, skills, languages, xp.
+//- Page 1 of the official sheet (identity header, truths & scars, stress /
+//- armor / injuries / courage / fortune, attributes, skills, languages, xp)
+//- plus Weapons and Armor from page 2, grouped here with Skills since
+//- these are the sections used most often during play.
 +tab({name: 'character', container: 'article'})
   .cc-page.cc-character
 
@@ -97,6 +99,36 @@
           +skill('stealth', ['Concealment', 'Disguise', 'Escape Artistry', 'Lock Picking', 'Sleight of Hand', 'Sneak'])
           +skill('survival', ['Animal Handling', 'Boating', 'Foraging', 'Hunting', 'Mysticism', 'Navigation', 'Tracking', 'Woodcraft'])
           +skill('tactics', ['Cavalry', 'Infantry', 'Leadership', 'Navy', 'Omen Reading', 'Scouting'])
+
+    .cc-panel.cc-weapons
+      .cc-banner(data-i18n='weapons') Weapons
+      .cc-rep-table.cc-rep-weapons
+        .cc-rep-header
+          span(data-i18n='name') Name
+          span(data-i18n='focus') Focus
+          span(data-i18n='reach or range') Reach or Range
+          span(data-i18n='damage and effects') Damage &amp; Effects
+          span(data-i18n='size') Size
+          span(data-i18n='qualities') Qualities
+        +fieldset({name: 'weapon'})
+          +text({name: 'name'})
+          +text({name: 'focus'})
+          +text({name: 'reach range'})
+          +text({name: 'damage effects'})
+          +text({name: 'size'})
+          +text({name: 'qualities'})
+
+    .cc-panel.cc-armor
+      .cc-banner(data-i18n='armor') Armor
+      .cc-rep-table.cc-rep-armor
+        .cc-rep-header
+          span(data-i18n='name') Name
+          span(data-i18n='resistance') Resistance
+          span(data-i18n='qualities') Qualities
+        +fieldset({name: 'armor'})
+          +text({name: 'name'})
+          +number({name: 'resistance'})
+          +text({name: 'qualities'})
 
     .cc-field-group
       .cc-field.cc-languages
@@ -235,9 +267,21 @@
       gap: 0.2rem;
       font-size: 0.8rem;
       font-style: italic;
+      white-space: nowrap;
 
+      // k-scaffold's default checkbox border relies on a mistyped custom
+      // property upstream (--checkboxBorderColor falls back to an
+      // undefined --checkboxBorderColor variable), which drops the whole
+      // border declaration - so checkboxes render invisible unless we
+      // set it explicitly here.
       .cc-focus-checkbox {
         margin: 0;
+        width: 0.8rem !important;
+        height: 0.8rem !important;
+        min-width: 0.8rem !important;
+        min-height: 0.8rem !important;
+        border: 1px solid var(--cc-rule) !important;
+        background: var(--cc-parchment) !important;
       }
 
       .cc-focus-roll {
@@ -256,12 +300,29 @@
         }
 
         &:before {
-          font-size: 0.9em;
+          font-size: 0.75em;
+          opacity: 0.6;
         }
       }
     }
 
     .cc-languages textarea {
       min-height: 4rem;
+    }
+
+    .cc-rep-weapons {
+      .cc-rep-header,
+      fieldset,
+      .repcontainer .repitem {
+        grid-template-columns: 1fr 1fr 1fr 2fr 0.6fr 1.4fr;
+      }
+    }
+
+    .cc-rep-armor {
+      .cc-rep-header,
+      fieldset,
+      .repcontainer .repitem {
+        grid-template-columns: 1.5fr 1fr 2.5fr;
+      }
     }
   }
