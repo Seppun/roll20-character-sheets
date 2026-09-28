@@ -2,37 +2,37 @@
 //- Page 4 of the official sheet (Traits, History, Personal Agenda,
 //- Journal/Notes) plus Belongings and Talents from page 2, merged here
 //- since Combat otherwise held very little on its own.
-+tab({name: 'notes', container: 'article'})
++tab({name: 'notes', container: 'article', button: {content: 'Notes'}})
   .cc-page.cc-notes
 
     .cc-field-group
       .cc-panel.cc-traits
-        .cc-banner(data-i18n='traits') Traits
+        .cc-banner Traits
         +textarea({name: 'traits'})
       .cc-panel.cc-history-agenda
-        .cc-banner(data-i18n='history') History
+        .cc-banner History
         +textarea({name: 'history'})
-        .cc-banner(data-i18n='personal agenda') Personal Agenda
+        .cc-banner Personal Agenda
         +textarea({name: 'personal agenda'})
 
     .cc-panel.cc-belongings
-      .cc-banner(data-i18n='belongings') Belongings
+      .cc-banner Belongings
       +textarea({name: 'belongings'})
 
     .cc-panel.cc-talents
-      .cc-banner(data-i18n='talents') Talents
+      .cc-banner Talents
       .cc-rep-table.cc-rep-talents
         .cc-rep-header
-          span(data-i18n='name') Name
-          span(data-i18n='keywords') Keywords
-          span(data-i18n='description') Description
+          span Name
+          span Keywords
+          span Description
         +fieldset({name: 'talent'})
           +text({name: 'name'})
           +text({name: 'keywords'})
           +textarea({name: 'description'})
 
     .cc-panel.cc-journal
-      .cc-banner(data-i18n='journal and notes') Journal/Notes
+      .cc-banner Journal/Notes
       +textarea({name: 'journal notes'})
 
 +scss.

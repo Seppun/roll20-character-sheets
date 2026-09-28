@@ -2,14 +2,14 @@
 //- Page 3 of the official sheet: spellcasting header + spell list.
 //- The printed sheet has 6 fixed spell blocks; built as a repeating
 //- section here instead so casters aren't capped at 6.
-+tab({name: 'spells', container: 'article'})
++tab({name: 'spells', container: 'article', button: {content: 'Spells'}})
   .cc-page.cc-spells
 
     .cc-panel.cc-spellcasting-header
-      .cc-banner(data-i18n='spellcasting') Spellcasting
+      .cc-banner Spellcasting
       .cc-field-group
         .cc-field
-          span(data-i18n='spellcasting type') Spellcasting Type
+          span Spellcasting Type
           +select({
             name: 'spellcasting type',
             trigger: {affects: ['spellcasting_attribute', 'base_power', 'power_rating']}
@@ -23,53 +23,53 @@
             +option({value: 'dabbling'})
               | Dabbling
         .cc-field
-          span(data-i18n='magical tradition') Magical Tradition
+          span Magical Tradition
           +text({name: 'magical tradition'})
         .cc-field
           //- Not a free choice: Traditional casters use Insight, Research
           //- casters use Reason, Dabblers use Will - fixed by RAW, so this
           //- is derived from Spellcasting Type rather than user-selected.
-          span(data-i18n='spellcasting attribute') Spellcasting Attribute
+          span Spellcasting Attribute
           +text({
             name: 'spellcasting attribute',
             readonly: true,
             trigger: {calculation: 'calcSpellcastingAttribute', affects: ['power_rating']}
           })
         .cc-field
-          span(data-i18n='power rating') Power Rating
+          span Power Rating
           +number({name: 'power rating', readonly: true, trigger: {calculation: 'calcPowerRating'}})
         .cc-field
-          span(data-i18n='base power') Base Power
+          span Base Power
           +number({name: 'base power', readonly: true, trigger: {calculation: 'calcBasePower', affects: ['power_rating']}})
 
     .cc-panel.cc-spell-list
-      .cc-banner(data-i18n='spells') Spells
+      .cc-banner Spells
       +fieldset({name: 'spell'})
         .cc-spell-block
           .cc-field-group
             .cc-field
-              span(data-i18n='name') Name
+              span Name
               +text({name: 'name'})
             .cc-field
-              span(data-i18n='skill') Skill
+              span Skill
               +text({name: 'skill'})
             .cc-field
-              span(data-i18n='difficulty') Difficulty
+              span Difficulty
               +number({name: 'difficulty'})
             .cc-field
-              span(data-i18n='cost') Cost
+              span Cost
               +text({name: 'cost'})
             .cc-field
-              span(data-i18n='duration') Duration
+              span Duration
               +text({name: 'duration'})
             .cc-field
-              span(data-i18n='category') Category
+              span Category
               +text({name: 'category'})
           .cc-field
-            span(data-i18n='spell effect') Spell Effect
+            span Spell Effect
             +textarea({name: 'effect'})
           .cc-field
-            span(data-i18n='momentum') Momentum
+            span Momentum
             +textarea({name: 'momentum'})
 
 +scss.

@@ -3,36 +3,36 @@
 //- armor / injuries / courage / fortune, attributes, skills, languages, xp)
 //- plus Weapons and Armor from page 2, grouped here with Skills since
 //- these are the sections used most often during play.
-+tab({name: 'character', container: 'article'})
++tab({name: 'character', container: 'article', button: {content: 'Character'}})
   .cc-page.cc-character
 
     .cc-banner Cohors Cthulhu
     .cc-field-group
       .cc-field
-        span(data-i18n='name & pronoun') Name & Pronoun
+        span Name & Pronoun
         +text({name: 'name pronoun'})
       .cc-field
-        span(data-i18n='culture') Culture
+        span Culture
         +text({name: 'culture'})
       .cc-field
-        span(data-i18n='caste') Caste
+        span Caste
         +text({name: 'caste'})
       .cc-field
-        span(data-i18n='wealth') Wealth
+        span Wealth
         +text({name: 'wealth'})
     .cc-field-group
       .cc-field
-        span(data-i18n='archetype') Archetype
+        span Archetype
         +text({name: 'archetype'})
       .cc-field
-        span(data-i18n='background') Background
+        span Background
         +text({name: 'background'})
       .cc-field
-        span(data-i18n='characteristic') Characteristic
+        span Characteristic
         +text({name: 'characteristic'})
 
     .cc-panel.cc-truths-scars
-      .cc-banner(data-i18n='personal truths and scars') Personal Truths &amp; Scars
+      .cc-banner Personal Truths &amp; Scars
       .cc-truths-scars-grid
         each n in [1, 2, 3, 4, 5]
           +text({name: `truth ${n}`}).cc-truth
@@ -41,33 +41,33 @@
 
     .cc-panel.cc-vitals
       .cc-vitals-stress
-        .cc-banner(data-i18n='stress') Stress
+        .cc-banner Stress
         +fillLeft({
           radioObj: {name: 'stress'},
           valueArray: Array.from({length: 20}, (_, i) => i + 1)
         }).cc-stress-track
         .cc-field.cc-stress-max
-          span(data-i18n='stress max') Max
+          span Max
           +number({name: 'stress max', readonly: true, trigger: {calculation: 'calcStressMax'}})
       .cc-vitals-courage-fortune
         .cc-field
-          span(data-i18n='courage') Courage
+          span Courage
           +number({name: 'courage', readonly: true, trigger: {calculation: 'calcCourage'}})
         .cc-field
-          span(data-i18n='fortune') Fortune
+          span Fortune
           +fillLeft({
             radioObj: {name: 'fortune'},
             valueArray: [1, 2, 3, 4, 5]
           }).cc-fortune-track
       .cc-vitals-armor
         .cc-field
-          span(data-i18n='base armour') Base Armour
+          span Base Armour
           +number({name: 'base armour', readonly: true, trigger: {calculation: 'calcBaseArmour', affects: ['total_armor']}})
         .cc-field
-          span(data-i18n='total armor') Total Armor
+          span Total Armor
           +number({name: 'total armor', readonly: true, trigger: {calculation: 'calcTotalArmor'}})
       .cc-vitals-injuries
-        .cc-banner(data-i18n='injuries') Injuries
+        .cc-banner Injuries
         +textarea({name: 'injuries'}).cc-injuries
 
     - const ccAttributes = ['agility', 'brawn', 'coordination', 'gravitas', 'insight', 'reason', 'will']
@@ -80,16 +80,22 @@
         reason: ['power_rating'],
       }
     .cc-panel.cc-attributes
-      .cc-banner(data-i18n='attributes') Attributes
+      .cc-banner Attributes
       table.cc-table.cc-attributes-table
         thead
           tr
             th
             each attr in ccAttributes
-              th(data-i18n=attr)= attr
+              th
+                +roller({
+                  name: `${attr} roll`,
+                  class: 'cc-attribute-roll',
+                  trigger: {triggeredFuncs: ['initiateAttributeRoll']}
+                })
+                  = attr
         tbody
           tr
-            th(data-i18n='rating') Rating
+            th Rating
             each attr in ccAttributes
               td
                 +number({
@@ -97,7 +103,7 @@
                   trigger: ccRatingAffects[attr] ? {affects: ccRatingAffects[attr]} : undefined
                 }).cc-attribute-rating
           tr
-            th(data-i18n='bonus damage') Bonus Damage
+            th Bonus Damage
             each attr in ccAttributes
               td
                 if ccBonusDamageAttributes.includes(attr)
@@ -110,13 +116,13 @@
                   span.cc-attribute-bonus-damage.cc-disabled
 
     .cc-panel.cc-skills
-      .cc-banner(data-i18n='skills') Skills
+      .cc-banner Skills
       table.cc-table.cc-skills-table
         thead
           tr
-            th(data-i18n='skill') Skill
-            th(data-i18n='ranks') Ranks
-            th(data-i18n='focuses') Focuses
+            th Skill
+            th Ranks
+            th Focuses
         tbody
           +skill('academia', ['Finance', 'History', 'Linguistics', 'Philosophy', 'Religion'])
           +skill('athletics', ['Climbing', 'Lifting', 'Physical Training', 'Running', 'Swimming'])
@@ -132,15 +138,15 @@
           +skill('tactics', ['Cavalry', 'Infantry', 'Leadership', 'Navy', 'Omen Reading', 'Scouting'])
 
     .cc-panel.cc-weapons
-      .cc-banner(data-i18n='weapons') Weapons
+      .cc-banner Weapons
       .cc-rep-table.cc-rep-weapons
         .cc-rep-header
-          span(data-i18n='name') Name
-          span(data-i18n='focus') Focus
-          span(data-i18n='reach or range') Reach or Range
-          span(data-i18n='damage and effects') Damage &amp; Effects
-          span(data-i18n='size') Size
-          span(data-i18n='qualities') Qualities
+          span Name
+          span Focus
+          span Reach or Range
+          span Damage &amp; Effects
+          span Size
+          span Qualities
         +fieldset({name: 'weapon'})
           +text({name: 'name'})
           +text({name: 'focus'})
@@ -150,12 +156,12 @@
           +text({name: 'qualities'})
 
     .cc-panel.cc-armor
-      .cc-banner(data-i18n='armor') Armor
+      .cc-banner Armor
       .cc-rep-table.cc-rep-armor
         .cc-rep-header
-          span(data-i18n='name') Name
-          span(data-i18n='resistance') Resistance
-          span(data-i18n='qualities') Qualities
+          span Name
+          span Resistance
+          span Qualities
         +fieldset({name: 'armor'})
           +text({name: 'name'})
           +number({name: 'resistance', trigger: {affects: ['total_armor']}})
@@ -163,19 +169,19 @@
 
     .cc-field-group
       .cc-field.cc-languages
-        span(data-i18n='languages') Languages
+        span Languages
         +textarea({name: 'languages'})
       .cc-panel.cc-experience
-        .cc-banner(data-i18n='experience') Experience
+        .cc-banner Experience
         .cc-field-group
           .cc-field
-            span(data-i18n='xp earned') Earned
+            span Earned
             +number({name: 'xp earned', trigger: {affects: ['xp_available']}})
           .cc-field
-            span(data-i18n='xp spent') Spent
+            span Spent
             +number({name: 'xp spent', trigger: {affects: ['xp_available']}})
           .cc-field
-            span(data-i18n='xp available') Available
+            span Available
             +number({name: 'xp available', readonly: true, trigger: {calculation: 'calcXpAvailable'}})
 
 +scss.
@@ -256,6 +262,26 @@
         text-align: left;
       }
 
+      .cc-attribute-roll {
+        background: none;
+        border: none;
+        padding: 0;
+        color: inherit;
+        font: inherit;
+        text-transform: inherit;
+        letter-spacing: inherit;
+        cursor: pointer;
+
+        &:hover {
+          text-decoration: underline;
+        }
+
+        &:before {
+          font-size: 0.8em;
+          opacity: 0.7;
+        }
+      }
+
       .cc-attribute-rating,
       .cc-attribute-bonus-damage {
         width: 3rem;
@@ -285,6 +311,26 @@
       // columns carry the row-separator line.
       td.cc-skill-ranks-cell {
         border-bottom: none;
+      }
+
+      .cc-skill-name-roll {
+        background: none;
+        border: none;
+        padding: 0;
+        color: inherit;
+        font: inherit;
+        text-transform: inherit;
+        letter-spacing: inherit;
+        cursor: pointer;
+
+        &:hover {
+          text-decoration: underline;
+        }
+
+        &:before {
+          font-size: 0.8em;
+          opacity: 0.7;
+        }
       }
 
       .cc-skill-ranks {
@@ -413,26 +459,24 @@
   };
   k.registerFuncs({calcXpAvailable});
 
-  // Rolling a Focus: 2d20 (plus any bought extra dice), target number =
-  // chosen Attribute + this Skill's ranks, crit on a die <= this skill's
-  // ranks (the focus always "applies" since this is a focus-specific
-  // roller), complication on a die within the chosen complication range.
   const ccCapitalize = (s) => s.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
 
-  const initiateFocusRoll = async ({trigger, attributes}) => {
-    const match = trigger.name.match(/^(.+)_focus_(.+)_roll$/);
-    if (!match) { return; }
-    const [, skill, focusSlug] = match;
-    const skillRanks = Number(attributes[`${skill}_ranks`]) || 0;
+  const ccAttributeQuery = '?{Attribute' +
+    '|Agility,@{agility_rating}' +
+    '|Brawn,@{brawn_rating}' +
+    '|Coordination,@{coordination_rating}' +
+    '|Gravitas,@{gravitas_rating}' +
+    '|Insight,@{insight_rating}' +
+    '|Reason,@{reason_rating}' +
+    '|Will,@{will_rating}}';
 
-    const attributeQuery = '?{Attribute' +
-      '|Agility,@{agility_rating}' +
-      '|Brawn,@{brawn_rating}' +
-      '|Coordination,@{coordination_rating}' +
-      '|Gravitas,@{gravitas_rating}' +
-      '|Insight,@{insight_rating}' +
-      '|Reason,@{reason_rating}' +
-      '|Will,@{will_rating}}';
+  // Shared 2d20 roll core, used for Attribute-only rolls, plain Skill
+  // rolls (no focus), and Focus rolls. attributeExpr is either a literal
+  // rating (attribute-only roll, no choice to make) or the ?{Attribute}
+  // query string (skill/focus rolls, since skill-to-attribute pairing
+  // isn't fixed by RAW). critMax is the die value at/under which a die is
+  // a critical success (this skill's ranks if a focus applies, else 1).
+  const runCcRoll = async ({skillLabel, focusLabel, attributeExpr, skillRanks, critMax}) => {
     const difficultyQuery = '?{Difficulty|1}';
     const complicationQuery = '?{Complication range (1-5)|1}';
     const bonusDiceQuery = '?{Additional d20s bought (0-3)|0}';
@@ -440,9 +484,9 @@
     const roll = await startRoll(
       '&{template:cc-skill} ' +
       `{{character_name=@{character_name}}} ` +
-      `{{skill=${ccCapitalize(skill)}}} ` +
-      `{{focus=${ccCapitalize(focusSlug)}}} ` +
-      `{{attribute_choice=[[0+${attributeQuery}]]}} ` +
+      `{{skill=${skillLabel}}} ` +
+      (focusLabel ? `{{focus=${focusLabel}}} ` : '') +
+      `{{attribute_choice=[[0+${attributeExpr}]]}} ` +
       `{{difficulty=[[0+${difficultyQuery}]]}} ` +
       `{{complication_range=[[0+${complicationQuery}]]}} ` +
       `{{roll1=[[(2+${bonusDiceQuery})d20]]}}`
@@ -456,7 +500,7 @@
     const targetNumber = attributeChoice + skillRanks;
     const complicationThreshold = 21 - complicationRange;
     const successCount = dice.filter((d) => d <= targetNumber).length +
-      dice.filter((d) => d <= skillRanks).length;
+      dice.filter((d) => d <= critMax).length;
     const complicationCount = dice.filter((d) => d >= complicationThreshold).length;
     const passed = successCount >= difficulty;
 
@@ -476,5 +520,52 @@
     }
 
     finishRoll(roll.rollId, overrides);
+  };
+
+  // Attribute-only roll (no skill): target number is just the attribute's
+  // own rating, crit only on a natural 1 (no focus applies).
+  const initiateAttributeRoll = async ({trigger, attributes}) => {
+    const attr = trigger.name.replace(/_roll$/, '');
+    const rating = Number(attributes[`${attr}_rating`]) || 0;
+    await runCcRoll({
+      skillLabel: ccCapitalize(attr),
+      focusLabel: '',
+      attributeExpr: String(rating),
+      skillRanks: 0,
+      critMax: 1,
+    });
+  };
+  k.registerFuncs({initiateAttributeRoll});
+
+  // Plain Skill roll (no specific focus): crit only on a natural 1, per
+  // RAW ("if you don't have a focus that applies, each die that rolls a
+  // 1 is a critical success").
+  const initiateSkillRoll = async ({trigger, attributes}) => {
+    const skill = trigger.name.replace(/_skill_roll$/, '');
+    const skillRanks = Number(attributes[`${skill}_ranks`]) || 0;
+    await runCcRoll({
+      skillLabel: ccCapitalize(skill),
+      focusLabel: '',
+      attributeExpr: ccAttributeQuery,
+      skillRanks,
+      critMax: 1,
+    });
+  };
+  k.registerFuncs({initiateSkillRoll});
+
+  // Focus roll: crit on a die <= this skill's ranks, since a
+  // focus-specific roller always "has the focus" that applies.
+  const initiateFocusRoll = async ({trigger, attributes}) => {
+    const match = trigger.name.match(/^(.+)_focus_(.+)_roll$/);
+    if (!match) { return; }
+    const [, skill, focusSlug] = match;
+    const skillRanks = Number(attributes[`${skill}_ranks`]) || 0;
+    await runCcRoll({
+      skillLabel: ccCapitalize(skill),
+      focusLabel: ccCapitalize(focusSlug),
+      attributeExpr: ccAttributeQuery,
+      skillRanks,
+      critMax: skillRanks,
+    });
   };
   k.registerFuncs({initiateFocusRoll});

@@ -6,7 +6,13 @@
 //- the roll itself (only Resilience needs this, for Stress Max).
 mixin skill(name, focuses, extraAffects)
   tr.cc-skill-row
-    th(data-i18n=name)= name
+    th
+      +roller({
+        name: `${name} skill roll`,
+        class: 'cc-skill-name-roll',
+        trigger: {triggeredFuncs: ['initiateSkillRoll']}
+      })
+        = name
     td.cc-skill-ranks-cell
       +number({
         name: `${name} ranks`,

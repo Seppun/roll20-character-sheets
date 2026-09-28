@@ -9,6 +9,41 @@
 }
 
 @mixin generic {
+  // k-scaffold's tabs mixin adds no default styling for the nav buttons
+  // (by design, so every sheet themes them itself) - without this, tabs
+  // render as plain unstyled inline text with no visible separation.
+  .tabs__nav-list {
+    gap: 0.3rem;
+    padding: 0;
+    margin: 0 0 0.4rem 0;
+  }
+
+  .tabs__button {
+    display: inline-block;
+    padding: 0.4rem 1.1rem;
+    background: var(--cc-parchment-dark);
+    color: var(--cc-rule);
+    border: 1px solid var(--cc-rule);
+    border-bottom: none;
+    border-radius: 4px 4px 0 0;
+    font-family: var(--cc-header-font);
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-size: 0.85rem;
+    cursor: pointer;
+
+    &:hover {
+      background: var(--cc-parchment);
+    }
+
+    &.k-active-button {
+      background: var(--cc-banner);
+      color: var(--cc-banner-text);
+      border-color: var(--cc-banner);
+    }
+  }
+
   .cc-banner {
     // Background is a base64-inlined copy of images/banner-brush.svg (an
     // original brush-stroke ribbon, not traced from the official sheet's

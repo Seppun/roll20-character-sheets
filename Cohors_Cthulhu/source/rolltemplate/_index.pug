@@ -11,27 +11,27 @@
   .cc-roll-body
     +templateConditionalDisplay('dice_text')
       .cc-roll-row
-        span(data-i18n='dice') Dice:
+        span Dice:
         span {{dice_text}}
     .cc-roll-row
-      span(data-i18n='target number') Target Number:
+      span Target Number:
       span {{target_number}}
     .cc-roll-row
-      span(data-i18n='difficulty') Difficulty:
+      span Difficulty:
       span {{difficulty}}
     .cc-roll-row
-      span(data-i18n='successes') Successes:
+      span Successes:
       span {{successes}}
     +templateConditionalDisplay('complications')
       .cc-roll-row.cc-roll-complication
-        span(data-i18n='complications') Complications:
+        span Complications:
         span {{complications}}
   +templateConditionalDisplay('passed')
     .cc-roll-outcome.cc-roll-pass
-      span(data-i18n='roll passed') Passed - Momentum: {{bonus_momentum}}
+      span Passed - Momentum: {{bonus_momentum}}
   +templateConditionalDisplay('failed')
     .cc-roll-outcome.cc-roll-fail
-      span(data-i18n='roll failed') Failed
+      span Failed
 
 +scss('roll').
   .sheet-rolltemplate-cc-skill {

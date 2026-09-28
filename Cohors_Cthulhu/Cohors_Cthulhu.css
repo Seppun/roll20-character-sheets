@@ -1151,6 +1151,34 @@ body .ui-dialog .tab-content .charsheet .tabs__nav-item {
 body .ui-dialog .tab-content .charsheet .tabs__nav-list {
   display: flex;
 }
+body .ui-dialog .tab-content .charsheet .tabs__nav-list {
+  gap: 0.3rem;
+  padding: 0;
+  margin: 0 0 0.4rem 0;
+}
+body .ui-dialog .tab-content .charsheet .tabs__button {
+  display: inline-block;
+  padding: 0.4rem 1.1rem;
+  background: var(--cc-parchment-dark);
+  color: var(--cc-rule);
+  border: 1px solid var(--cc-rule);
+  border-bottom: none;
+  border-radius: 4px 4px 0 0;
+  font-family: var(--cc-header-font);
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+body .ui-dialog .tab-content .charsheet .tabs__button:hover {
+  background: var(--cc-parchment);
+}
+body .ui-dialog .tab-content .charsheet .tabs__button.k-active-button {
+  background: var(--cc-banner);
+  color: var(--cc-banner-text);
+  border-color: var(--cc-banner);
+}
 body .ui-dialog .tab-content .charsheet .cc-banner {
   background: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0NDAgNjIiIHByZXNlcnZlQXNwZWN0UmF0aW89Im5vbmUiPgogIDxwYXRoIGZpbGw9IiM2YjE0MjAiIGQ9Ik0wLDIuOCBMMTgsLTAuMyBMMzYsOC43IEw1NCwtMS43IEw3Miw2LjYgTDkwLDMuNiBMMTA4LC0yLjAgTDEyNiw2LjEgTDE0NCwtMi4zIEwxNjIsNC44CiAgICBMMTgwLC0xLjcgTDE5OCwtMS40IEwyMTYsNC42IEwyMzQsMTEuOSBMMjUyLC0wLjggTDI3MCwxLjAgTDI4OCw4LjMgTDMwNiwxNC4xIEwzMjQsNy40IEwzNDIsNC4xCiAgICBMMzYwLDE0LjYgTDM3OCwtMi4yIEw0MDAsNiBMNDQwLDMwIEw0MDAsNTQgTDM4MCw2MC41IEwzNjIsNTAuMiBMMzQ0LDQ3LjYgTDMyNiw0Ny4xIEwzMDgsNTAuNgogICAgTDI5MCw1OS43IEwyNzIsNDguMyBMMjU0LDU1LjUgTDIzNiw1Ni41IEwyMTgsNTEuNyBMMjAwLDU0LjkgTDE4Miw0Ni4xIEwxNjQsNDYuMSBMMTQ2LDQ4LjcKICAgIEwxMjgsNTcuMiBMMTEwLDUyLjcgTDkyLDUwLjcgTDc0LDU1LjUgTDU2LDUzLjIgTDM4LDUwLjQgTDIwLDU5LjMgTDIsNTcuNiBaIi8+CiAgPHBhdGggZmlsbD0iI2IwNDQ1NiIgb3BhY2l0eT0iMC41NSIgZD0iTTEwLDEyLjMgTDMwLDEzLjggTDUwLDE4LjkgTDcwLDEyLjUgTDkwLDEzLjEgTDExMCwxNC4yIEwxMzAsOC42IEwxNTAsMTMuMgogICAgTDE3MCwxNC44IEwxOTAsMTcuMSBMMjEwLDcuMyBMMjMwLDEwLjIgTDI1MCw3LjMgTDI3MCwxNy4zIEwyOTAsMTUuNyBMMzEwLDYuNiBMMzMwLDE5LjgKICAgIEwzMzAsMzkuNyBMMzEwLDQxLjkgTDI5MCw0Mi4wIEwyNzAsMzUuNyBMMjUwLDM0LjEgTDIzMCwzOC41IEwyMTAsMzcuMyBMMTkwLDQzLjcgTDE3MCw0Mi4zCiAgICBMMTUwLDQxLjIgTDEzMCw0MC43IEwxMTAsNDEuOSBMOTAsMzUuNyBMNzAsMzkuMyBMNTAsMzUuOSBMMzAsNDQuOSBMMTAsMzQuNyBaIi8+CiAgPHBhdGggZmlsbD0iIzM0MDgxMCIgb3BhY2l0eT0iMC41IiBkPSJNNiwzOS42IEwyOCw0NC45IEw1MCw0NC4zIEw3Miw0Mi44IEw5NCw0MC4yIEwxMTYsNDUuOSBMMTM4LDQ2LjEgTDE2MCw0My4xCiAgICBMMTgyLDQzLjEgTDIwNCw0MC40IEwyMjYsMzguMCBMMjQ4LDQxLjcgTDI3MCw0My45IEwyOTIsMzguNyBMMzE0LDQ1LjkKICAgIEwzMTQsNTkuNyBMMjkyLDUzLjEgTDI3MCw1Mi4yIEwyNDgsNjAuMCBMMjI2LDUzLjUgTDIwNCw1My4wIEwxODIsNTcuMiBMMTYwLDU0LjggTDEzOCw1OS4xCiAgICBMMTE2LDUzLjkgTDk0LDU5LjcgTDcyLDU0LjYgTDUwLDU2LjggTDI4LDU5LjUgTDYsNTcuNSBaIi8+Cjwvc3ZnPgo=") no-repeat center/100% 100%;
   color: var(--cc-banner-text);
@@ -1313,6 +1341,23 @@ body .ui-dialog .tab-content .charsheet .cc-character .cc-attributes-table td {
 body .ui-dialog .tab-content .charsheet .cc-character .cc-attributes-table th:first-child {
   text-align: left;
 }
+body .ui-dialog .tab-content .charsheet .cc-character .cc-attributes-table .cc-attribute-roll {
+  background: none;
+  border: none;
+  padding: 0;
+  color: inherit;
+  font: inherit;
+  text-transform: inherit;
+  letter-spacing: inherit;
+  cursor: pointer;
+}
+body .ui-dialog .tab-content .charsheet .cc-character .cc-attributes-table .cc-attribute-roll:hover {
+  text-decoration: underline;
+}
+body .ui-dialog .tab-content .charsheet .cc-character .cc-attributes-table .cc-attribute-roll:before {
+  font-size: 0.8em;
+  opacity: 0.7;
+}
 body .ui-dialog .tab-content .charsheet .cc-character .cc-attributes-table .cc-attribute-rating,
 body .ui-dialog .tab-content .charsheet .cc-character .cc-attributes-table .cc-attribute-bonus-damage {
   width: 3rem;
@@ -1335,6 +1380,23 @@ body .ui-dialog .tab-content .charsheet .cc-character .cc-skills-table td {
 }
 body .ui-dialog .tab-content .charsheet .cc-character .cc-skills-table td.cc-skill-ranks-cell {
   border-bottom: none;
+}
+body .ui-dialog .tab-content .charsheet .cc-character .cc-skills-table .cc-skill-name-roll {
+  background: none;
+  border: none;
+  padding: 0;
+  color: inherit;
+  font: inherit;
+  text-transform: inherit;
+  letter-spacing: inherit;
+  cursor: pointer;
+}
+body .ui-dialog .tab-content .charsheet .cc-character .cc-skills-table .cc-skill-name-roll:hover {
+  text-decoration: underline;
+}
+body .ui-dialog .tab-content .charsheet .cc-character .cc-skills-table .cc-skill-name-roll:before {
+  font-size: 0.8em;
+  opacity: 0.7;
 }
 body .ui-dialog .tab-content .charsheet .cc-character .cc-skills-table .cc-skill-ranks {
   width: 3rem;
@@ -1509,6 +1571,23 @@ body.sheet-darkmode {
 .cc-character .cc-attributes-table th:first-child {
   text-align: left;
 }
+.cc-character .cc-attributes-table .cc-attribute-roll {
+  background: none;
+  border: none;
+  padding: 0;
+  color: inherit;
+  font: inherit;
+  text-transform: inherit;
+  letter-spacing: inherit;
+  cursor: pointer;
+}
+.cc-character .cc-attributes-table .cc-attribute-roll:hover {
+  text-decoration: underline;
+}
+.cc-character .cc-attributes-table .cc-attribute-roll:before {
+  font-size: 0.8em;
+  opacity: 0.7;
+}
 .cc-character .cc-attributes-table .cc-attribute-rating,
 .cc-character .cc-attributes-table .cc-attribute-bonus-damage {
   width: 3rem;
@@ -1531,6 +1610,23 @@ body.sheet-darkmode {
 }
 .cc-character .cc-skills-table td.cc-skill-ranks-cell {
   border-bottom: none;
+}
+.cc-character .cc-skills-table .cc-skill-name-roll {
+  background: none;
+  border: none;
+  padding: 0;
+  color: inherit;
+  font: inherit;
+  text-transform: inherit;
+  letter-spacing: inherit;
+  cursor: pointer;
+}
+.cc-character .cc-skills-table .cc-skill-name-roll:hover {
+  text-decoration: underline;
+}
+.cc-character .cc-skills-table .cc-skill-name-roll:before {
+  font-size: 0.8em;
+  opacity: 0.7;
 }
 .cc-character .cc-skills-table .cc-skill-ranks {
   width: 3rem;

@@ -9,6 +9,7 @@ mixin focusItem(skillName, focusName)
     +checkbox({name: `${skillName} focus ${slug} known`}).cc-focus-checkbox
     +roller({
       name: `${skillName} focus ${slug} roll`,
+      class: 'cc-focus-roll',
       trigger: {triggeredFuncs: ['initiateFocusRoll']}
-    }).cc-focus-roll
+    })
       = focusName
