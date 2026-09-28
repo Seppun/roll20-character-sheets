@@ -44,13 +44,7 @@
           radioObj: {name: 'stress'},
           valueArray: Array.from({length: 20}, (_, i) => i + 1)
         }).cc-stress-track
-      .cc-vitals-side
-        .cc-field
-          span(data-i18n='base armour') Base Armour
-          +number({name: 'base armour', readonly: true})
-        .cc-field
-          span(data-i18n='total armor') Total Armor
-          +number({name: 'total armor', readonly: true})
+      .cc-vitals-courage-fortune
         .cc-field
           span(data-i18n='courage') Courage
           +number({name: 'courage', readonly: true})
@@ -60,6 +54,13 @@
             radioObj: {name: 'fortune'},
             valueArray: [1, 2, 3, 4, 5]
           }).cc-fortune-track
+      .cc-vitals-armor
+        .cc-field
+          span(data-i18n='base armour') Base Armour
+          +number({name: 'base armour', readonly: true})
+        .cc-field
+          span(data-i18n='total armor') Total Armor
+          +number({name: 'total armor', readonly: true})
       .cc-vitals-injuries
         .cc-banner(data-i18n='injuries') Injuries
         +textarea({name: 'injuries'}).cc-injuries
@@ -119,7 +120,7 @@
     .cc-truths-scars-grid {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
-      gap: 0.4rem;
+      gap: 0.3rem;
 
       .cc-truth,
       .cc-scar {
@@ -134,21 +135,28 @@
 
     .cc-vitals {
       display: grid;
-      grid-template-columns: 2fr 1fr 2fr;
+      grid-template-columns: 1.6fr 1fr 1fr 1.4fr;
       gap: 0.75rem;
       align-items: start;
+    }
+
+    .cc-vitals-courage-fortune,
+    .cc-vitals-armor {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
     }
 
     .cc-stress-track {
       display: grid;
       grid-template-columns: repeat(10, 1fr);
-      gap: 0.2rem;
+      gap: 0.15rem;
       --fillLeftSelectedColor: var(--cc-parchment);
       --fillLeftUnselectedColor: var(--cc-rule);
 
       .fill-left__radio {
-        width: 1.1rem;
-        height: 1.1rem;
+        width: 0.9rem;
+        height: 0.9rem;
         border: 1px solid var(--cc-rule);
       }
     }
@@ -158,8 +166,8 @@
       --fillLeftUnselectedColor: var(--cc-rule);
 
       .fill-left__radio {
-        width: 1.1rem;
-        height: 1.1rem;
+        width: 0.9rem;
+        height: 0.9rem;
         border: 1px solid var(--cc-rule);
       }
     }
