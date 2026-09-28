@@ -10,7 +10,14 @@
 
 @mixin generic {
   .cc-banner {
-    background: var(--cc-banner) url('images/banner-brush.svg') no-repeat center / 100% 100%;
+    // Background is a base64-inlined copy of images/banner-brush.svg (an
+    // original brush-stroke ribbon, not traced from the official sheet's
+    // art) - inlined so it always loads regardless of how the compiled
+    // CSS is hosted, rather than a relative url() to the source file.
+    // No background-color here: the ribbon shape's transparent cutouts
+    // must show whatever sits behind it (page/panel background), or the
+    // rough silhouette disappears behind a solid rectangle.
+    background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0NDAgNjAiIHByZXNlcnZlQXNwZWN0UmF0aW89Im5vbmUiPgogIDxwYXRoIGZpbGw9IiM2YjE0MjAiIGQ9Ik0wLDE0IEMyMCwwIDYwLDIwIDEwMCw0IEMxNDAsLTQgMTgwLDE2IDIyMCwyIEMyNjAsLTQgMzAwLDE0IDM0MCwwCiAgICBMMzgwLDQgTDQ0MCwzMCBMMzgwLDU4IEwzNDAsNjAKICAgIEMzMDAsNDYgMjYwLDYwIDIyMCw1NCBDMTgwLDQ0IDE0MCw2MCAxMDAsNTIgQzYwLDQwIDIwLDU4IDAsNDQgWiIvPgogIDxwYXRoIGZpbGw9IiNhODM4NGEiIG9wYWNpdHk9IjAuNiIgZD0iTTE0LDIwIEM1MCwxMCA5MCwyMiAxMzAsMTIgQzE3MCw0IDIxMCwxOCAyNTAsMTAKICAgIEMyODAsNCAzMTAsMTIgMzM0LDggTDMzNCw0MiBDMzEwLDM4IDI4MCw0NCAyNTAsNDAgQzIxMCw0OCAxNzAsMzggMTMwLDQ0IEM5MCw1MCA1MCw0MiAxNiwzOCBaIi8+CiAgPHBhdGggZmlsbD0iIzNhMGExMiIgb3BhY2l0eT0iMC41NSIgZD0iTTQsNDAgQzQwLDUwIDgwLDQwIDEyMCw0OCBDMTcwLDU2IDIyMCw0NCAyNzAsNTAgQzMwMCw1NCAzMjAsNDggMzM0LDQ0CiAgICBMMzM0LDUwIEMzMDAsNTYgMjYwLDQ4IDIyMCw1NCBDMTcwLDYwIDEyMCw1MCA4MCw1NiBDNTAsNTggMjIsNTIgNCw0NiBaIi8+Cjwvc3ZnPgo=') no-repeat center / 100% 100%;
     color: var(--cc-banner-text);
     font-family: var(--cc-header-font);
     text-transform: uppercase;

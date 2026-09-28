@@ -1152,7 +1152,7 @@ body .ui-dialog .tab-content .charsheet .tabs__nav-list {
   display: flex;
 }
 body .ui-dialog .tab-content .charsheet .cc-banner {
-  background: var(--cc-banner) url("images/banner-brush.svg") no-repeat center/100% 100%;
+  background: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0NDAgNjAiIHByZXNlcnZlQXNwZWN0UmF0aW89Im5vbmUiPgogIDxwYXRoIGZpbGw9IiM2YjE0MjAiIGQ9Ik0wLDE0IEMyMCwwIDYwLDIwIDEwMCw0IEMxNDAsLTQgMTgwLDE2IDIyMCwyIEMyNjAsLTQgMzAwLDE0IDM0MCwwCiAgICBMMzgwLDQgTDQ0MCwzMCBMMzgwLDU4IEwzNDAsNjAKICAgIEMzMDAsNDYgMjYwLDYwIDIyMCw1NCBDMTgwLDQ0IDE0MCw2MCAxMDAsNTIgQzYwLDQwIDIwLDU4IDAsNDQgWiIvPgogIDxwYXRoIGZpbGw9IiNhODM4NGEiIG9wYWNpdHk9IjAuNiIgZD0iTTE0LDIwIEM1MCwxMCA5MCwyMiAxMzAsMTIgQzE3MCw0IDIxMCwxOCAyNTAsMTAKICAgIEMyODAsNCAzMTAsMTIgMzM0LDggTDMzNCw0MiBDMzEwLDM4IDI4MCw0NCAyNTAsNDAgQzIxMCw0OCAxNzAsMzggMTMwLDQ0IEM5MCw1MCA1MCw0MiAxNiwzOCBaIi8+CiAgPHBhdGggZmlsbD0iIzNhMGExMiIgb3BhY2l0eT0iMC41NSIgZD0iTTQsNDAgQzQwLDUwIDgwLDQwIDEyMCw0OCBDMTcwLDU2IDIyMCw0NCAyNzAsNTAgQzMwMCw1NCAzMjAsNDggMzM0LDQ0CiAgICBMMzM0LDUwIEMzMDAsNTYgMjYwLDQ4IDIyMCw1NCBDMTcwLDYwIDEyMCw1MCA4MCw1NiBDNTAsNTggMjIsNTIgNCw0NiBaIi8+Cjwvc3ZnPgo=") no-repeat center/100% 100%;
   color: var(--cc-banner-text);
   font-family: var(--cc-header-font);
   text-transform: uppercase;
@@ -1312,8 +1312,36 @@ body .ui-dialog .tab-content .charsheet .cc-character .cc-skills-table .cc-skill
   color: var(--cc-ink);
 }
 body .ui-dialog .tab-content .charsheet .cc-character .cc-skills-table td.cc-skill-focuses {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.15rem 0.6rem;
+}
+body .ui-dialog .tab-content .charsheet .cc-character .cc-focus-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
   font-size: 0.8rem;
   font-style: italic;
+}
+body .ui-dialog .tab-content .charsheet .cc-character .cc-focus-item .cc-focus-checkbox {
+  margin: 0;
+}
+body .ui-dialog .tab-content .charsheet .cc-character .cc-focus-item .cc-focus-roll {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--cc-ink);
+  font-style: italic;
+  font-size: inherit;
+  font-family: inherit;
+  cursor: pointer;
+}
+body .ui-dialog .tab-content .charsheet .cc-character .cc-focus-item .cc-focus-roll:hover {
+  color: var(--cc-rule);
+  text-decoration: underline;
+}
+body .ui-dialog .tab-content .charsheet .cc-character .cc-focus-item .cc-focus-roll:before {
+  font-size: 0.9em;
 }
 body .ui-dialog .tab-content .charsheet .cc-character .cc-languages textarea {
   min-height: 4rem;
