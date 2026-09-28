@@ -1970,8 +1970,7 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
       `{{target_number=[[0]]}} ` +
       `{{successes=[[0]]}} ` +
       `{{dice_text=[[0]]}} ` +
-      `{{passed=[[0]]}} ` +
-      `{{failed=[[0]]}} ` +
+      `{{outcome=[[0]]}} ` +
       `{{complications=[[0]]}} ` +
       `{{bonus_momentum=[[0]]}}`;
     log(`CC DEBUG: roll string = ${rollString}`);
@@ -1997,9 +1996,8 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
           target_number: '?',
           successes: '?',
           dice_text: `error: could not read dice from ${JSON.stringify(roll1)}`,
-          passed: '',
-          failed: 1,
-          complications: '',
+          outcome: 0,
+          complications: 0,
         });
         return;
       }
@@ -2011,18 +2009,19 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
       const complicationCount = dice.filter((d) => d >= complicationThreshold).length;
       const passed = successCount >= difficulty;
   
-      // Every key is set explicitly on every path (never omitted), since
-      // the [[0]] placeholder left it as the string "0" - and Roll20
-      // templates treat "0" as non-empty/truthy, so an un-set {{#passed}}
-      // or {{#complications}} would otherwise always show.
+      // outcome is a plain 0/1 flag (rather than separate passed/failed
+      // fields) because the Passed/Failed blocks are gated with the
+      // rollTotal() helper (an exact-value comparison on the computed
+      // override), not a plain {{#field}} truthiness check - which,
+      // like {{fieldname}} display, doesn't respect finishRoll overrides
+      // on a field that started life as a [[0]] roll expression.
       const overrides = {
         target_number: targetNumber,
         successes: successCount,
         dice_text: dice.join(', '),
-        passed: passed ? 1 : '',
-        failed: passed ? '' : 1,
-        bonus_momentum: passed ? Math.max(0, successCount - difficulty) : '',
-        complications: complicationCount > 0 ? complicationCount : '',
+        outcome: passed ? 1 : 0,
+        bonus_momentum: passed ? Math.max(0, successCount - difficulty) : 0,
+        complications: complicationCount,
       };
   
       log(`CC DEBUG: finishing roll with overrides = ${JSON.stringify(overrides)}`);
@@ -2035,9 +2034,8 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
         target_number: '?',
         successes: '?',
         dice_text: `error: ${err.message}`,
-        passed: '',
-        failed: 1,
-        complications: '',
+        outcome: 0,
+        complications: 0,
       });
     }
   };

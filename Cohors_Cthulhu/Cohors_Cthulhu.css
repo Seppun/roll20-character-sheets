@@ -1741,6 +1741,14 @@ body.sheet-darkmode {
   padding: 0.4rem 0.6rem;
   min-width: 220px;
 }
+.sheet-rolltemplate-cc-skill .inlinerollresult {
+  background-color: transparent !important;
+  border: 0 transparent !important;
+  font-weight: inherit;
+  font-size: inherit;
+  padding: 0 !important;
+  pointer-events: none;
+}
 .sheet-rolltemplate-cc-skill .cc-roll-header {
   font-weight: bold;
   text-transform: uppercase;

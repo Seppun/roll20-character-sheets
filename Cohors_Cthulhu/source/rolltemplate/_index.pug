@@ -11,16 +11,22 @@
   .cc-roll-body
     //- Fields we only ever set via finishRoll's overrides (never part of
     //- the initial roll string's dice/query math) must be referenced here
-    //- as computed::fieldname, both in {{}} output and in conditional
-    //- {{#..}} sections - plain {{fieldname}} shows the ORIGINAL value of
-    //- the [[0]] placeholder from startRoll, ignoring the override
-    //- entirely. Confirmed against the proven pattern in this repo's
-    //- Achtung!_Cthulhu_2d20 sheet, which does exactly this. difficulty is
-    //- read from roll.results but never overridden, so it stays plain.
-    +templateConditionalDisplay('computed::dice_text')
-      .cc-roll-row
-        span Dice:
-        span {{computed::dice_text}}
+    //- as computed::fieldname - plain {{fieldname}} shows the ORIGINAL
+    //- value of the [[0]] placeholder from startRoll, ignoring the
+    //- override entirely. Confirmed against the proven pattern in this
+    //- repo's Achtung!_Cthulhu_2d20 sheet. difficulty is read from
+    //- roll.results but never overridden, so it stays plain.
+    //-
+    //- A plain {{#field}}/{{#computed::field}} section does NOT respect
+    //- finishRoll overrides either (same underlying quirk - the section's
+    //- truthiness is checked against the pre-override value), so
+    //- conditional display of an overridden field needs the rollTotal()/
+    //- rollGreater() helper functions instead, which do an exact
+    //- comparison against the computed value (again mirroring
+    //- Achtung!_Cthulhu_2d20's own {{#rollTotal() computed::outcome 1}}).
+    .cc-roll-row
+      span Dice:
+      span {{computed::dice_text}}
     .cc-roll-row
       span Target Number:
       span {{computed::target_number}}
@@ -30,14 +36,14 @@
     .cc-roll-row
       span Successes:
       span {{computed::successes}}
-    +templateConditionalDisplay('computed::complications')
+    +rollGreater({values: 'computed::complications 0'})
       .cc-roll-row.cc-roll-complication
         span Complications:
         span {{computed::complications}}
-  +templateConditionalDisplay('computed::passed')
+  +rollTotal({values: 'computed::outcome 1'})
     .cc-roll-outcome.cc-roll-pass
       span Passed - Momentum: {{computed::bonus_momentum}}
-  +templateConditionalDisplay('computed::failed')
+  +rollTotal({values: 'computed::outcome 0'})
     .cc-roll-outcome.cc-roll-fail
       span Failed
 
@@ -54,6 +60,20 @@
     border-radius: 3px;
     padding: 0.4rem 0.6rem;
     min-width: 220px;
+
+    // computed::fieldname values render as Roll20's standard inline-roll
+    // spans (hoverable, with their own tooltip breakdown), which come
+    // with Roll20's default yellow highlight box - strip that back down
+    // to plain text so they match the rest of the card. Mirrors
+    // Achtung!_Cthulhu_2d20's own .inlinerollresult overrides.
+    .inlinerollresult {
+      background-color: transparent !important;
+      border: 0 transparent !important;
+      font-weight: inherit;
+      font-size: inherit;
+      padding: 0 !important;
+      pointer-events: none;
+    }
 
     .cc-roll-header {
       font-weight: bold;
