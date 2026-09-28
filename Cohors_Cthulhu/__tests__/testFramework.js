@@ -1946,8 +1946,6 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
   // isn't fixed by RAW). critMax is the die value at/under which a die is
   // a critical success (this skill's ranks if a focus applies, else 1).
   const runCcRoll = async ({skillLabel, focusLabel, attributeExpr, skillRanks, critMax}) => {
-    log(`CC DEBUG: runCcRoll starting, skillLabel=${skillLabel} focusLabel=${focusLabel} skillRanks=${skillRanks}`);
-  
     const difficultyQuery = '?{Difficulty|1}';
     const complicationQuery = '?{Complication range (1-5)|1}';
     const bonusDiceQuery = '?{Additional d20s bought (0-3)|0}';
@@ -1973,10 +1971,8 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
       `{{outcome=[[0]]}} ` +
       `{{complications=[[0]]}} ` +
       `{{bonus_momentum=[[0]]}}`;
-    log(`CC DEBUG: roll string = ${rollString}`);
   
     const roll = await startRoll(rollString);
-    log(`CC DEBUG: startRoll resolved, raw results = ${JSON.stringify(roll.results)}`);
   
     try {
       const attributeChoice = Number(roll.results.attribute_choice.result) || 0;
@@ -2024,12 +2020,10 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
         complications: complicationCount,
       };
   
-      log(`CC DEBUG: finishing roll with overrides = ${JSON.stringify(overrides)}`);
       finishRoll(roll.rollId, overrides);
     } catch (err) {
       // Surface failures in chat instead of leaving the template blank
       // with no clue why.
-      log(`CC DEBUG: error in runCcRoll: ${err.message}\n${err.stack}`);
       finishRoll(roll.rollId, {
         target_number: '?',
         successes: '?',
@@ -2050,7 +2044,6 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
   // Attribute-only roll (no skill): target number is just the attribute's
   // own rating, crit only on a natural 1 (no focus applies).
   const initiateAttributeRoll = async ({trigger, attributes}) => {
-    log(`CC DEBUG: initiateAttributeRoll fired, trigger.name=${trigger.name}`);
     const attr = ccNormalizeName(trigger.name).replace(/_roll$/, '');
     const rating = Number(attributes[`${attr}_rating`]) || 0;
     await runCcRoll({
@@ -2067,7 +2060,6 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
   // RAW ("if you don't have a focus that applies, each die that rolls a
   // 1 is a critical success").
   const initiateSkillRoll = async ({trigger, attributes}) => {
-    log(`CC DEBUG: initiateSkillRoll fired, trigger.name=${trigger.name}`);
     const skill = ccNormalizeName(trigger.name).replace(/_skill_roll$/, '');
     const skillRanks = Number(attributes[`${skill}_ranks`]) || 0;
     await runCcRoll({
@@ -2083,7 +2075,6 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
   // Focus roll: crit on a die <= this skill's ranks, since a
   // focus-specific roller always "has the focus" that applies.
   const initiateFocusRoll = async ({trigger, attributes}) => {
-    log(`CC DEBUG: initiateFocusRoll fired, trigger.name=${trigger.name}`);
     const match = ccNormalizeName(trigger.name).match(/^(.+)_focus_(.+)_roll$/);
     if (!match) { return; }
     const [, skill, focusSlug] = match;
