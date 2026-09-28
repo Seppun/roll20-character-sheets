@@ -76,26 +76,23 @@
     'Lorica Squamata': {resistance: '3', qualities: 'Heavy, Uncomfortable'},
   };
 
-//- Talent profiles (Name/Keywords/Requirements/Description) from the
-//- rulebook's Chapter 6 (Common Talents, organized by skill) and each
-//- archetype's own talent list in Chapter 5 (Mystic/Sage/Schemer/
-//- Scoundrel/Scout/Soldier). Too many to hand-write inline like
-//- ccWeaponProfiles/ccArmorProfiles above, so this loads from a JSON file
-//- instead (source/data/talents.json) via the `require` local that
-//- generate.js's pugOptions exposes to every template.
-//-
-//- This is a deliberate subset of the full rulebook talent list. Two
-//- categories are left out entirely because the source PDF's two-column
-//- layout scrambled their name-to-description pairing badly enough that
-//- even careful automated extraction produced silently wrong pairings
-//- (a talent's real text attached to a different talent's name) rather
-//- than just visibly-truncated text - a failure mode that isn't safe to
-//- ship as game rules: Culture talents (Roman Citizen/Germanic Tribe/
-//- etc), and every Archetype Specialization's own talent tree (Lupercus/
-//- Staff Bearer/Engineer/Medicus/Frumentarius/Magistrate/Robber/Sicarius/
-//- Hunter/Veles/Berserker/Legionary). Players can still enter any of
-//- those as free text via "Custom / Other" - the row's other fields
-//- simply won't auto-fill for them.
+//- Talent profiles (Name/Keywords/Requirements/Description) covering
+//- Chapter 6's Common Talents (organized by skill), each archetype's own
+//- talent list and specialization talent trees in Chapter 5 (Mystic/Sage/
+//- Schemer/Scoundrel/Scout/Soldier and their specializations), the
+//- Caste-granted talents, and the per-Culture talents. Too many to
+//- hand-write inline like ccWeaponProfiles/ccArmorProfiles above, so this
+//- loads from a JSON file instead (source/data/talents.json) via the
+//- `require` local that generate.js's pugOptions exposes to every
+//- template. An initial pass at this data (built from the PDF's text
+//- layer alone) silently mismatched several specialization/culture
+//- talents' names to the wrong descriptions, courtesy of the source PDF's
+//- two-column layout - the final data here was instead transcribed
+//- directly from the rendered page images to catch exactly that. A couple
+//- of pairs of talents across different specializations share the same
+//- name with different effects (e.g. "Scotopia" appears in both the
+//- Robber and Hunter specializations) - those are disambiguated as
+//- "NAME (SPECIALIZATION)" in this data/dropdown.
 -
   const ccTalentProfiles = require('./source/data/talents.json');
   const ccTalentNames = Object.keys(ccTalentProfiles).sort();
@@ -355,7 +352,7 @@
           span Requirements
           span Description
         +fieldset({name: 'talent'})
-          //- The talent list (68 entries) is far too long for a plain
+          //- The talent list (159 entries) is far too long for a plain
           //- dropdown, so this uses a text input paired with a <datalist>
           //- instead of k-scaffold's +select/+option - a native HTML
           //- combobox that lets the browser filter the suggestion list to

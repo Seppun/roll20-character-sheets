@@ -338,5 +338,460 @@
   "keywords": "Spellcaster, Weird",
   "requirements": "",
   "description": "You've dabbled with occult forces beyond your comprehension. You are now a spellcaster of the dabbling spellcaster type, as described in Chapter 4: Magic on page 58)."
+ },
+ "SPECTRAL HUNTER": {
+  "keywords": "Lupercus, Spellcaster",
+  "requirements": "Mystic archetype, no other talent with the Spellcaster keyword",
+  "description": "You are a spellcaster, as described in more detail in Chapter 4: Magic on page 58. In addition, when you take stress from the cost of a battlefield spell, you can immediately move to anywhere within Medium range. If you already have a talent with the Spellcaster keyword, you may discard it and replace it with this one. A character may have only one talent with the Spellcaster keyword."
+ },
+ "HASTY RITUAL": {
+  "keywords": "Lupercus",
+  "requirements": "Spectral Hunter talent",
+  "description": "Choose one spell that you know. Once per scene, you can cast the chosen spell without first performing the Prepare minor action. When you do so, the spell is cast as a flawed spell (see Flawed Spells on page 61)."
+ },
+ "INSTINCTIVE MAGIC": {
+  "keywords": "Lupercus, Resilience",
+  "requirements": "Hasty Ritual talent",
+  "description": "Once per scene, when you cast a battlefield spell, you may use Resilience (the Fortitude focus applies) instead of any other skill. In addition, the spell's cost is reduced by 2, to a minimum of 1."
+ },
+ "JAWS OF THE WOLF": {
+  "keywords": "Lupercus",
+  "requirements": "Hasty Ritual talent",
+  "description": "When you successfully cast an attack spell, you gain +1 bonus Momentum, which may only be used to add +1 to the damage the spell inflicts on the target."
+ },
+ "LUPERCALIA": {
+  "keywords": "Lupercus",
+  "requirements": "Jaws of the Wolf talent",
+  "description": "Lupercalia is the great festival for which your college of priests exists. This ceremonial ritual has made you skilled at the working of ritual magic. Whenever you pass one of a ritual's component skill tests, you may ignore up to 2 resistance for every effect rolled."
+ },
+ "WOLF HOWL": {
+  "keywords": "Lupercus, Persuasion, Survival",
+  "requirements": "Jaws of the Wolf talent",
+  "description": "You can invoke the mighty she-wolf of Rome, growling a warning that scratches at the rationality of foes who hear it. You can perform a mental attack targeting a creature you are aware of, and which is aware of you, within Medium range by making a Will + Persuasion or Will + Survival test with a difficulty of 1 (you do not need the Fearsome X special rule to make this mental attack). Passing the test means you inflict power +2 mental damage on your target."
+ },
+ "QUIET WISDOM": {
+  "keywords": "Staff Bearer, Persuasion, Spellcaster",
+  "requirements": "Mystic archetype",
+  "description": "You are a spellcaster, as described in more detail in Chapter 4: Magic on page 58. In addition, you may re-roll 1d20 when you make a Persuasion-based skill test, but you must accept the new result. If you already have a talent with the Spellcaster keyword, you may discard it and replace it with this one. A character may have only one talent with the Spellcaster keyword."
+ },
+ "KNOW THE SIGNS": {
+  "keywords": "Staff Bearer, Observation, Spellcaster",
+  "requirements": "Mystic archetype",
+  "description": "You have personally dealt with the effects of the supernatural and recognize the signs of its activity. You are a spellcaster, as described in more detail in Chapter 4: Magic on page 58. In addition, whenever you are in the presence of a person or object that has been affected by supernatural abilities within the last six hours, you may make an Insight + Observation test with a difficulty equal to the number of hours that have passed since the person or object was affected. If you pass the skill test, you recognize the taint of the supernatural. Spending 2 Momentum lets you identify the specific powers used on the person or object. If you already have a talent with the Spellcaster keyword, you may discard it and replace it with this one. A character may have only one talent with the Spellcaster keyword."
+ },
+ "DO WE FEAR THIS?": {
+  "keywords": "Staff Bearer, Persuasion",
+  "requirements": "Force of Presence talent or Protective Superstitions talent",
+  "description": "You can easily buoy the spirits of your allies, imbuing them with a sense of purpose that lets them endure great adversity. As a minor action, you may spend 1 Fortune point to grant each of your allies within Close range a bonus to Morale resistance equal to your ranks in Persuasion. This bonus lasts until the end of the scene."
+ },
+ "FORCE OF PRESENCE": {
+  "keywords": "Staff Bearer, Weird",
+  "requirements": "Quiet Wisdom talent",
+  "description": "Your bonus damage for attacks that deal mental damage increases by +1."
+ },
+ "RUNECASTING": {
+  "keywords": "Staff Bearer, Observation",
+  "requirements": "Quiet Wisdom talent or Know the Signs talent",
+  "description": "You know how to cast the runes to scry for future events. Once every twenty-four hours, you may cast the runes. Make an Insight + Observation test with a difficulty between 1 and 5 (your choice). If you pass the test, roll a number of d20s equal to the test's difficulty and record the result of each die rolled. At any point until the next morning, you may use the following reaction: when you, or any creature you can perceive within line of sight, makes a skill test, you may change one or more of the d20s rolled to match one of your previously recorded results. Each recorded result may be used to change a single d20 only. You do not have to use all the recorded results on a single test."
+ },
+ "PROTECTIVE SUPERSTITIONS": {
+  "keywords": "Staff Bearer, Observation",
+  "requirements": "Know the Signs talent",
+  "description": "When you resist a spell (see Resisting Magic on page 66), you gain +1 bonus Momentum per rank in Observation."
+ },
+ "FABRICATOR": {
+  "keywords": "Engineer, Crafting, Engineering",
+  "requirements": "Sage archetype",
+  "description": "You may re-roll 1d20 when you make a Crafting- or Engineering-based skill test, but you must accept the new result."
+ },
+ "DEDICATION": {
+  "keywords": "Engineer, Momentum",
+  "requirements": "Fabricator talent",
+  "description": "Your commitment to a cause is unwavering, and this has carried you through many a tough situation. At the start of a scene, if there is no Momentum in your group's Momentum pool, roll 1d20. If you roll equal to or less than your Will rating, add +1 Momentum to your group's Momentum pool."
+ },
+ "IN THE NICK OF TIME": {
+  "keywords": "Engineer, Academia, Engineering",
+  "requirements": "Intense Study talent, 3+ ranks in Academia or Engineering",
+  "description": "Whenever you pass an Academia- or Engineering-based skill test as part of an extended test, you gain the Vicious damage effect on the test."
+ },
+ "INCISIVE SCRUTINY": {
+  "keywords": "Engineer",
+  "requirements": "Fabricator talent",
+  "description": "You have a knack for finding weak spots in arguments, theories, and machines alike to glean information from them, learning about things by observing how they respond to pressure against vulnerable points. When you pass an Insight- or Reason-based skill test, you gain +1 bonus Momentum, which may be used only for the Obtain Information Momentum option."
+ },
+ "INTENSE SCRUTINY": {
+  "keywords": "Engineer",
+  "requirements": "(Incisive Scrutiny talent or Intense Study talent) and 3+ ranks in Academia or Engineering",
+  "description": "When you pass a Reason- or Will-based skill test as part of an extended test, you gain the Piercing 2 damage effect on the test."
+ },
+ "INTENSE STUDY": {
+  "keywords": "Engineer",
+  "requirements": "Dedication talent or Intense Scrutiny talent",
+  "description": "You are extremely well-read, possessing vast amounts of knowledge on a wide range of subjects that can provide you with situational expertise in times of need. Twice per game session, before you make a skill test, you may choose a focus you do not possess and gain it for that test. You then retain the focus for the remainder of the session."
+ },
+ "PHYSICIAN": {
+  "keywords": "Medicus, Medicine",
+  "requirements": "Sage archetype, 1+ ranks in Medicine",
+  "description": "You may re-roll 1d20 when you make a Medicine-based skill test, but you must accept the new result."
+ },
+ "EMERGENCY DOCTOR": {
+  "keywords": "Medicus, Medicine",
+  "requirements": "Physician talent",
+  "description": "When you take the Stabilize major action, the difficulty is reduced by 1, to a minimum of 0."
+ },
+ "FAST AID": {
+  "keywords": "Medicus, Medicine",
+  "requirements": "Physician talent",
+  "description": "When you make a Medicine-based skill test, you may choose to suffer one additional complication in exchange for gaining one automatic success on the test."
+ },
+ "FIELD MEDICINE": {
+  "keywords": "Medicus, Medicine",
+  "requirements": "Physician talent",
+  "description": "When you make a Medicine-based skill test, you may ignore any increase in difficulty for working without the proper tools or equipment."
+ },
+ "FIRST RESPONSE": {
+  "keywords": "Medicus, Medicine",
+  "requirements": "Fast Aid talent, 3+ ranks in Medicine",
+  "description": "In combat, you may use the Stabilize major action on characters who are not dying: if you pass a skill test to perform this action, your target does one of the following (your choice): removes stress equal to your ranks in Medicine and removes 1 additional point of stress per Momentum spent; removes a condition; or removes an ongoing damage effect, such as the Persistent damage effect, that is currently afflicting them."
+ },
+ "TRIAGE": {
+  "keywords": "Medicus, Medicine",
+  "requirements": "Emergency Doctor talent or First Response talent, 3+ ranks in Medicine",
+  "description": "You can make a Reason + Medicine test to identify specific injuries or illnesses in a patient, or to determine the severity of a patient's condition. If you do so, you gain +1 bonus Momentum, which you may use only on the Obtain Information Momentum option. In addition, when you pass a Reason + Medicine test to remove a scar, you can remove the scar of one additional patient for each Momentum spent."
+ },
+ "SHARP SENSES": {
+  "keywords": "Frumentarius, Observation",
+  "requirements": "Schemer archetype",
+  "description": "You may re-roll 1d20 when you make an Observation-based skill test, but you must accept the new result."
+ },
+ "DO OR DIE": {
+  "keywords": "Frumentarius, Morale",
+  "requirements": "Sharp Senses talent",
+  "description": "Frumentarii are used to operating independently and know they are likely to be cut off from support much of the time. Such is their determination that they may generate 1 Threat for the GM's Threat pool to gain +2 Morale resistance until the end of the current scene."
+ },
+ "INTERROGATION": {
+  "keywords": "Frumentarius",
+  "requirements": "Know Thy Enemy talent",
+  "description": "When you pass a skill test to coerce someone to reveal information in a social conflict, you gain +1 bonus Momentum, which you may spend only on the Obtain Information Momentum option."
+ },
+ "KNOW THY ENEMY": {
+  "keywords": "Frumentarius",
+  "requirements": "Sharp Senses talent",
+  "description": "When you make an Insight-based skill test to determine whether someone is lying or hiding the truth, the first d20 you buy does not cost you Momentum."
+ },
+ "PERFECT FACADE": {
+  "keywords": "Frumentarius, Stealth",
+  "requirements": "Sharp Senses talent",
+  "description": "You have learned to capably impersonate a broad range of people, effectively blending into the background and appearing as though you belong. When you pass a Stealth-based skill test to make or use a disguise, you gain bonus Momentum equal to your ranks in Stealth, to a maximum of +3 bonus Momentum."
+ },
+ "THOROUGH SEARCH": {
+  "keywords": "Frumentarius",
+  "requirements": "Interrogation talent",
+  "description": "When you pass a skill test to search an area for evidence, you generate +1 bonus Momentum, which you may use only on the Obtain Information Momentum option. If you assist another character on a skill test to search an area for evidence, and they pass their skill test, then that character receives this talent's +1 bonus Momentum, which is subject to the same restriction."
+ },
+ "CHARISMATIC": {
+  "keywords": "Magistrate, Persuasion",
+  "requirements": "Schemer archetype",
+  "description": "You may re-roll 1d20 when you make a Persuasion-based skill test, but you must accept the new result."
+ },
+ "COMMANDING PRESENCE": {
+  "keywords": "Magistrate, Persuasion, Tactics",
+  "requirements": "Charismatic talent",
+  "description": "You lead with immense charisma and persuasive skills. When you make a Persuasion- or Tactics-based skill test, the first d20 you buy does not cost you Momentum."
+ },
+ "HONESTAS": {
+  "keywords": "Magistrate",
+  "requirements": "Charismatic talent",
+  "description": "You maintain a careful air of respectability. Whenever you make a skill test to resist being coerced into breaking a promise, betraying your allies, or otherwise acting dishonorably, the difficulty is reduced by 1, to a minimum of 0."
+ },
+ "LICTORS": {
+  "keywords": "Magistrate, Tactics",
+  "requirements": "Commanding Presence talent",
+  "description": "You may designate any number of allied characters in your zone up to your rank in Tactics to act as your lictors. For the remainder of the scene, whenever you are targeted by an attack, one of your lictors can choose to be the target instead; the lictor gains Courage resistance against that attack equal to your ranks in Tactics."
+ },
+ "RHETORIC": {
+  "keywords": "Magistrate",
+  "requirements": "Charismatic talent",
+  "description": "When you make a skill test to speak to a crowd, if you buy any bonus d20s, you may re-roll a single d20."
+ },
+ "STOIC": {
+  "keywords": "Magistrate",
+  "requirements": "Honestas talent",
+  "description": "You subscribe to the philosophy of Stoicism, being indifferent to the vicissitudes of fortune and to pleasure and pain. The difficulty of all skill tests you make to resist coercion, mental intrusion, pain, or other mental attacks is reduced by 2, to a minimum of 0."
+ },
+ "HASTY RETREAT": {
+  "keywords": "Robber",
+  "requirements": "Scoundrel archetype",
+  "description": "When you make a skill test to evade pursuit, if you buy any bonus d20s, you may re-roll a single d20."
+ },
+ "INCONSPICUOUS (ROBBER)": {
+  "keywords": "Robber, Stealth",
+  "requirements": "Scoundrel archetype",
+  "description": "Committing a crime is easy-getting away with it is harder. Through practice, you have learned how to avoid notice and slip away undetected. If any people who aren't your enemies are within Close range of you, you may make an Insight + Stealth test to hide or avoid notice even if you are visible to an enemy. The GM may increase the difficulty of this test if your appearance, clothing, or similar stand out or are likely to draw undue attention."
+ },
+ "ALTER EGO": {
+  "keywords": "Robber",
+  "requirements": "Inconspicuous talent",
+  "description": "You can adopt an alter ego: another \"I.\" Whenever you enter a scene, you may choose an identity or persona to adopt. If you do, you receive a new truth that represents who you appear to be, and you retain this truth until you are discovered or choose to drop your disguise. If you move out of sight of others during a scene, you may take a major action and generate 2 Threat for the GM's Threat pool in order to quick-change into a new disguise."
+ },
+ "NIMBLE": {
+  "keywords": "Robber, Movement",
+  "requirements": "Hasty Retreat talent",
+  "description": "You're quick on your feet, and few obstacles can impede you. When you make a skill test to move over, around, or through difficult terrain or similar physical obstacles (such as during a pursuit or skirmish), the difficulty is reduced by 2. If this reduces the test's difficulty to 0, you may move over or around that obstacle freely, as if it weren't there."
+ },
+ "RANSACK": {
+  "keywords": "Robber, Observation",
+  "requirements": "Scotopia talent",
+  "description": "When time is of the essence, you prioritize getting the work done over covering your tracks. When you make an Observation-based skill test to search an area, you may generate 2 Threat for the GM's Threat pool to reduce the test's difficulty by 1 and halve the amount of time the search takes."
+ },
+ "SCOTOPIA (ROBBER)": {
+  "keywords": "Robber",
+  "requirements": "Alter Ego talent or Nimble talent",
+  "description": "Your eyes are accustomed to the dark. You ignore any penalties to skill tests imposed due to poor illumination or low light levels. This talent does not help you in total darkness, however."
+ },
+ "SUBTLE STEP": {
+  "keywords": "Sicarius, Stealth",
+  "requirements": "Scoundrel archetype",
+  "description": "You're well versed in methods for avoiding notice, and you reveal little that you do not intend. When you make a Stealth-based skill test to sneak or otherwise pass unseen through an area, the first d20 you buy does not cost you Momentum."
+ },
+ "ASSASSIN": {
+  "keywords": "Sicarius",
+  "requirements": "Death Dealer talent or Silent Strike talent",
+  "description": "You are practiced in the art of murder, and taking lives no longer carries emotional weight for you. When you attack with a melee weapon that has the Hidden weapon quality, you may spend 2 Momentum to count the result of each blank rolled in your dice pool as an effect instead of the die's actual roll."
+ },
+ "BACKSTABBER": {
+  "keywords": "Sicarius",
+  "requirements": "Guard Break talent or Subtle Step talent",
+  "description": "When you attack a target that does not have Guard, your weapon's attacks gain the Intense damage effect if they do not already have that effect."
+ },
+ "DEATH DEALER": {
+  "keywords": "Sicarius, Stealth",
+  "requirements": "Guard Break talent or Silent Strike talent",
+  "description": "You are a proficient killer, relying on trickery and misdirection. When you are armed with any weapon that has the Hidden weapon quality, you may use your Stealth skill instead of your Fighting skill to attack with that weapon, and you may increase that weapon's damage by +1."
+ },
+ "GUARD BREAK": {
+  "keywords": "Sicarius",
+  "requirements": "Backstabber talent or Subtle Step talent",
+  "description": "When you attack an opponent with a Reach greater than yours, treat the opponent's Reach as 1 point lower."
+ },
+ "SILENT STRIKE": {
+  "keywords": "Sicarius",
+  "requirements": "Backstabber talent or Death Dealer talent",
+  "description": "Each attack you make with a melee weapon that has a Reach of 1 gains the Subtle weapon quality."
+ },
+ "TRACKER": {
+  "keywords": "Hunter",
+  "requirements": "Scout archetype",
+  "description": "When you make a skill test to discover or follow tracks, the first d20 you buy does not cost you Momentum."
+ },
+ "CONSTANTLY WATCHING": {
+  "keywords": "Hunter",
+  "requirements": "Tracker talent",
+  "description": "When you make a skill test to detect danger or hidden enemies, the difficulty is reduced by 1, to a minimum of 0."
+ },
+ "DEAD EYE": {
+  "keywords": "Hunter",
+  "requirements": "Expert Aim talent",
+  "description": "You know where to sink your shots to do the most damage. When you attack with a ranged weapon, the weapon deals an extra +1 damage."
+ },
+ "EXPERT AIM": {
+  "keywords": "Hunter",
+  "requirements": "Tracker talent",
+  "description": "When you take a moment to aim, you rarely miss even the most challenging targets. When you take the Aim minor action, instead of re-rolling 1d20, you may select a single d20 in your dice pool before rolling and count that die as having rolled a 1."
+ },
+ "SCOTOPIA (HUNTER)": {
+  "keywords": "Hunter",
+  "requirements": "Constantly Watching talent",
+  "description": "Your eyes are accustomed to the dark. You ignore any penalties to skill tests imposed due to poor illumination or low light levels. This talent does not help you in total darkness, however."
+ },
+ "SELF-SUFFICIENT": {
+  "keywords": "Hunter, Survival",
+  "requirements": "Tracker talent",
+  "description": "You may re-roll 1d20 when you make a Survival-based skill test, but you must accept the new result."
+ },
+ "PACK TACTICS": {
+  "keywords": "Veles",
+  "requirements": "Scout archetype",
+  "description": "When you assist another character during combat and they pass their skill test, the character you assist generates +1 bonus Momentum."
+ },
+ "ACROBATIC DODGE": {
+  "keywords": "Veles, Athletics",
+  "requirements": "Swift Victory talent",
+  "description": "You're always moving, and you have a knack for recognizing opportunities to escape an aggressive enemy. When an enemy makes a melee attack against you, you may oppose the attack with Agility + Athletics instead of Agility + Fighting. You may not inflict damage if you win this opposed test, but you may move to any point within Close range; if you spend 1 Momentum after winning this opposed test, you may move to anywhere within Medium range instead."
+ },
+ "ASSAIL": {
+  "keywords": "Veles, Fighting",
+  "requirements": "Pack Tactics talent",
+  "description": "Velites are known for unleashing a rain of javelins the moment before they charge into combat. When you make a ranged attack with a weapon that has the Thrown Weapons focus, you may spend 2 Momentum to take a second major action that turn."
+ },
+ "FORTUNE FAVORS THE BOLD": {
+  "keywords": "Veles, Fortune",
+  "requirements": "Rejuvenation talent",
+  "description": "When you fail a skill test and spend Fortune to re-roll dice, before you re-roll, you can choose to increase the difficulty of the test by +1. If you do so and the re-rolled dice let you pass the test, you immediately regain the spent Fortune."
+ },
+ "REJUVENATION": {
+  "keywords": "Veles, Resilience",
+  "requirements": "Pack Tactics talent",
+  "description": "Used to strings of clashes at the edges of the battlefield, Velites know how to quickly get back into the fray. When you take the Catch Breath major action, the difficulty of the skill test to do so is reduced by 1, to a minimum of 0; in addition, each Momentum you spend to remove stress as part of this action removes 2 stress instead of 1."
+ },
+ "SWIFT VICTORY": {
+  "keywords": "Veles",
+  "requirements": "Pack Tactics talent",
+  "description": "There is value in speed, even if there are consequences. When you make an Athletics-based skill test to take a Rush major action or to cross difficult terrain, you may choose to suffer one additional complication in exchange for gaining one automatic success on the test. Further, at the start of any conflict, you may generate 1 Threat for the GM's Threat pool to take the first action, regardless of who would otherwise act first."
+ },
+ "HEAD TAKER": {
+  "keywords": "Berserker, Fighting",
+  "requirements": "Soldier archetype",
+  "description": "Choose a single Toughened or Nemesis NPC you can perceive within line of sight. Your melee attacks gain +1 against the chosen NPC. This effect lasts until the chosen NPC is dead, until the end of the scene, or until you suffer stress from an attack the chosen NPC makes. You gain +1 nonrefreshing Fortune point when you defeat the chosen NPC, which you lose at the end of the current scene."
+ },
+ "WAR CRY": {
+  "keywords": "Berserker",
+  "requirements": "\"Head Taker\" talent",
+  "description": "When the chosen NPC from your use of the \"Head Taker\" talent targets you with a melee attack, you may bellow a war cry as a reaction. Before the GM rolls the dice pool for the chosen NPC's attack, you may choose 1d20 from that dice pool. That die is not rolled, and it instead counts as if it had rolled a 20. Additionally, the complication range of the chosen NPC's attack increases by +1."
+ },
+ "HACK AND SLASH": {
+  "keywords": "Berserker, Fighting",
+  "requirements": "\"Head Taker\" talent",
+  "description": "When you make a melee attack targeting a creature you have already hit with a melee attack during the current scene, the first d20 you buy does not cost you Momentum."
+ },
+ "BRUTAL FIGHTER": {
+  "keywords": "Berserker",
+  "requirements": "Hack and Slash talent",
+  "description": "All weapons you wield gain the Vicious damage effect. If a weapon already has the Vicious damage effect, its damage increases by +2 when you use it."
+ },
+ "BLOODY-HANDED": {
+  "keywords": "Berserker, Fighting",
+  "requirements": "Brutal Fighter talent",
+  "description": "When you make a melee attack, you may add the Area damage effect to the attack, striking one extra target (an opponent chosen by the GM) within Close range for each effect rolled. If you do so, you also add 1 Threat to the GM's Threat pool for each effect rolled. The GM may spend Threat from your use of this talent to cause your attack to hit secondary targets you did not wish to strike: each unintended target costs the GM 2 Threat."
+ },
+ "ONSLAUGHT": {
+  "keywords": "Berserker, Movement",
+  "requirements": "\"Head Taker\" talent",
+  "description": "After you make a melee attack and your opponent takes stress from that attack, you may move anywhere within Medium range as a free action."
+ },
+ "BERSERKER RUSH": {
+  "keywords": "Berserker, Fighting",
+  "requirements": "Onslaught talent",
+  "description": "After you use the Rush major action, you may spend 2 Momentum to make a melee attack at the end of your movement. If your target takes damage from this attack, the attack deals +1 to the target."
+ },
+ "LEGIONARY TRAINING": {
+  "keywords": "Legionary, Fighting",
+  "requirements": "Soldier archetype",
+  "description": "You may re-roll 1d20 on any Fighting-based skill test you make with a spear, gladius, or pilum, but you must accept the new result."
+ },
+ "LEGIONARY VETERAN": {
+  "keywords": "Legionary",
+  "requirements": "Legionary Training talent",
+  "description": "You have endured many hardships as a legionary, giving you an iron resolve. Increase your Courage resistance by +2."
+ },
+ "PRECISION STRIKES": {
+  "keywords": "Legionary",
+  "requirements": "Legionary Training talent",
+  "description": "The weapons you wield gain the Piercing 1 damage effect. If a weapon already has the Piercing damage effect, increase Piercing by +1."
+ },
+ "STRIKE AS ONE": {
+  "keywords": "Legionary, Tactics",
+  "requirements": "Precision Strikes talent",
+  "description": "As a minor action before making an attack, you may spend one or more Momentum to give an order to strike to one ally per Momentum spent; the maximum Momentum you may spend here is equal to your Tactics rank. When you then make an attack (as a major action as normal), each ally who received the order may use their Reaction to make a melee attack or ranged attack."
+ },
+ "SCUTARIUS": {
+  "keywords": "Legionary",
+  "requirements": "Legionary Training talent",
+  "description": "As a major action, you may lock shields with an allied character in the same zone. To do so, you and your ally must each have a shield equipped. While your shields are locked together, you gain an additional +X Cover resistance, where X is Shield X weapon quality of your ally's shield; your ally in turn receives an additional bonus to Cover resistance equal to your shield's Shield X quality."
+ },
+ "BRACE FOR IMPACT": {
+  "keywords": "Legionary, Fighting",
+  "requirements": "Scutarius talent",
+  "description": "When you are targeted by a melee attack but before the attack's dice pool is rolled, you may brace yourself in formation with an allied character in the same zone. To enter the formation, you and your ally must each have a shield equipped. You and your ally each gain +1 Cover resistance. If you win the melee attack's opposed Agility + Fighting test, you may inflict damage on your opponent and force them to fall back to a point you choose within Close range."
+ },
+ "FORMATION TACTICS": {
+  "keywords": "Legionary",
+  "requirements": "Brace for Impact talent",
+  "description": "As a major action, you may enter a formation with an allied character in the same zone. To enter the formation, you and your ally must each have a shield and gladius or similar sword equipped. While you are in this formation, you can regain Guard as a free action even if you have an enemy within Reach. Further, if an enemy makes a successful attack against anyone in this formation, that enemy suffers 2 physical damage."
+ },
+ "PURSE STRINGS": {
+  "keywords": "Servant",
+  "requirements": "Servant caste",
+  "description": "As a reliable member of the Servant caste, you have been entrusted with your employer's household financial matters, which you can use to your own advantage. Once per adventure, you may purchase an item with a Restriction rating of 3 or lower using your employer's wealth or requisition points instead of your own wealth or your requisition points. You either remove the item from your employer's possession or purchase it on their behalf and \"borrow\" it for a short time. You must return the item to your employer's control following the current adventure."
+ },
+ "ENVY AND ATTENTION": {
+  "keywords": "Noble",
+  "requirements": "Noble caste",
+  "description": "You hold considerable status in society, and while that comes with numerous benefits, it can cause challenges and complications to arise as well. Whenever you attempt a skill test to sway opinion or influence others using Gravitas, the cost to buy the first bonus d20 on that skill test is reduced to 0, but the GM begins each adventure with +2 additional Threat in their Threat pool to represent these potential problems. This talent cannot be retrained (see Retraining on page 144) unless your character loses their position as a member of the Noble caste."
+ },
+ "ALEA IACTA EST (THE DIE IS CAST)": {
+  "keywords": "Roman Citizen",
+  "requirements": "Roman Citizen culture",
+  "description": "Once per scene when an NPC suffers a complication, you can use this talent to increase the GM's Threat cost to cancel the complication to 4 Threat."
+ },
+ "ALL ROADS LEAD TO ROME": {
+  "keywords": "Roman Citizen",
+  "requirements": "Roman Citizen culture",
+  "description": "The Roman Empire is vast and includes a wide variety of peoples, with different cultures, languages, and traditions. When you make a skill test to learn about an unfamiliar culture, or to act in an appropriate manner when interacting with members of such a culture, the test's difficulty is reduced by 1, to a minimum of 0."
+ },
+ "UNYIELDING": {
+  "keywords": "Germanic Tribe",
+  "requirements": "Germanic Tribe culture",
+  "description": "You are made of sterner stuff than most. You increase your maximum stress by +3."
+ },
+ "WOODWISE": {
+  "keywords": "Germanic Tribe",
+  "requirements": "Germanic Tribe culture",
+  "description": "When you are in the woodlands of Germania and make a skill test to find food or shelter, to navigate, or to travel in the forest, the difficulty of the test is reduced by 1, to a minimum of 0."
+ },
+ "BALANCING THE SCALES": {
+  "keywords": "Ægyptus",
+  "requirements": "Ægyptus culture",
+  "description": "The people of Ægyptus have a long history of understanding the balance between one's good and ill deeds, stretching back to stories of Anubis weighing the hearts of the dead in the afterlife. When you make a skill test to haggle for the price of a good or service, you can generate 2 Threat for the GM's Threat pool to reduce the difficulty of the test by 1, to a minimum of 1."
+ },
+ "WRIT IN STONE": {
+  "keywords": "Ægyptus, Academia",
+  "requirements": "Ægyptus culture",
+  "description": "Your homeland is known for its long history, some of which is etched into stone on the faces of ancient walls. When you make an Academia-based skill test to recall a bit of relevant history or lore, you may re-roll each d20 that fails to generate a success."
+ },
+ "NIGHT RAIDERS": {
+  "keywords": "Briton",
+  "requirements": "Briton culture",
+  "description": "The people of Britannia, particularly those in the northern regions, are skilled at fighting in the dead of night. Your keen night sight allows you to ignore location truths that modify skill tests imposed due to poor illumination or low light levels. This talent does not help you in total darkness, however."
+ },
+ "WARRIOR BORN": {
+  "keywords": "Briton",
+  "requirements": "Briton culture",
+  "description": "A true child of Andraste, you are fearless and relentless on the attack. You begin the game with +2 Courage resistance."
+ },
+ "NOBLE LINE": {
+  "keywords": "Gaul",
+  "requirements": "Gaul culture",
+  "description": "The people of Gaul have a long lineage of respected noble leaders. You may re-roll 1d20 on any test you make to gain support or aid from a non-Roman, but you must accept the new result."
+ },
+ "UNDERGOING ALL DANGERS": {
+  "keywords": "Gaul",
+  "requirements": "Gaul culture",
+  "description": "Some claim that the people of Gaul once burned down their former homes before they migrated, in the belief that destroying the hope of return would compel them to face any hardship. You begin the game with +1 Courage resistance."
+ },
+ "COSMOPOLITAN": {
+  "keywords": "Greek",
+  "requirements": "Greek culture",
+  "description": "Your homeland supports countless visitors and residents with a dazzling variety of customs and tongues. When you speak with someone with whom you do not share a language, you are both nevertheless able to clearly communicate with each other through a combination of pidgin, gestures, and other means, provided the information is not overly complex."
+ },
+ "PRACTICED LISTENER": {
+  "keywords": "Greek",
+  "requirements": "Greek culture",
+  "description": "Your homeland is rife with the great thinkers of the age, each with their own unique perspective on truth. Hearing their words in the streets of Greece and at the forum have given you keen insight. When you make an Insight-based check to determine the honesty of a speaker, you may re-roll a d20 that fails to generate a success."
+ },
+ "DO AS THE ROMANS DO": {
+  "keywords": "Other Culture / Foederati",
+  "requirements": "Other Culture / Foederati culture",
+  "description": "Learning to live among the people of Rome is a useful talent for anyone who resides in proximity. You gain access to any of the culture talents available to Roman citizens. Choose one Roman culture talent."
+ },
+ "HIDDEN POTENTIAL": {
+  "keywords": "Other Culture / Foederati",
+  "requirements": "Other Culture / Foederati culture",
+  "description": "Once per scene, you can generate 2 Threat for the GM's Threat pool. If you do, for the remainder of the scene, you can choose one skill in which you do not have ranks and treat it as if you have 2 ranks in the chosen skill, plus one focus appropriate for the chosen skill."
+ },
+ "WORLD-WEARY": {
+  "keywords": "Other Culture / Foederati",
+  "requirements": "Other Culture / Foederati culture",
+  "description": "When you make a Will-based skill test, you add one automatic success to the test. After putting up with the headaches of life under Roman rule, you tend to remain unfazed."
  }
 }
