@@ -9,6 +9,19 @@
 }
 
 @mixin generic {
+  // Slight off-white page background (instead of Roll20's default white),
+  // plus a maroon Imperial eagle/SPQR watermark tucked in the top-right
+  // corner, barely visible - same "&" trick as everywhere else in this
+  // mixin, since Cohors_Cthulhu.scss includes this mixin directly inside
+  // .charsheet, so "&" here means .charsheet itself. This applies across
+  // every tab (Character/Spells/Notes), since they all live inside the
+  // same .charsheet root. The watermark's low opacity is baked into the
+  // PNG's own alpha channel (not a CSS opacity), so it composites over
+  // --cc-page-bg without needing a separate layer/pseudo-element.
+  & {
+    background: var(--cc-page-bg) url('https://raw.githubusercontent.com/Seppun/roll20-character-sheets/Cohorscc/Cohors_Cthulhu/images/eagle-spqr.png') no-repeat top right / 320px auto;
+  }
+
   // k-scaffold's tabs mixin adds no default styling for the nav buttons
   // (by design, so every sheet themes them itself) - without this, tabs
   // render as plain unstyled inline text with no visible separation.
