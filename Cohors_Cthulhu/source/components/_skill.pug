@@ -5,7 +5,7 @@
 mixin skill(name, focuses)
   tr.cc-skill-row
     th(data-i18n=name)= name
-    td
+    td.cc-skill-ranks-cell
       +number({name: `${name} ranks`}).cc-skill-ranks
     td.cc-skill-focuses
       each focus in focuses

@@ -1335,19 +1335,23 @@ body .ui-dialog .tab-content .charsheet .cc-character .cc-attribute-bonus-damage
 body .ui-dialog .tab-content .charsheet .cc-character .cc-skills-table th,
 body .ui-dialog .tab-content .charsheet .cc-character .cc-skills-table td {
   vertical-align: middle;
+  min-height: 2.6rem;
+}
+body .ui-dialog .tab-content .charsheet .cc-character .cc-skills-table td.cc-skill-ranks-cell {
+  border-bottom: none;
 }
 body .ui-dialog .tab-content .charsheet .cc-character .cc-skills-table .cc-skill-ranks {
   width: 3rem;
   text-align: center;
   background: transparent;
   border: 1px solid var(--cc-rule);
-  border-bottom: none;
   color: var(--cc-ink);
 }
 body .ui-dialog .tab-content .charsheet .cc-character .cc-skills-table td.cc-skill-focuses {
   display: flex;
   flex-wrap: wrap;
   align-content: center;
+  align-items: center;
   gap: 0.15rem 0.6rem;
 }
 body .ui-dialog .tab-content .charsheet .cc-character .cc-focus-item {

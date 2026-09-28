@@ -249,6 +249,13 @@
       th,
       td {
         vertical-align: middle;
+        min-height: 2.6rem;
+      }
+
+      // No row-divider under the Ranks column - only the Skill/Focuses
+      // columns carry the row-separator line.
+      td.cc-skill-ranks-cell {
+        border-bottom: none;
       }
 
       .cc-skill-ranks {
@@ -256,7 +263,6 @@
         text-align: center;
         background: transparent;
         border: 1px solid var(--cc-rule);
-        border-bottom: none;
         color: var(--cc-ink);
       }
 
@@ -264,6 +270,7 @@
         display: flex;
         flex-wrap: wrap;
         align-content: center;
+        align-items: center;
         gap: 0.15rem 0.6rem;
       }
     }
