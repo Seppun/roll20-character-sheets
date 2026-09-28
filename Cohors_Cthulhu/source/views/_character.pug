@@ -75,6 +75,30 @@
     'Lorica Segmentata': {resistance: '3', qualities: 'Uncomfortable'},
     'Lorica Squamata': {resistance: '3', qualities: 'Heavy, Uncomfortable'},
   };
+
+//- Talent profiles (Name/Keywords/Requirements/Description) from the
+//- rulebook's Chapter 6 (Common Talents, organized by skill) and each
+//- archetype's own talent list in Chapter 5 (Mystic/Sage/Schemer/
+//- Scoundrel/Scout/Soldier). Too many to hand-write inline like
+//- ccWeaponProfiles/ccArmorProfiles above, so this loads from a JSON file
+//- instead (source/data/talents.json) via the `require` local that
+//- generate.js's pugOptions exposes to every template.
+//-
+//- This is a deliberate subset of the full rulebook talent list. Two
+//- categories are left out entirely because the source PDF's two-column
+//- layout scrambled their name-to-description pairing badly enough that
+//- even careful automated extraction produced silently wrong pairings
+//- (a talent's real text attached to a different talent's name) rather
+//- than just visibly-truncated text - a failure mode that isn't safe to
+//- ship as game rules: Culture talents (Roman Citizen/Germanic Tribe/
+//- etc), and every Archetype Specialization's own talent tree (Lupercus/
+//- Staff Bearer/Engineer/Medicus/Frumentarius/Magistrate/Robber/Sicarius/
+//- Hunter/Veles/Berserker/Legionary). Players can still enter any of
+//- those as free text via "Custom / Other" - the row's other fields
+//- simply won't auto-fill for them.
+-
+  const ccTalentProfiles = require('./source/data/talents.json');
+  const ccTalentNames = Object.keys(ccTalentProfiles).sort();
 +tab({name: 'character', container: 'article', button: {content: 'Character'}})
   .cc-page.cc-character
 
@@ -321,6 +345,35 @@
               | Lorica Squamata
           +number({name: 'resistance', trigger: {affects: ['total_armor']}})
           +text({name: 'qualities'})
+
+    .cc-panel.cc-talents
+      .cc-banner Talents
+      .cc-rep-table.cc-rep-talents
+        .cc-rep-header
+          span Name
+          span Keywords
+          span Requirements
+          span Description
+        +fieldset({name: 'talent'})
+          //- The talent list (68 entries) is far too long for a plain
+          //- dropdown, so this uses a text input paired with a <datalist>
+          //- instead of k-scaffold's +select/+option - a native HTML
+          //- combobox that lets the browser filter the suggestion list to
+          //- entries matching what's typed so far, while still accepting
+          //- any free-text value for talents not in the list. The
+          //- datalist itself is declared once, below, and shared by every
+          //- row via the matching id.
+          +text({
+            name: 'name',
+            list: 'cc-talent-options',
+            trigger: {triggeredFuncs: ['ccApplyTalentPreset']}
+          })
+          +text({name: 'keywords'})
+          +text({name: 'requirements'})
+          +textarea({name: 'description'})
+      datalist#cc-talent-options
+        each talentName in ccTalentNames
+          option(value=talentName)
 
     .cc-field-group
       .cc-field.cc-languages
@@ -625,6 +678,18 @@
         grid-template-columns: 1.5fr 1fr 2.5fr;
       }
     }
+
+    .cc-rep-talents {
+      .cc-rep-header,
+      fieldset,
+      .repcontainer .repitem {
+        grid-template-columns: 1.4fr 1fr 1.4fr 3fr;
+      }
+
+      textarea {
+        min-height: 3rem;
+      }
+    }
   }
 
 +module.
@@ -665,6 +730,24 @@
     });
   };
   k.registerFuncs({ccApplyArmorPreset});
+
+  // Same pattern again for the Talents table's Name field - the only
+  // difference from ccApplyWeaponPreset/ccApplyArmorPreset is that this is
+  // a free-text input with a <datalist> (see the comment on the Name
+  // +text() above) rather than a +select(), so a value the player typed
+  // that doesn't match any known talent is a normal, expected case (not an
+  // error) - it just leaves Keywords/Requirements/Description untouched,
+  // same as picking "Custom / Other" does for weapons/armor.
+  const ccTalentProfiles = !{JSON.stringify(ccTalentProfiles)};
+  const ccApplyTalentPreset = ({trigger, attributes}) => {
+    const profile = ccTalentProfiles[attributes[trigger.name]];
+    if (!profile) { return; }
+    const [section, rowID] = k.parseRepeatName(trigger.name);
+    Object.keys(profile).forEach((field) => {
+      attributes[`${section}_${rowID}_${field}`] = profile[field];
+    });
+  };
+  k.registerFuncs({ccApplyTalentPreset});
 
   // Shared lookup table used by Bonus Damage, Base Armour, Courage, and
   // (in views/_spells.pug) spellcasting Power Rating. Rulebook table:
