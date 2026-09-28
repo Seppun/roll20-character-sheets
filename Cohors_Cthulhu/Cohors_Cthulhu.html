@@ -2649,34 +2649,60 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
       `{{roll1=[[(2+${bonusDiceQuery})d20]]}}`
     );
   
-    const attributeChoice = Number(roll.results.attribute_choice.result) || 0;
-    const difficulty = Number(roll.results.difficulty.result) || 1;
-    const complicationRange = Number(roll.results.complication_range.result) || 1;
-    const dice = roll.results.roll1.dice;
+    try {
+      const attributeChoice = Number(roll.results.attribute_choice.result) || 0;
+      const difficulty = Number(roll.results.difficulty.result) || 1;
+      const complicationRange = Number(roll.results.complication_range.result) || 1;
   
-    const targetNumber = attributeChoice + skillRanks;
-    const complicationThreshold = 21 - complicationRange;
-    const successCount = dice.filter((d) => d <= targetNumber).length +
-      dice.filter((d) => d <= critMax).length;
-    const complicationCount = dice.filter((d) => d >= complicationThreshold).length;
-    const passed = successCount >= difficulty;
+      // Roll20's documented result shape nests individual dice under
+      // rolls[0].results[].v; some sheets also see a flattened .dice
+      // array, so try that first if present, then fall back.
+      const roll1 = roll.results.roll1;
+      const dice = Array.isArray(roll1.dice) ?
+        roll1.dice :
+        (roll1.rolls && roll1.rolls[0] && roll1.rolls[0].results || []).map((r) => r.v);
   
-    const overrides = {
-      target_number: targetNumber,
-      successes: successCount,
-      dice_text: dice.join(', '),
-    };
-    if (passed) {
-      overrides.passed = 1;
-      overrides.bonus_momentum = Math.max(0, successCount - difficulty);
-    } else {
-      overrides.failed = 1;
+      if (!dice.length) {
+        finishRoll(roll.rollId, {
+          target_number: '?',
+          successes: '?',
+          dice_text: `error: could not read dice from ${JSON.stringify(roll1)}`,
+        });
+        return;
+      }
+  
+      const targetNumber = attributeChoice + skillRanks;
+      const complicationThreshold = 21 - complicationRange;
+      const successCount = dice.filter((d) => d <= targetNumber).length +
+        dice.filter((d) => d <= critMax).length;
+      const complicationCount = dice.filter((d) => d >= complicationThreshold).length;
+      const passed = successCount >= difficulty;
+  
+      const overrides = {
+        target_number: targetNumber,
+        successes: successCount,
+        dice_text: dice.join(', '),
+      };
+      if (passed) {
+        overrides.passed = 1;
+        overrides.bonus_momentum = Math.max(0, successCount - difficulty);
+      } else {
+        overrides.failed = 1;
+      }
+      if (complicationCount > 0) {
+        overrides.complications = complicationCount;
+      }
+  
+      finishRoll(roll.rollId, overrides);
+    } catch (err) {
+      // Surface failures in chat instead of leaving the template blank
+      // with no clue why.
+      finishRoll(roll.rollId, {
+        target_number: '?',
+        successes: '?',
+        dice_text: `error: ${err.message}`,
+      });
     }
-    if (complicationCount > 0) {
-      overrides.complications = complicationCount;
-    }
-  
-    finishRoll(roll.rollId, overrides);
   };
   
   // Attribute-only roll (no skill): target number is just the attribute's
