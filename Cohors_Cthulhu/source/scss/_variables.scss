@@ -6,6 +6,10 @@
   --cc-banner: #6b1420;
   --cc-banner-text: #f2e9d8;
   --cc-rule: #8a1c2b;
+  // Same color as --cc-rule, softened - used for dividers between
+  // repeating rows (Weapons/Armor/Talents), where a full-strength line
+  // between every entry reads as heavier than intended.
+  --cc-rule-soft: rgba(138, 28, 43, 0.4);
   // Header font is reserved for .cc-banner (the section-title ribbons)
   // only - everything else on the sheet uses --cc-body-font.
   --cc-header-font: Georgia, 'Times New Roman', serif;
@@ -20,4 +24,5 @@
   --cc-banner: #4a0e18;
   --cc-banner-text: #f2e9d8;
   --cc-rule: #7a1a28;
+  --cc-rule-soft: rgba(122, 26, 40, 0.4);
 }

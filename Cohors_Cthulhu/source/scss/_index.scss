@@ -148,9 +148,25 @@
     fieldset,
     .repcontainer .repitem {
       border: none;
-      border-bottom: 1px solid var(--cc-rule);
-      padding: 0.3rem 0.4rem;
+      border-bottom: 1px solid var(--cc-rule-soft);
+      padding: 0.15rem 0.4rem;
       margin: 0;
+    }
+
+    // Roll20 injects its own per-row wrapper/margin around repeating items
+    // (a .repcontrol div holding the row's delete "-" control, alongside
+    // Roll20's own default spacing on .repitem) that the margin:0 above
+    // doesn't fully reach - this is most of where "significant whitespace
+    // between items" was coming from on multi-line rows.
+    .repcontainer {
+      .repitem {
+        margin: 0 !important;
+      }
+
+      .repcontrol {
+        margin: 0;
+        padding: 0;
+      }
     }
 
     input,
