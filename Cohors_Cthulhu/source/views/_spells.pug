@@ -2,6 +2,11 @@
 //- Page 3 of the official sheet: spellcasting header + spell list.
 //- The printed sheet has 6 fixed spell blocks; built as a repeating
 //- section here instead so casters aren't capped at 6.
+- const ccSpellbooks = require('./source/data/spells.json');
+-
+  const ccSpellNamesByTradition = Object.fromEntries(
+    Object.entries(ccSpellbooks).map(([tradition, spells]) => [tradition, Object.keys(spells).sort()])
+  );
 +tab({name: 'spells', container: 'article', button: {content: 'Spells'}})
   .cc-page.cc-spells
 
@@ -24,7 +29,21 @@
               | Dabbling
         .cc-field
           span Magical Tradition
-          +text({name: 'magical tradition'})
+          //- A fixed choice, not free text: the Spell Name dropdown below
+          //- filters its suggestions to this tradition's spellbook, which
+          //- only works if this value is one of a known, fixed set.
+          +select({
+            name: 'magical tradition',
+            trigger: {affects: ['tradition_marker']}
+          })
+            +option({value: ''})
+              | Select One
+            +option({value: 'runic'})
+              | Runic
+            +option({value: 'oracular'})
+              | Oracular
+            +option({value: 'celtic'})
+              | Celtic
         .cc-field
           //- Not a free choice: Traditional casters use Insight, Research
           //- casters use Reason, Dabblers use Will - fixed by RAW, so this
@@ -42,6 +61,30 @@
           span Base Power
           +number({name: 'base power', readonly: true, trigger: {calculation: 'calcBasePower', affects: ['power_rating']}})
 
+    //- Hidden radio group mirroring Magical Tradition, following the same
+    //- "hidden radio + CSS general sibling selector" trick used for the
+    //- Stress Max marker on the Character tab: pure CSS can't compare the
+    //- Magical Tradition select's value against anything, but it CAN match
+    //- on a hidden radio's :checked state. These three radios must be
+    //- direct siblings of .cc-spell-list (NOT wrapped in their own div) -
+    //- the `~` general sibling combinator below only matches elements that
+    //- share the same parent, and both live directly under .cc-page.cc-spells.
+    +radio({
+      name: 'tradition marker',
+      value: 'runic',
+      trigger: {calculation: 'calcTraditionMarker'}
+    }).cc-tradition-marker-runic
+    +radio({
+      name: 'tradition marker',
+      value: 'oracular',
+      trigger: {calculation: 'calcTraditionMarker'}
+    }).cc-tradition-marker-oracular
+    +radio({
+      name: 'tradition marker',
+      value: 'celtic',
+      trigger: {calculation: 'calcTraditionMarker'}
+    }).cc-tradition-marker-celtic
+
     .cc-panel.cc-spell-list
       .cc-banner Spells
       +fieldset({name: 'spell'})
@@ -49,13 +92,45 @@
           .cc-field-group
             .cc-field
               span Name
-              +text({name: 'name'})
+              //- Three variants of the same underlying "name" attribute -
+              //- one <datalist> per magical tradition, each with only that
+              //- tradition's spells. Only one is ever visible at a time
+              //- (CSS below, driven by the hidden tradition marker), but
+              //- since all three share the same attribute name, they stay
+              //- in sync automatically and only one apply button is needed.
+              //- Like the Talents datalist, this is a native HTML combobox
+              //- instead of a plain <select> so it still accepts free text
+              //- for homebrew/flawed spells not in the book.
+              .cc-spell-name-row
+                +action({
+                  name: 'spell apply',
+                  class: 'cc-spell-apply',
+                  trigger: {triggeredFuncs: ['ccApplySpellPreset']}
+                })
+                +text({
+                  name: 'name',
+                  list: 'cc-spell-options-runic',
+                  trigger: {triggeredFuncs: ['ccApplySpellPreset']}
+                }).cc-spell-name-runic
+                +text({
+                  name: 'name',
+                  list: 'cc-spell-options-oracular',
+                  trigger: {triggeredFuncs: ['ccApplySpellPreset']}
+                }).cc-spell-name-oracular
+                +text({
+                  name: 'name',
+                  list: 'cc-spell-options-celtic',
+                  trigger: {triggeredFuncs: ['ccApplySpellPreset']}
+                }).cc-spell-name-celtic
             .cc-field
               span Skill
               +text({name: 'skill'})
             .cc-field
               span Difficulty
-              +number({name: 'difficulty'})
+              //- Free text, not a number: some spells (e.g. Gaze of Balor)
+              //- specify an opposed test - "2, opposed by target's Will +
+              //- Resilience" - rather than a bare difficulty number.
+              +text({name: 'difficulty'})
             .cc-field
               span Cost
               +text({name: 'cost'})
@@ -71,6 +146,15 @@
           .cc-field
             span Momentum
             +textarea({name: 'momentum'})
+      datalist#cc-spell-options-runic
+        each spellName in ccSpellNamesByTradition.runic
+          option(value=spellName)
+      datalist#cc-spell-options-oracular
+        each spellName in ccSpellNamesByTradition.oracular
+          option(value=spellName)
+      datalist#cc-spell-options-celtic
+        each spellName in ccSpellNamesByTradition.celtic
+          option(value=spellName)
 
 +scss.
   .cc-spells {
@@ -83,6 +167,66 @@
       textarea {
         min-height: 3rem;
         width: 100%;
+      }
+    }
+
+    // The hidden tradition-marker radios (see the pug comment above them,
+    // near the Magical Tradition select) never need to be visible
+    // themselves - only their checked state matters, which display:none
+    // doesn't affect.
+    .cc-tradition-marker-runic,
+    .cc-tradition-marker-oracular,
+    .cc-tradition-marker-celtic {
+      display: none;
+    }
+
+    // Hide all three Name-input variants by default; the rules below then
+    // reveal only the one matching the checked tradition marker. Until a
+    // Magical Tradition is chosen, none of the markers are checked and the
+    // Name field for every spell row stays hidden.
+    .cc-spell-name-runic,
+    .cc-spell-name-oracular,
+    .cc-spell-name-celtic {
+      display: none;
+    }
+
+    .cc-tradition-marker-runic:checked ~ .cc-spell-list .cc-spell-name-runic {
+      display: block;
+    }
+
+    .cc-tradition-marker-oracular:checked ~ .cc-spell-list .cc-spell-name-oracular {
+      display: block;
+    }
+
+    .cc-tradition-marker-celtic:checked ~ .cc-spell-list .cc-spell-name-celtic {
+      display: block;
+    }
+
+    .cc-spell-name-row {
+      display: flex;
+      align-items: center;
+      gap: 0.2rem;
+
+      input {
+        flex: 1 1 auto;
+      }
+    }
+
+    .cc-spell-apply {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 0.9rem;
+      padding: 0 0.3rem 0 0;
+      color: var(--cc-ink);
+
+      &:before {
+        content: '\21BB';
+        opacity: 0.8;
+      }
+
+      &:hover:before {
+        opacity: 1;
       }
     }
   }
@@ -118,3 +262,23 @@
     return base + ccAttributeBonus(rating);
   };
   k.registerFuncs({calcPowerRating});
+
+  // Keeps the hidden tradition-marker radio group (see the pug comment
+  // above .cc-spell-tradition-marker) in sync with Magical Tradition.
+  const calcTraditionMarker = ({attributes}) => attributes.magical_tradition;
+  k.registerFuncs({calcTraditionMarker});
+
+  // Spell data keyed by tradition then spell name - see source/data/spells.json.
+  const ccSpellbooks = !{JSON.stringify(ccSpellbooks)};
+  const ccApplySpellPreset = ({trigger, attributes}) => {
+    const [section, rowID] = k.parseRepeatName(trigger.name);
+    const prefix = `${section}_${rowID}_`;
+    const tradition = attributes.magical_tradition;
+    const book = tradition && ccSpellbooks[tradition];
+    const profile = book && book[attributes[`${prefix}name`]];
+    if (!profile) { return; }
+    Object.keys(profile).forEach((field) => {
+      attributes[`${prefix}${field}`] = profile[field];
+    });
+  };
+  k.registerFuncs({ccApplySpellPreset});
