@@ -154,6 +154,12 @@ on('ready', () => {
   };
 
   const handleMessage = (msg) => {
+    // Temporary, unconditional diagnostic - logs every chat message this
+    // script sees (type, raw content, and any inlinerolls) while we
+    // confirm the hidden signal actually reaches this handler at all.
+    // Remove once the Momentum pool is confirmed working end to end.
+    log(`[CCMomentum] chat:message type=${msg.type} content=${JSON.stringify(msg.content)} inlinerolls=${JSON.stringify(msg.inlinerolls)}`);
+
     const signalDelta = extractMomentumSignalDelta(msg);
     if (signalDelta !== null) {
       if (Number.isFinite(signalDelta) && signalDelta !== 0) {
