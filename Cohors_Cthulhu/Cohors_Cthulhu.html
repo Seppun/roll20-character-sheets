@@ -847,7 +847,7 @@
         </div>
       </div>
     </div>
-    <div class="cc-footer"><span class="cc-build-html">HTML build: 2026-09-29 17:40:50 UTC</span><span class="cc-build-css"></span></div>
+    <div class="cc-footer"><span class="cc-build-html">HTML build: 2026-09-29 17:57:14 UTC</span><span class="cc-build-css"></span></div>
   </div>
       </article>
       <article class="tabs__container tabs--cohors-cthulhu__container tabs--cohors-cthulhu__container--spells" data-container-tab="cohors-cthulhu" data-tab="spells">
@@ -1029,7 +1029,8 @@
       <div class="cc-roll-row cc-roll-complication"><span>Complications:</span><span>{{computed::complications}}</span></div>{{/rollGreater() computed::complications 0}}
     </div>{{#rollTotal() computed::outcome 1}}
     <div class="cc-roll-outcome cc-roll-pass"><span>Passed - Momentum: {{computed::bonus_momentum}}</span></div>{{/rollTotal() computed::outcome 1}}{{#rollTotal() computed::outcome 0}}
-    <div class="cc-roll-outcome cc-roll-fail"><span>Failed</span></div>{{/rollTotal() computed::outcome 0}}{{#is_weapon}}
+    <div class="cc-roll-outcome cc-roll-fail"><span>Failed</span></div>{{/rollTotal() computed::outcome 0}}{{#rollGreater() computed::extra_momentum 0}}
+    <div class="cc-roll-row"><span>{{computed::extra_momentum}} extra momentum spent</span></div>{{/rollGreater() computed::extra_momentum 0}}{{#is_weapon}}
     <div class="cc-roll-header cc-roll-damage-header"><span class="cc-roll-skill">Damage</span></div>
     <div class="cc-roll-body">
       <div class="cc-roll-row"><span>Challenge Dice:</span><span class="cc-roll-dice-result">{{computed::damage_dice_text}}</span></div>
@@ -3193,6 +3194,22 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
     };
   };
   
+  // Spells whose own Momentum options let the caster pay Momentum to scale
+  // up an effect AND explicitly say that scaling also lands on the Cost
+  // roll - currently just Scrying ("Unlike the costs of most spells,
+  // Scrying's cost increases by +1 Challenge Die for each Momentum spent
+  // on either of the following options"). Every other spell with a
+  // Momentum-scaled effect (Cyclone of Cernunnos's own damage, Horn of
+  // Néit's own Challenge Die, etc.) scales something this sheet doesn't
+  // otherwise roll, so Extra Momentum is still tracked and shown for them
+  // (see initiateSpellRoll below), it just doesn't add to Cost dice.
+  // Kept separate from spells.json/ccSpellbooks (rather than a key on
+  // each spell profile) so ccApplySpellPreset's generic copy loop doesn't
+  // also write it into a meaningless row attribute.
+  const ccSpellMomentumCostDice = {
+    'Scrying': 1,
+  };
+  
   // Casting roll: a standard 2d20 skill test (Spellcasting Attribute + the
   // spell's own Skill, vs its Difficulty), with the spell's Cost rolled
   // alongside it in the same message - like a Weapon's attack+damage, but
@@ -3214,10 +3231,17 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
   
     const difficultyDefault = ccParseLeadingNumber(attributes[`${prefix}difficulty`]) || 1;
     const {diceCount: costDiceCount, effects: costEffects} = ccParseSpellCost(attributes[`${prefix}cost`]);
+    const costDicePerMomentum = ccSpellMomentumCostDice[spellName] || 0;
   
     const difficultyQuery = `?{Difficulty|${difficultyDefault}}`;
     const complicationQuery = '?{Complication range (1-5)|1}';
     const bonusDiceQuery = '?{Additional d20s bought (0-3)|0}';
+    // Reused verbatim (identical query text) in both extra_momentum and
+    // cost_dice below - Roll20 only prompts once per unique query per
+    // roll and substitutes that same answer everywhere it appears, the
+    // same way bonusDiceQuery above is embedded directly into roll1's
+    // dice count rather than resolved separately.
+    const extraMomentumQuery = '?{Extra Momentum spent|0}';
   
     const rollString = '&{template:ccskill} ' +
       `{{character_name=@{character_name}}} ` +
@@ -3227,6 +3251,7 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
       `{{difficulty=[[0+${difficultyQuery}]]}} ` +
       `{{complication_range=[[0+${complicationQuery}]]}} ` +
       `{{roll1=[[(2+${bonusDiceQuery})d20]]}} ` +
+      `{{extra_momentum=[[0+${extraMomentumQuery}]]}} ` +
       `{{target_number=[[0]]}} ` +
       `{{successes=[[0]]}} ` +
       `{{dice_text=[[0]]}} ` +
@@ -3234,7 +3259,7 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
       `{{complications=[[0]]}} ` +
       `{{bonus_momentum=[[0]]}} ` +
       `{{is_spell=1}} ` +
-      `{{cost_dice=[[${Math.max(0, costDiceCount)}d6]]}} ` +
+      `{{cost_dice=[[(${Math.max(0, costDiceCount)}+(${extraMomentumQuery})*${costDicePerMomentum})d6]]}} ` +
       `{{cost_total=[[0]]}} ` +
       `{{cost_effect_count=[[0]]}} ` +
       `{{cost_dice_text=[[0]]}} ` +
@@ -3245,6 +3270,7 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
     try {
       const difficulty = Number(roll.results.difficulty.result) || 1;
       const complicationRange = Number(roll.results.complication_range.result) || 1;
+      const extraMomentum = Number(roll.results.extra_momentum.result) || 0;
   
       const roll1 = roll.results.roll1;
       const dice = Array.isArray(roll1.dice) ?
@@ -3281,6 +3307,7 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
         outcome: passed ? 1 : 0,
         bonus_momentum: passed ? Math.max(0, successCount - difficulty) : 0,
         complications: complicationCount,
+        extra_momentum: extraMomentum,
         cost_total: totalCost,
         cost_effect_count: effectCount,
         cost_dice_text: converted.map((c) => c.symbol).join(' '),

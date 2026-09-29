@@ -2414,6 +2414,22 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
     };
   };
   
+  // Spells whose own Momentum options let the caster pay Momentum to scale
+  // up an effect AND explicitly say that scaling also lands on the Cost
+  // roll - currently just Scrying ("Unlike the costs of most spells,
+  // Scrying's cost increases by +1 Challenge Die for each Momentum spent
+  // on either of the following options"). Every other spell with a
+  // Momentum-scaled effect (Cyclone of Cernunnos's own damage, Horn of
+  // Néit's own Challenge Die, etc.) scales something this sheet doesn't
+  // otherwise roll, so Extra Momentum is still tracked and shown for them
+  // (see initiateSpellRoll below), it just doesn't add to Cost dice.
+  // Kept separate from spells.json/ccSpellbooks (rather than a key on
+  // each spell profile) so ccApplySpellPreset's generic copy loop doesn't
+  // also write it into a meaningless row attribute.
+  const ccSpellMomentumCostDice = {
+    'Scrying': 1,
+  };
+  
   // Casting roll: a standard 2d20 skill test (Spellcasting Attribute + the
   // spell's own Skill, vs its Difficulty), with the spell's Cost rolled
   // alongside it in the same message - like a Weapon's attack+damage, but
@@ -2435,10 +2451,17 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
   
     const difficultyDefault = ccParseLeadingNumber(attributes[`${prefix}difficulty`]) || 1;
     const {diceCount: costDiceCount, effects: costEffects} = ccParseSpellCost(attributes[`${prefix}cost`]);
+    const costDicePerMomentum = ccSpellMomentumCostDice[spellName] || 0;
   
     const difficultyQuery = `?{Difficulty|${difficultyDefault}}`;
     const complicationQuery = '?{Complication range (1-5)|1}';
     const bonusDiceQuery = '?{Additional d20s bought (0-3)|0}';
+    // Reused verbatim (identical query text) in both extra_momentum and
+    // cost_dice below - Roll20 only prompts once per unique query per
+    // roll and substitutes that same answer everywhere it appears, the
+    // same way bonusDiceQuery above is embedded directly into roll1's
+    // dice count rather than resolved separately.
+    const extraMomentumQuery = '?{Extra Momentum spent|0}';
   
     const rollString = '&{template:ccskill} ' +
       `{{character_name=@{character_name}}} ` +
@@ -2448,6 +2471,7 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
       `{{difficulty=[[0+${difficultyQuery}]]}} ` +
       `{{complication_range=[[0+${complicationQuery}]]}} ` +
       `{{roll1=[[(2+${bonusDiceQuery})d20]]}} ` +
+      `{{extra_momentum=[[0+${extraMomentumQuery}]]}} ` +
       `{{target_number=[[0]]}} ` +
       `{{successes=[[0]]}} ` +
       `{{dice_text=[[0]]}} ` +
@@ -2455,7 +2479,7 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
       `{{complications=[[0]]}} ` +
       `{{bonus_momentum=[[0]]}} ` +
       `{{is_spell=1}} ` +
-      `{{cost_dice=[[${Math.max(0, costDiceCount)}d6]]}} ` +
+      `{{cost_dice=[[(${Math.max(0, costDiceCount)}+(${extraMomentumQuery})*${costDicePerMomentum})d6]]}} ` +
       `{{cost_total=[[0]]}} ` +
       `{{cost_effect_count=[[0]]}} ` +
       `{{cost_dice_text=[[0]]}} ` +
@@ -2466,6 +2490,7 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
     try {
       const difficulty = Number(roll.results.difficulty.result) || 1;
       const complicationRange = Number(roll.results.complication_range.result) || 1;
+      const extraMomentum = Number(roll.results.extra_momentum.result) || 0;
   
       const roll1 = roll.results.roll1;
       const dice = Array.isArray(roll1.dice) ?
@@ -2502,6 +2527,7 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
         outcome: passed ? 1 : 0,
         bonus_momentum: passed ? Math.max(0, successCount - difficulty) : 0,
         complications: complicationCount,
+        extra_momentum: extraMomentum,
         cost_total: totalCost,
         cost_effect_count: effectCount,
         cost_dice_text: converted.map((c) => c.symbol).join(' '),
