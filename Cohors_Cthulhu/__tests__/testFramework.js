@@ -2006,17 +2006,23 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
   // pool in sync and display it to the table. delta is net: positive for
   // Momentum a passed roll generates, negative for Momentum spent (buying
   // additional d20s, or - for spells - declaring Extra Momentum spent).
-  // Harmless with no such script installed: it's just an unrecognized "!"
-  // chat command that Roll20 quietly drops. Sheet-worker sendChat() and
-  // the API's own chat handling can only be verified in a live Roll20
-  // game, not from this build/test environment, so this piece specifically
-  // needs a real playtest to confirm end to end.
-  const ccSendMomentumSignal = (delta) => {
+  //
+  // Originally tried calling sendChat() directly - confirmed live in a
+  // real game that sheet workers have no such function at all ("sendChat
+  // is not defined"), unlike the API sandbox's own sendChat. The only way
+  // sheet-worker code can put anything into chat is a real dice roll via
+  // startRoll, so this rides a dedicated, hidden roll template
+  // (ccmomentumsignal, in rolltemplate/_index.pug) instead - whispered to
+  // the GM and display:none besides, so nobody at the table ever sees it,
+  // but its rendered HTML still reaches the API's chat:message handler
+  // for parsing. Harmless with no such script installed - Roll20 still
+  // renders (and immediately hides) a card nobody looks at.
+  const ccSendMomentumSignal = async (delta) => {
     if (!delta) { return; }
     try {
-      sendChat('Cohors Cthulhu', `!ccmomentum-adjust ${delta}`);
+      await startRoll(`/w gm &{template:ccmomentumsignal} {{delta=[[0+${delta}]]}}`);
     } catch (err) {
-      console.log('[CC] sendChat failed (Momentum pool signal):', err.message);
+      console.log('[CC] Momentum pool signal failed:', err.message);
     }
   };
   
@@ -2094,7 +2100,7 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
       // bonusDiceQuery above, so this recovers that count without needing
       // its own roll-string field.
       const bonusDiceBought = Math.max(0, dice.length - 2);
-      ccSendMomentumSignal(bonusMomentum - bonusDiceBought);
+      await ccSendMomentumSignal(bonusMomentum - bonusDiceBought);
   
       // outcome is a plain 0/1 flag (rather than separate passed/failed
       // fields) because the Passed/Failed blocks are gated with the
@@ -2334,7 +2340,7 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
   
       const weaponBonusMomentum = passed ? Math.max(0, successCount - 1) : 0;
       const weaponBonusDiceBought = Math.max(0, dice.length - 2);
-      ccSendMomentumSignal(weaponBonusMomentum - weaponBonusDiceBought);
+      await ccSendMomentumSignal(weaponBonusMomentum - weaponBonusDiceBought);
   
       finishRoll(roll.rollId, {
         target_number: targetNumber,
@@ -2558,7 +2564,7 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
       const spellBonusDiceBought = Math.max(0, dice.length - 2);
       // ccSendMomentumSignal is defined in views/_character.pug's +module
       // block - both end up in the same sheet-worker script scope.
-      ccSendMomentumSignal(spellBonusMomentum - spellBonusDiceBought - extraMomentum);
+      await ccSendMomentumSignal(spellBonusMomentum - spellBonusDiceBought - extraMomentum);
   
       finishRoll(roll.rollId, {
         target_number: targetNumber,

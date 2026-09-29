@@ -109,6 +109,19 @@
           .cc-roll-row.cc-roll-complication
             span {{computed::cost_effects_summary}}
 
+//- A minimal, purpose-built roll template used only to carry the global
+//- Momentum pool signal (see ccSendMomentumSignal in views/_character.pug)
+//- to a companion Roll20 API script (api-scripts/ccmomentum.js) - never
+//- shown to anyone. Deliberately kept separate from ccskill above (rather
+//- than piggybacking on its own visible card) so restyling the actual
+//- gameplay roll card - already done several times - can never silently
+//- break the API script's parsing of this one. Sheet workers have no
+//- sendChat() of their own (confirmed live: it throws "sendChat is not
+//- defined"), so this rides startRoll/a real dice roll instead, which is
+//- the only way sheet-worker code can put anything into chat at all.
++rolltemplate('ccmomentumsignal')
+  span.cc-momentum-signal-delta {{delta}}
+
 +scss('roll').
   // Roll templates render inside Roll20's chat pane, which sanitizes their
   // CSS through a stricter, older filter than the main sheet - CSS custom
@@ -217,4 +230,12 @@
       background: #4a1414;
       color: #f0e0e0;
     }
+  }
+
+  // The Momentum pool signal card (see the pug comment above
+  // +rolltemplate('ccmomentumsignal')) is never meant to be seen - only
+  // its rendered HTML (still present in the chat message payload the API
+  // script reads, regardless of display:none) matters.
+  .sheet-rolltemplate-ccmomentumsignal {
+    display: none;
   }

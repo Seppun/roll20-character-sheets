@@ -17,13 +17,23 @@
 // -1 per point of Extra Momentum a spellcaster declares spending (see the
 //    Cast button's "Extra Momentum spent" prompt on the Spells tab).
 //
+// The signal itself is a whispered, hidden (display:none) roll using a
+// dedicated template, ccmomentumsignal (rolltemplate/_index.pug) - sheet
+// workers turned out to have no sendChat() of their own (confirmed live:
+// calling it throws "sendChat is not defined"), so startRoll/a real dice
+// roll is the only way sheet-worker code can reach chat at all. This
+// script parses that hidden card's rendered HTML out of msg.content to
+// read the delta - fragile in the sense that any change to that specific
+// template's markup would need a matching change here, but the template
+// exists solely for this and is never touched for cosmetic reasons the
+// way the visible gameplay roll card has been.
+//
 // INSTALL: This is a separate piece from the character sheet's own
 // Layout/Style/Script boxes. In your Roll20 game: Game Settings > API
 // Scripts > New Script, paste this whole file in, Save Script. This
 // requires a Pro-tier game with the API sandbox enabled - the character
-// sheet works fine without this script installed, it just won't have a
-// shared Momentum pool (the sheet's signal is a plain "!" chat command,
-// silently ignored by Roll20 if no script is listening for it).
+// sheet works fine without this script installed, the hidden signal just
+// has nothing listening for it.
 //
 // CHAT COMMANDS:
 //   !momentum            - announce the current pool value
@@ -119,14 +129,40 @@ on('ready', () => {
 
   const formatDelta = (delta) => (delta > 0 ? `+${delta}` : `${delta}`);
 
+  // Pulls the numeric delta out of the hidden ccmomentumsignal card's
+  // rendered HTML. Two strategies, tried in order: the value is an inline
+  // roll ([[0+delta]] in the sheet worker), which Roll20 normally wraps in
+  // its own inlinerollresult span - but falls back to just grabbing
+  // whatever number sits inside our own named span, in case that wrapping
+  // ever differs from what's expected here.
+  const extractMomentumSignalDelta = (content) => {
+    if (!content.includes('sheet-rolltemplate-ccmomentumsignal')) { return null; }
+    const withInlineRoll = content.match(/sheet-rolltemplate-ccmomentumsignal[\s\S]*?class="inlinerollresult[^"]*"[^>]*>\s*(-?\d+)/);
+    if (withInlineRoll) { return Number(withInlineRoll[1]); }
+    const bareSpan = content.match(/class="[^"]*cc-momentum-signal-delta[^"]*"[^>]*>[\s\S]*?(-?\d+)/);
+    if (bareSpan) { return Number(bareSpan[1]); }
+    return null;
+  };
+
   const handleMessage = (msg) => {
-    const content = String(msg.content || '').trim();
-    const [command, ...args] = content.split(/\s+/);
+    const content = String(msg.content || '');
+
+    const signalDelta = extractMomentumSignalDelta(content);
+    if (signalDelta !== null) {
+      if (Number.isFinite(signalDelta) && signalDelta !== 0) {
+        setPool(getPool() + signalDelta);
+        announce(formatDelta(signalDelta));
+      }
+      return;
+    }
+
+    const trimmed = content.trim();
+    const [command, ...args] = trimmed.split(/\s+/);
     if (!command) { return; }
 
-    // Hidden signal from the character sheet itself (ccSendMomentumSignal)
-    // - not a player-facing command, so no GM check here: it's the sheet
-    // reporting Momentum that already changed on a roll, not a request.
+    // Manual/legacy alias for the same adjustment the hidden signal above
+    // makes automatically - kept for testing from chat directly (e.g.
+    // `!ccmomentum-adjust 2`), not something the sheet itself sends.
     if (command === '!ccmomentum-adjust') {
       const delta = Number(args[0]);
       if (!Number.isFinite(delta) || delta === 0) { return; }
