@@ -2259,8 +2259,7 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
       `{{total_damage=[[0]]}} ` +
       `{{effect_count=[[0]]}} ` +
       `{{damage_dice_text=[[0]]}} ` +
-      `{{effects_summary=[[0]]}} ` +
-      `{{effects_list=${effects.join(', ') || 'None'}}}`;
+      `{{effects_summary=[[0]]}}`;
   
     const roll = await startRoll(rollString);
   
@@ -2397,6 +2396,12 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
   // further effects comma-separated (see source/data/spells.json). Mirrors
   // ccParseDamageEffects above for Weapons, but the count and its effect
   // share one comma segment here instead of being their own segments.
+  //
+  // "Drain" is filtered out of the returned effects: every spell's Cost is
+  // Drain (that's just naming the damage as mental/Drain-type, per the
+  // rulebook's Spell Format section), so it always applies and isn't a
+  // bonus effect that should only show up when an Effect face is rolled -
+  // unlike a genuine extra like Piercing or Stun.
   const ccParseSpellCost = (text) => {
     const segments = String(text || '').split(',').map((s) => s.trim()).filter(Boolean);
     const [first, ...rest] = segments;
@@ -2405,7 +2410,7 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
     const firstEffect = match && match[2] ? match[2].trim() : '';
     return {
       diceCount,
-      effects: [firstEffect, ...rest].filter(Boolean),
+      effects: [firstEffect, ...rest].filter((e) => e && !/^drain\b/i.test(e)),
     };
   };
   
@@ -2454,8 +2459,7 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
       `{{cost_total=[[0]]}} ` +
       `{{cost_effect_count=[[0]]}} ` +
       `{{cost_dice_text=[[0]]}} ` +
-      `{{cost_effects_summary=[[0]]}} ` +
-      `{{cost_effects_list=${costEffects.join(', ') || 'None'}}}`;
+      `{{cost_effects_summary=[[0]]}}`;
   
     const roll = await startRoll(rollString);
   

@@ -847,7 +847,7 @@
         </div>
       </div>
     </div>
-    <div class="cc-footer"><span class="cc-build-html">HTML build: 2026-09-29 16:30:04 UTC</span><span class="cc-build-css"></span></div>
+    <div class="cc-footer"><span class="cc-build-html">HTML build: 2026-09-29 17:10:25 UTC</span><span class="cc-build-css"></span></div>
   </div>
       </article>
       <article class="tabs__container tabs--cohors-cthulhu__container tabs--cohors-cthulhu__container--spells" data-container-tab="cohors-cthulhu" data-tab="spells">
@@ -1032,17 +1032,15 @@
     <div class="cc-roll-outcome cc-roll-fail"><span>Failed</span></div>{{/rollTotal() computed::outcome 0}}{{#is_weapon}}
     <div class="cc-roll-header cc-roll-damage-header"><span class="cc-roll-skill">Damage</span></div>
     <div class="cc-roll-body">
-      <div class="cc-roll-row"><span>Challenge Dice:</span><span>{{computed::damage_dice_text}}</span></div>
+      <div class="cc-roll-row"><span>Challenge Dice:</span><span class="cc-roll-dice-result">{{computed::damage_dice_text}}</span></div>
       <div class="cc-roll-row"><span>Total Damage:</span><span>{{computed::total_damage}}</span></div>{{#rollGreater() computed::effect_count 0}}
       <div class="cc-roll-row cc-roll-complication"><span>{{computed::effects_summary}}</span></div>{{/rollGreater() computed::effect_count 0}}
-      <div class="cc-roll-row"><span>Weapon Effects:</span><span>{{effects_list}}</span></div>
     </div>{{/is_weapon}}{{#is_spell}}
     <div class="cc-roll-header cc-roll-damage-header"><span class="cc-roll-skill">Cost (paid regardless of outcome)</span></div>
     <div class="cc-roll-body">
-      <div class="cc-roll-row"><span>Challenge Dice:</span><span>{{computed::cost_dice_text}}</span></div>
+      <div class="cc-roll-row"><span>Challenge Dice:</span><span class="cc-roll-dice-result">{{computed::cost_dice_text}}</span></div>
       <div class="cc-roll-row"><span>Mental Damage to Caster:</span><span>{{computed::cost_total}}</span></div>{{#rollGreater() computed::cost_effect_count 0}}
       <div class="cc-roll-row cc-roll-complication"><span>{{computed::cost_effects_summary}}</span></div>{{/rollGreater() computed::cost_effect_count 0}}
-      <div class="cc-roll-row"><span>Cost Effects:</span><span>{{cost_effects_list}}</span></div>
     </div>{{/is_spell}}
   </div>
 </rolltemplate>
@@ -3040,8 +3038,7 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
       `{{total_damage=[[0]]}} ` +
       `{{effect_count=[[0]]}} ` +
       `{{damage_dice_text=[[0]]}} ` +
-      `{{effects_summary=[[0]]}} ` +
-      `{{effects_list=${effects.join(', ') || 'None'}}}`;
+      `{{effects_summary=[[0]]}}`;
   
     const roll = await startRoll(rollString);
   
@@ -3178,6 +3175,12 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
   // further effects comma-separated (see source/data/spells.json). Mirrors
   // ccParseDamageEffects above for Weapons, but the count and its effect
   // share one comma segment here instead of being their own segments.
+  //
+  // "Drain" is filtered out of the returned effects: every spell's Cost is
+  // Drain (that's just naming the damage as mental/Drain-type, per the
+  // rulebook's Spell Format section), so it always applies and isn't a
+  // bonus effect that should only show up when an Effect face is rolled -
+  // unlike a genuine extra like Piercing or Stun.
   const ccParseSpellCost = (text) => {
     const segments = String(text || '').split(',').map((s) => s.trim()).filter(Boolean);
     const [first, ...rest] = segments;
@@ -3186,7 +3189,7 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
     const firstEffect = match && match[2] ? match[2].trim() : '';
     return {
       diceCount,
-      effects: [firstEffect, ...rest].filter(Boolean),
+      effects: [firstEffect, ...rest].filter((e) => e && !/^drain\b/i.test(e)),
     };
   };
   
@@ -3235,8 +3238,7 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
       `{{cost_total=[[0]]}} ` +
       `{{cost_effect_count=[[0]]}} ` +
       `{{cost_dice_text=[[0]]}} ` +
-      `{{cost_effects_summary=[[0]]}} ` +
-      `{{cost_effects_list=${costEffects.join(', ') || 'None'}}}`;
+      `{{cost_effects_summary=[[0]]}}`;
   
     const roll = await startRoll(rollString);
   

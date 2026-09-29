@@ -66,16 +66,17 @@
       .cc-roll-body
         .cc-roll-row
           span Challenge Dice:
-          span {{computed::damage_dice_text}}
+          span.cc-roll-dice-result {{computed::damage_dice_text}}
         .cc-roll-row
           span Total Damage:
           span {{computed::total_damage}}
+        //- Only shown when an Effect face actually came up on the dice
+        //- (rollGreater gates on effect_count > 0) - a separate always-on
+        //- "Weapon Effects: ..." line was removed since it just repeated
+        //- the same effect names regardless of whether they triggered.
         +rollGreater({values: 'computed::effect_count 0'})
           .cc-roll-row.cc-roll-complication
             span {{computed::effects_summary}}
-        .cc-roll-row
-          span Weapon Effects:
-          span {{effects_list}}
     //- Spell Cost is rolled unconditionally alongside the casting test -
     //- RAW pays it "whether or not [the caster] successfully cast it"
     //- (see Casting a Battlefield Spell, page 66) - so it's always shown,
@@ -86,16 +87,18 @@
       .cc-roll-body
         .cc-roll-row
           span Challenge Dice:
-          span {{computed::cost_dice_text}}
+          span.cc-roll-dice-result {{computed::cost_dice_text}}
         .cc-roll-row
           span Mental Damage to Caster:
           span {{computed::cost_total}}
+        //- Same "only show it if it triggered" treatment as Weapon
+        //- Effects above - and Drain is excluded from cost_effects_summary
+        //- entirely (see ccParseSpellCost in views/_spells.pug), since
+        //- it's inherent to every spell's cost rather than a bonus effect
+        //- that only applies when an Effect face is rolled.
         +rollGreater({values: 'computed::cost_effect_count 0'})
           .cc-roll-row.cc-roll-complication
             span {{computed::cost_effects_summary}}
-        .cc-roll-row
-          span Cost Effects:
-          span {{cost_effects_list}}
 
 +scss('roll').
   // Roll templates render inside Roll20's chat pane, which sanitizes their
@@ -174,6 +177,13 @@
       justify-content: space-between;
       gap: 0.5rem;
       font-size: 0.9rem;
+    }
+
+    // Challenge Dice results (the †/‡/–/☠ symbols) are the main thing a
+    // player scans for after a damage/cost roll, so they read larger than
+    // the rest of the row text around them.
+    .sheet-cc-roll-dice-result {
+      font-size: 1.4rem;
     }
 
     .sheet-cc-roll-complication {
