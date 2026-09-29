@@ -60,15 +60,17 @@
     +rollTotal({values: 'computed::outcome 0'})
       .cc-roll-outcome.cc-roll-fail
         span Failed
-    //- Only spell rolls ever set extra_momentum (see initiateSpellRoll in
-    //- views/_spells.pug) - it's the Momentum a caster declares spending
-    //- on one of their spell's own listed Momentum options (e.g. Cyclone
-    //- of Cernunnos's extra damage, Horn of Néit's extra Challenge Die).
-    //- For weapon/plain skill rolls the field is never set, so this stays
-    //- hidden the same way is_weapon/is_spell themselves do.
-    +rollGreater({values: 'computed::extra_momentum 0'})
+    //- momentum_spent covers every way a roll can cost the party Momentum:
+    //- additional d20s bought (all roll types) plus, for spells only,
+    //- Extra Momentum declared spent on one of the spell's own listed
+    //- Momentum options (e.g. Cyclone of Cernunnos's extra damage, Horn of
+    //- Néit's extra Challenge Die) - see runCcRoll/initiateWeaponRoll in
+    //- views/_character.pug and initiateSpellRoll in views/_spells.pug.
+    //- Hidden when nothing was spent, same as complications above.
+    +rollGreater({values: 'computed::momentum_spent 0'})
       .cc-roll-row
-        span {{computed::extra_momentum}} extra momentum spent
+        span Momentum Spent:
+        span {{computed::momentum_spent}}
     +templateConditionalDisplay('is_weapon')
       .cc-roll-header.cc-roll-damage-header
         span.cc-roll-skill Damage

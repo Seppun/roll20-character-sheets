@@ -482,6 +482,7 @@
       `{{outcome=[[0]]}} ` +
       `{{complications=[[0]]}} ` +
       `{{bonus_momentum=[[0]]}} ` +
+      `{{momentum_spent=[[0]]}} ` +
       `{{is_spell=1}} ` +
       `{{cost_dice=[[(${Math.max(0, costDiceCount)}+(${extraMomentumQuery})*${costDicePerMomentum})d6]]}} ` +
       `{{cost_total=[[0]]}} ` +
@@ -538,6 +539,7 @@
         bonus_momentum: spellBonusMomentum,
         complications: complicationCount,
         extra_momentum: extraMomentum,
+        momentum_spent: spellBonusDiceBought + extraMomentum,
         cost_total: totalCost,
         cost_effect_count: effectCount,
         cost_dice_text: converted.map((c) => c.symbol).join(' '),

@@ -961,7 +961,8 @@
       `{{dice_text=[[0]]}} ` +
       `{{outcome=[[0]]}} ` +
       `{{complications=[[0]]}} ` +
-      `{{bonus_momentum=[[0]]}}`;
+      `{{bonus_momentum=[[0]]}} ` +
+      `{{momentum_spent=[[0]]}}`;
 
     const roll = await startRoll(rollString);
 
@@ -1019,6 +1020,7 @@
         outcome: passed ? 1 : 0,
         bonus_momentum: bonusMomentum,
         complications: complicationCount,
+        momentum_spent: bonusDiceBought,
       };
 
       console.log(`[CC] ${skillLabel} outcome:`, {
@@ -1194,6 +1196,7 @@
       `{{outcome=[[0]]}} ` +
       `{{complications=[[0]]}} ` +
       `{{bonus_momentum=[[0]]}} ` +
+      `{{momentum_spent=[[0]]}} ` +
       `{{is_weapon=1}} ` +
       `{{damage_dice=[[${diceCount}d6]]}} ` +
       `{{total_damage=[[0]]}} ` +
@@ -1253,6 +1256,7 @@
         outcome: passed ? 1 : 0,
         bonus_momentum: weaponBonusMomentum,
         complications: complicationCount,
+        momentum_spent: weaponBonusDiceBought,
         total_damage: totalDamage,
         effect_count: effectCount,
         damage_dice_text: converted.map((c) => c.symbol).join(' '),

@@ -2066,7 +2066,8 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
       `{{dice_text=[[0]]}} ` +
       `{{outcome=[[0]]}} ` +
       `{{complications=[[0]]}} ` +
-      `{{bonus_momentum=[[0]]}}`;
+      `{{bonus_momentum=[[0]]}} ` +
+      `{{momentum_spent=[[0]]}}`;
   
     const roll = await startRoll(rollString);
   
@@ -2124,6 +2125,7 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
         outcome: passed ? 1 : 0,
         bonus_momentum: bonusMomentum,
         complications: complicationCount,
+        momentum_spent: bonusDiceBought,
       };
   
       console.log(`[CC] ${skillLabel} outcome:`, {
@@ -2299,6 +2301,7 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
       `{{outcome=[[0]]}} ` +
       `{{complications=[[0]]}} ` +
       `{{bonus_momentum=[[0]]}} ` +
+      `{{momentum_spent=[[0]]}} ` +
       `{{is_weapon=1}} ` +
       `{{damage_dice=[[${diceCount}d6]]}} ` +
       `{{total_damage=[[0]]}} ` +
@@ -2358,6 +2361,7 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
         outcome: passed ? 1 : 0,
         bonus_momentum: weaponBonusMomentum,
         complications: complicationCount,
+        momentum_spent: weaponBonusDiceBought,
         total_damage: totalDamage,
         effect_count: effectCount,
         damage_dice_text: converted.map((c) => c.symbol).join(' '),
@@ -2527,6 +2531,7 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
       `{{outcome=[[0]]}} ` +
       `{{complications=[[0]]}} ` +
       `{{bonus_momentum=[[0]]}} ` +
+      `{{momentum_spent=[[0]]}} ` +
       `{{is_spell=1}} ` +
       `{{cost_dice=[[(${Math.max(0, costDiceCount)}+(${extraMomentumQuery})*${costDicePerMomentum})d6]]}} ` +
       `{{cost_total=[[0]]}} ` +
@@ -2583,6 +2588,7 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
         bonus_momentum: spellBonusMomentum,
         complications: complicationCount,
         extra_momentum: extraMomentum,
+        momentum_spent: spellBonusDiceBought + extraMomentum,
         cost_total: totalCost,
         cost_effect_count: effectCount,
         cost_dice_text: converted.map((c) => c.symbol).join(' '),

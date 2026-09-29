@@ -847,7 +847,7 @@
         </div>
       </div>
     </div>
-    <div class="cc-footer"><span class="cc-build-html">HTML build: 2026-09-29 21:12:52 UTC</span><span class="cc-build-css"></span></div>
+    <div class="cc-footer"><span class="cc-build-html">HTML build: 2026-09-29 21:25:05 UTC</span><span class="cc-build-css"></span></div>
   </div>
       </article>
       <article class="tabs__container tabs--cohors-cthulhu__container tabs--cohors-cthulhu__container--spells" data-container-tab="cohors-cthulhu" data-tab="spells">
@@ -1029,8 +1029,8 @@
       <div class="cc-roll-row cc-roll-complication"><span>Complications:</span><span>{{computed::complications}}</span></div>{{/rollGreater() computed::complications 0}}
     </div>{{#rollTotal() computed::outcome 1}}
     <div class="cc-roll-outcome cc-roll-pass"><span>Passed - Momentum: {{computed::bonus_momentum}}</span></div>{{/rollTotal() computed::outcome 1}}{{#rollTotal() computed::outcome 0}}
-    <div class="cc-roll-outcome cc-roll-fail"><span>Failed</span></div>{{/rollTotal() computed::outcome 0}}{{#rollGreater() computed::extra_momentum 0}}
-    <div class="cc-roll-row"><span>{{computed::extra_momentum}} extra momentum spent</span></div>{{/rollGreater() computed::extra_momentum 0}}{{#is_weapon}}
+    <div class="cc-roll-outcome cc-roll-fail"><span>Failed</span></div>{{/rollTotal() computed::outcome 0}}{{#rollGreater() computed::momentum_spent 0}}
+    <div class="cc-roll-row"><span>Momentum Spent:</span><span>{{computed::momentum_spent}}</span></div>{{/rollGreater() computed::momentum_spent 0}}{{#is_weapon}}
     <div class="cc-roll-header cc-roll-damage-header"><span class="cc-roll-skill">Damage</span></div>
     <div class="cc-roll-body">
       <div class="cc-roll-row"><span>Challenge Dice:</span><span class="cc-roll-dice-result">{{computed::damage_dice_text}}</span></div>
@@ -2848,7 +2848,8 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
       `{{dice_text=[[0]]}} ` +
       `{{outcome=[[0]]}} ` +
       `{{complications=[[0]]}} ` +
-      `{{bonus_momentum=[[0]]}}`;
+      `{{bonus_momentum=[[0]]}} ` +
+      `{{momentum_spent=[[0]]}}`;
   
     const roll = await startRoll(rollString);
   
@@ -2906,6 +2907,7 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
         outcome: passed ? 1 : 0,
         bonus_momentum: bonusMomentum,
         complications: complicationCount,
+        momentum_spent: bonusDiceBought,
       };
   
       console.log(`[CC] ${skillLabel} outcome:`, {
@@ -3081,6 +3083,7 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
       `{{outcome=[[0]]}} ` +
       `{{complications=[[0]]}} ` +
       `{{bonus_momentum=[[0]]}} ` +
+      `{{momentum_spent=[[0]]}} ` +
       `{{is_weapon=1}} ` +
       `{{damage_dice=[[${diceCount}d6]]}} ` +
       `{{total_damage=[[0]]}} ` +
@@ -3140,6 +3143,7 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
         outcome: passed ? 1 : 0,
         bonus_momentum: weaponBonusMomentum,
         complications: complicationCount,
+        momentum_spent: weaponBonusDiceBought,
         total_damage: totalDamage,
         effect_count: effectCount,
         damage_dice_text: converted.map((c) => c.symbol).join(' '),
@@ -3309,6 +3313,7 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
       `{{outcome=[[0]]}} ` +
       `{{complications=[[0]]}} ` +
       `{{bonus_momentum=[[0]]}} ` +
+      `{{momentum_spent=[[0]]}} ` +
       `{{is_spell=1}} ` +
       `{{cost_dice=[[(${Math.max(0, costDiceCount)}+(${extraMomentumQuery})*${costDicePerMomentum})d6]]}} ` +
       `{{cost_total=[[0]]}} ` +
@@ -3365,6 +3370,7 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
         bonus_momentum: spellBonusMomentum,
         complications: complicationCount,
         extra_momentum: extraMomentum,
+        momentum_spent: spellBonusDiceBought + extraMomentum,
         cost_total: totalCost,
         cost_effect_count: effectCount,
         cost_dice_text: converted.map((c) => c.symbol).join(' '),
