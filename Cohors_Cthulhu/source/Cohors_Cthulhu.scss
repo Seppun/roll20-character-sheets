@@ -3,6 +3,12 @@
 @use './scss';
 @use 'sfc';
 
+// Inter, for everything on the sheet except .cc-banner's section-title
+// ribbons (which keep the serif --cc-header-font). Loaded the same way
+// Ars_Magica_5th already does for its own Google Fonts - a plain CSS
+// @import, proven to survive Roll20's paste sanitizer.
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
 html {
   font-size: 16px;
   @include k.variables;
@@ -20,6 +26,10 @@ body {
   .ui-dialog {
     .tab-content {
       .charsheet {
+        // Sheet-wide default font - anything that doesn't set its own
+        // font-family (most spans/labels, not just the explicit
+        // --cc-body-font rules on field inputs) inherits this.
+        font-family: var(--cc-body-font);
         @include k.defaultStyles;
         @include scss.generic;
         @include sfc.sheet;

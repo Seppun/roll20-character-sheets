@@ -6,8 +6,10 @@
   --cc-banner: #6b1420;
   --cc-banner-text: #f2e9d8;
   --cc-rule: #8a1c2b;
+  // Header font is reserved for .cc-banner (the section-title ribbons)
+  // only - everything else on the sheet uses --cc-body-font.
   --cc-header-font: Georgia, 'Times New Roman', serif;
-  --cc-body-font: Georgia, 'Times New Roman', serif;
+  --cc-body-font: 'Inter', sans-serif;
 }
 
 @mixin dark {

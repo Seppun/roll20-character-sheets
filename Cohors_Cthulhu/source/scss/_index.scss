@@ -39,7 +39,9 @@
     border: 1px solid var(--cc-rule);
     border-bottom: none;
     border-radius: 4px 4px 0 0;
-    font-family: var(--cc-header-font);
+    // Not banner text, so --cc-body-font (Inter) applies, unlike
+    // .cc-banner just below.
+    font-family: var(--cc-body-font);
     font-weight: bold;
     text-transform: uppercase;
     letter-spacing: 0.04em;
