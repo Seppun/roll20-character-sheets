@@ -1073,12 +1073,20 @@
   // that table's own iconography (dagger/crossed daggers/dash/Cthulhu
   // face) rather than a generic pip count, so the roll template reads the
   // same way the physical dice would.
+  //
+  // The Effect face was originally the octopus emoji (an astral-plane
+  // character, outside the Basic Multilingual Plane), which Roll20's
+  // savesheetsettings endpoint rejected with a 500 the first time this
+  // HTML was pasted into a fresh game - a known failure mode on Roll20's
+  // backend for any 4-byte-UTF-8 character in custom sheet code. Skull
+  // and crossbones reads the same way (a distinct "something happened"
+  // face) and is a plain BMP character, so it saves without issue.
   const ccChallengeDieFromD6 = (d6) => {
     switch (Number(d6)) {
       case 1: return {pips: 1, effect: false, symbol: '†'};
       case 2: return {pips: 2, effect: false, symbol: '‡'};
-      case 5: return {pips: 1, effect: true, symbol: '🐙'};
-      case 6: return {pips: 1, effect: true, symbol: '🐙'};
+      case 5: return {pips: 1, effect: true, symbol: '☠'};
+      case 6: return {pips: 1, effect: true, symbol: '☠'};
       default: return {pips: 0, effect: false, symbol: '–'};
     }
   };

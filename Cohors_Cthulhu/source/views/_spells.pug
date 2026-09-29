@@ -281,12 +281,21 @@
       }
     }
 
-    // Small eagle toggle for the Effect/Momentum content below it - a
-    // native checkbox with its default appearance stripped and an eagle
-    // glyph drawn via :before instead, so no separate <label> is needed
-    // (the checkbox itself stays natively clickable). Unchecked (the
-    // default) = expanded; checked = collapsed, with the eagle rotating
-    // 180deg to show which way it's currently "folded".
+    // Fold/unfold toggle for the Effect/Momentum content below it - a
+    // native checkbox with its default appearance stripped and a glyph
+    // drawn via :before instead, so no separate <label> is needed (the
+    // checkbox itself stays natively clickable). Unchecked (the default) =
+    // expanded; checked = collapsed, with the glyph rotating 180deg to
+    // show which way it's currently "folded".
+    //
+    // This was originally an eagle emoji (matching the sheet's Roman/SPQR
+    // theme), but that's an astral-plane character (outside the Basic
+    // Multilingual Plane) - Sass compiles a \1F985 escape straight into
+    // the literal 4-byte UTF-8 character in the output CSS, and Roll20's
+    // savesheetsettings endpoint 500s on custom sheet code containing one
+    // (confirmed: a fresh game with this pasted in came back blank with a
+    // 500 on save; reverting to the commit before this glyph existed
+    // worked fine). A plain triangle is BMP-safe and reads the same way.
     .cc-spell-collapse-toggle {
       appearance: none;
       -webkit-appearance: none;
@@ -301,7 +310,7 @@
       line-height: 1;
 
       &:before {
-        content: '\1F985';
+        content: '\25BE';
         display: inline-block;
         opacity: 0.8;
         transition: transform 150ms ease;
