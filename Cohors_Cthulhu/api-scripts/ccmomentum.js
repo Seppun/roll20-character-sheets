@@ -132,22 +132,28 @@ on('ready', () => {
 
   // Pulls the numeric delta out of the hidden ccmomentumsignal roll.
   // msg.content for a message with an inline roll ([[0+delta]] in the
-  // sheet worker) holds the RAW template invocation with a $[[0]]
-  // placeholder, not rendered HTML - the API never renders templates to
-  // HTML at all (that's a client-side/browser step). The actual computed
-  // value lives in msg.inlinerolls, a separate array Roll20 populates for
-  // any message containing one or more [[...]] expressions.
+  // sheet worker) holds the RAW field list with a $[[0]] placeholder in
+  // place of the resolved value, not rendered HTML - the API never
+  // renders templates to HTML at all (that's a client-side/browser step).
+  // Confirmed live that Roll20 also strips the leading &{template:X}
+  // reference out of msg.content entirely before the API ever sees it -
+  // true of every roll, not just this one, so template name can't be
+  // used to identify our message. {{ccmomentumdelta=...}} (the field
+  // name itself) survives and is distinctive enough not to collide with
+  // anything else. The actual computed value lives in msg.inlinerolls, a
+  // separate array Roll20 populates for any message with [[...]] in it -
+  // this template has exactly one such expression, so it's always [0].
   const extractMomentumSignalDelta = (msg) => {
     const content = String(msg.content || '');
-    if (!content.includes('template:ccmomentumsignal')) { return null; }
+    if (!content.includes('{{ccmomentumdelta=')) { return null; }
     const rolls = Array.isArray(msg.inlinerolls) ? msg.inlinerolls : [];
     if (!rolls.length) {
-      log(`[CCMomentum] ccmomentumsignal message with no inlinerolls - raw msg: ${JSON.stringify(msg)}`);
+      log(`[CCMomentum] ccmomentumdelta message with no inlinerolls - raw msg: ${JSON.stringify(msg)}`);
       return null;
     }
     const total = rolls[0] && rolls[0].results && rolls[0].results.total;
     if (!Number.isFinite(total)) {
-      log(`[CCMomentum] ccmomentumsignal inlinerolls[0] had no usable .results.total - raw msg: ${JSON.stringify(msg)}`);
+      log(`[CCMomentum] ccmomentumdelta inlinerolls[0] had no usable .results.total - raw msg: ${JSON.stringify(msg)}`);
       return null;
     }
     return total;

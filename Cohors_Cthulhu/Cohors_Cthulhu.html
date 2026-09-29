@@ -847,7 +847,7 @@
         </div>
       </div>
     </div>
-    <div class="cc-footer"><span class="cc-build-html">HTML build: 2026-09-29 20:37:52 UTC</span><span class="cc-build-css"></span></div>
+    <div class="cc-footer"><span class="cc-build-html">HTML build: 2026-09-29 21:12:52 UTC</span><span class="cc-build-css"></span></div>
   </div>
       </article>
       <article class="tabs__container tabs--cohors-cthulhu__container tabs--cohors-cthulhu__container--spells" data-container-tab="cohors-cthulhu" data-tab="spells">
@@ -1045,7 +1045,7 @@
     </div>{{/is_spell}}
   </div>
 </rolltemplate>
-<rolltemplate class="sheet-rolltemplate-ccmomentumsignal"><span class="cc-momentum-signal-delta">{{delta}}</span>
+<rolltemplate class="sheet-rolltemplate-ccmomentumsignal"><span class="cc-momentum-signal-delta">{{ccmomentumdelta}}</span>
 </rolltemplate>
 <script type="text/worker">const k = (function(){
   const kFuncs = {};
@@ -2802,7 +2802,16 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
   const ccSendMomentumSignal = async (delta) => {
     if (!delta) { return; }
     try {
-      await startRoll(`/w gm &{template:ccmomentumsignal} {{delta=[[0+${delta}]]}}`);
+      // Confirmed live: a startRoll() a sheet worker never finishRoll()s
+      // doesn't post its real template content at all - Roll20 replaces
+      // it with a generic "A roll was initiated by a character sheet,
+      // but it was not finished: {{delta=$[[0]]}}" placeholder message
+      // instead (missing the &{template:...} reference entirely, though
+      // the actual computed inline-roll value is still present and
+      // correct). finishRoll with no overrides completes the roll
+      // properly since delta needs no override to begin with.
+      const roll = await startRoll(`/w gm &{template:ccmomentumsignal} {{ccmomentumdelta=[[0+${delta}]]}}`);
+      finishRoll(roll.rollId, {});
     } catch (err) {
       console.log('[CC] Momentum pool signal failed:', err.message);
     }

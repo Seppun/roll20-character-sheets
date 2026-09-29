@@ -915,7 +915,16 @@
   const ccSendMomentumSignal = async (delta) => {
     if (!delta) { return; }
     try {
-      await startRoll(`/w gm &{template:ccmomentumsignal} {{delta=[[0+${delta}]]}}`);
+      // Confirmed live: a startRoll() a sheet worker never finishRoll()s
+      // doesn't post its real template content at all - Roll20 replaces
+      // it with a generic "A roll was initiated by a character sheet,
+      // but it was not finished: {{delta=$[[0]]}}" placeholder message
+      // instead (missing the &{template:...} reference entirely, though
+      // the actual computed inline-roll value is still present and
+      // correct). finishRoll with no overrides completes the roll
+      // properly since delta needs no override to begin with.
+      const roll = await startRoll(`/w gm &{template:ccmomentumsignal} {{ccmomentumdelta=[[0+${delta}]]}}`);
+      finishRoll(roll.rollId, {});
     } catch (err) {
       console.log('[CC] Momentum pool signal failed:', err.message);
     }

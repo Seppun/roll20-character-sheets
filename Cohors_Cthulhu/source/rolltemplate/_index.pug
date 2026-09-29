@@ -119,8 +119,17 @@
 //- sendChat() of their own (confirmed live: it throws "sendChat is not
 //- defined"), so this rides startRoll/a real dice roll instead, which is
 //- the only way sheet-worker code can put anything into chat at all.
+//-
+//- Confirmed live: Roll20 strips the &{template:X} reference itself out
+//- of msg.content before the API ever sees it - true for EVERY roll, not
+//- just this one (a normal, finished ccskill weapon roll's msg.content
+//- has no "template:ccskill" in it either) - only the {{field=value}}
+//- pairs survive. So the API script can't detect "is this our signal" by
+//- template name at all; it looks for this field's own distinctive name
+//- instead (ccmomentumdelta, not just "delta", to keep it unlikely to
+//- collide with an unrelated field from anything else in the game).
 +rolltemplate('ccmomentumsignal')
-  span.cc-momentum-signal-delta {{delta}}
+  span.cc-momentum-signal-delta {{ccmomentumdelta}}
 
 +scss('roll').
   // Roll templates render inside Roll20's chat pane, which sanitizes their
