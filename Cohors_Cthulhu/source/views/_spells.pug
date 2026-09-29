@@ -530,6 +530,9 @@
       // ccSendMomentumSignal is defined in views/_character.pug's +module
       // block - both end up in the same sheet-worker script scope.
       await ccSendMomentumSignal(spellBonusMomentum - spellBonusDiceBought - extraMomentum);
+      // ccSendThreatSignal is defined in views/_character.pug's +module
+      // block, alongside ccSendMomentumSignal - both end up in scope here.
+      await ccSendThreatSignal(complicationCount);
 
       finishRoll(roll.rollId, {
         target_number: targetNumber,

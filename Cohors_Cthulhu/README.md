@@ -217,43 +217,66 @@ and compare against a sheet you know works.
   timestamps ever differ, you pasted an old copy of one file after
   updating the other.
 
-## Global Momentum pool (API script)
+## Global Momentum and Threat pools (API scripts)
 
-Momentum in the 2d20 System is a shared party resource, not a
-per-character stat - it can't live as an attribute on this (or any)
-character sheet, since each character's sheet is its own isolated set of
-attributes with no visibility into any other character's. `api-scripts/`
-holds a small Roll20 API script, `ccmomentum.js`, that maintains a single
-game-wide Momentum pool instead, kept in sync automatically: every roll
-made from this sheet (Attribute/Skill/Focus/Weapon/Spell) sends a hidden
-`!ccmomentum-adjust N` chat command via the sheet worker's own `sendChat`
-(see `ccSendMomentumSignal` in `source/views/_character.pug`) whenever a
-roll generates Momentum, or spends it by buying additional d20s or (for
-spells) declaring Extra Momentum spent.
+Momentum and Threat in the 2d20 System are shared, game-wide resources,
+not per-character stats - neither can live as an attribute on this (or
+any) character sheet, since each character's sheet is its own isolated
+set of attributes with no visibility into any other character's, let
+alone a GM-only pool. `api-scripts/` holds two small, independent Roll20
+API scripts, `ccmomentum.js` and `ccthreat.js`, that each maintain one
+such pool, kept in sync automatically by every roll made from this sheet
+(Attribute/Skill/Focus/Weapon/Spell):
 
-This is a **separate piece from the character sheet itself** - it's not
-part of the compiled `Cohors_Cthulhu.html`/`.css`, and isn't pasted into
-the Custom Sheet Layout/Style boxes. Instead, in a Pro-tier game with the
-API sandbox enabled: Game Settings > API Scripts > New Script, paste in
-the whole contents of `api-scripts/ccmomentum.js`, Save Script. Without
-that script installed, the sheet's hidden signal is just an unrecognized
-"!" chat command that Roll20 quietly ignores - rolling still works fine,
-there's just no shared pool.
+- **Momentum** increases by the Momentum a passed roll generates, and
+  decreases by additional d20s bought (all roll types) or, for spells,
+  Extra Momentum declared spent.
+- **Threat** increases by the Complications a roll generates (2d20 RAW:
+  each Complication generates 1 point of Threat for the GM). There's no
+  automatic decrease - RAW never has a player spend Threat from their own
+  sheet, only the GM spends it (buying NPCs extra d20s, directorial
+  effects), which happens in narration rather than on this sheet, so
+  `!threat-adjust` (GM only) is the only way the pool goes down.
 
-Chat commands once installed: `!momentum` (announce the current value),
-and GM-only `!momentum-set N` / `!momentum-adjust N` for manual
-corrections. The pool displays in chat on every change, plus two passive
+Sheet workers turned out to have no `sendChat()` of their own (confirmed
+live: calling it throws "sendChat is not defined"), so each pool's signal
+instead rides a dedicated, hidden (`display:none`) roll template -
+`ccmomentumsignal`/`ccthreatsignal` in `rolltemplate/_index.pug` - sent
+via `startRoll`/`finishRoll`, the only way sheet-worker code can put
+anything into chat at all (see `ccSendMomentumSignal`/`ccSendThreatSignal`
+in `source/views/_character.pug`). The two signals are kept fully
+independent (separate templates, separate fields, separate API scripts)
+so adding Threat could never risk the already-working Momentum pool.
+
+These are **separate pieces from the character sheet itself** - neither
+is part of the compiled `Cohors_Cthulhu.html`/`.css`, and neither is
+pasted into the Custom Sheet Layout/Style boxes. Instead, in a Pro-tier
+game with the API sandbox enabled: Game Settings > API Scripts > New
+Script, paste in the whole contents of `api-scripts/ccmomentum.js`, Save
+Script, then repeat for `api-scripts/ccthreat.js` - they run side by side
+as two ordinary API scripts. Without either script installed, that pool's
+hidden signal just renders (and immediately hides) a roll template card
+nobody looks at - rolling still works fine, there's just no shared pool.
+
+Chat commands once installed: `!momentum` / `!threat` (announce the
+current value), and GM-only `!momentum-set N` / `!threat-set N` and
+`!momentum-adjust N` / `!threat-adjust N` for manual corrections (the
+latter pair is also how a GM actually spends Threat, since nothing on the
+sheet does that automatically). Both scripts also unconditionally log
+every chat message they see, to make debugging from the API console
+easier. Each pool posts to chat on every change, plus two passive
 displays that don't require re-opening chat: a pinned custom entry at the
-top of the Turn Order tracker (needs no setup), and, if the GM places any
-token/graphic named "Momentum Pool" on the current page, that token's
-bar1 is kept in sync too - closer to how a deck's remaining count sits
-visibly on the tabletop.
+top of the Turn Order tracker (needs no setup, one row per pool), and, if
+the GM places a token/graphic named "Momentum Pool" or "Threat Pool" on
+the current page, that token's bar1 is kept in sync too - closer to how a
+deck's remaining count sits visibly on the tabletop.
 
-**This piece specifically has not been tested in a live Roll20 game** -
-unlike the sheet itself (verified by rebuilding and rendering with
-Playwright), a Roll20 API script's `sendChat`/`state`/`findObjs`/etc.
-sandbox only exists inside an actual Roll20 session, which this
-development environment has no access to. The script's own internal logic
-was verified with mocked versions of those globals, but the real
-end-to-end path (sheet worker `sendChat` -> API script `chat:message` ->
-displays updating) needs a real playtest to confirm.
+The Momentum pool has been **confirmed working end-to-end in a live
+Roll20 game**. The Threat pool reuses the exact same, already-proven
+signal mechanism (hidden roll template + `startRoll`/`finishRoll` +
+`msg.inlinerolls`), so it's expected to work the same way, but hasn't
+itself had a separate live playtest yet - a Roll20 API script's
+`sendChat`/`state`/`findObjs`/etc. sandbox only exists inside an actual
+Roll20 session, which this development environment has no access to, so
+its internal logic was verified with mocked versions of those globals
+instead.

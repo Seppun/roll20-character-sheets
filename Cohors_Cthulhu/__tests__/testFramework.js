@@ -2035,6 +2035,27 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
     }
   };
   
+  // Threat is the GM's mirror of Momentum: also a shared, game-wide
+  // resource, so it isn't tracked on this sheet either - a companion
+  // Roll20 API script (api-scripts/ccthreat.js) keeps that pool in sync
+  // instead. Unlike Momentum, RAW gives players no way to spend Threat
+  // directly from their own sheet - only to generate it - so delta here
+  // is always the Complications a roll produced (2d20 RAW: each
+  // Complication generates 1 point of Threat for the GM), never negative.
+  // Kept as a fully separate hidden roll/template/API script from
+  // ccSendMomentumSignal above rather than folding the two signals into
+  // one roll, so this addition can never risk the already-proven-working
+  // Momentum pool plumbing.
+  const ccSendThreatSignal = async (delta) => {
+    if (!delta) { return; }
+    try {
+      const roll = await startRoll(`/w gm &{template:ccthreatsignal} {{ccthreatdelta=[[0+${delta}]]}}`);
+      finishRoll(roll.rollId, {});
+    } catch (err) {
+      console.log('[CC] Threat pool signal failed:', err.message);
+    }
+  };
+  
   // Shared 2d20 roll core, used for Attribute-only rolls, plain Skill
   // rolls (no focus), and Focus rolls. attributeExpr is either a literal
   // rating (attribute-only roll, no choice to make) or the ?{Attribute}
@@ -2111,6 +2132,7 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
       // its own roll-string field.
       const bonusDiceBought = Math.max(0, dice.length - 2);
       await ccSendMomentumSignal(bonusMomentum - bonusDiceBought);
+      await ccSendThreatSignal(complicationCount);
   
       // outcome is a plain 0/1 flag (rather than separate passed/failed
       // fields) because the Passed/Failed blocks are gated with the
@@ -2353,6 +2375,7 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
       const weaponBonusMomentum = passed ? Math.max(0, successCount - 1) : 0;
       const weaponBonusDiceBought = Math.max(0, dice.length - 2);
       await ccSendMomentumSignal(weaponBonusMomentum - weaponBonusDiceBought);
+      await ccSendThreatSignal(complicationCount);
   
       finishRoll(roll.rollId, {
         target_number: targetNumber,
@@ -2579,6 +2602,9 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
       // ccSendMomentumSignal is defined in views/_character.pug's +module
       // block - both end up in the same sheet-worker script scope.
       await ccSendMomentumSignal(spellBonusMomentum - spellBonusDiceBought - extraMomentum);
+      // ccSendThreatSignal is defined in views/_character.pug's +module
+      // block, alongside ccSendMomentumSignal - both end up in scope here.
+      await ccSendThreatSignal(complicationCount);
   
       finishRoll(roll.rollId, {
         target_number: targetNumber,

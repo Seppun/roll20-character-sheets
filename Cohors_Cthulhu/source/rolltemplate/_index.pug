@@ -133,6 +133,14 @@
 +rolltemplate('ccmomentumsignal')
   span.cc-momentum-signal-delta {{ccmomentumdelta}}
 
+//- Same purpose as ccmomentumsignal above, but for the GM's Threat pool
+//- (see ccSendThreatSignal in views/_character.pug and its companion API
+//- script, api-scripts/ccthreat.js) - kept as its own template/hidden roll
+//- rather than piggybacking on ccmomentumsignal so this addition can never
+//- risk the already-working Momentum signal.
++rolltemplate('ccthreatsignal')
+  span.cc-threat-signal-delta {{ccthreatdelta}}
+
 +scss('roll').
   // Roll templates render inside Roll20's chat pane, which sanitizes their
   // CSS through a stricter, older filter than the main sheet - CSS custom
@@ -243,10 +251,12 @@
     }
   }
 
-  // The Momentum pool signal card (see the pug comment above
-  // +rolltemplate('ccmomentumsignal')) is never meant to be seen - only
-  // its rendered HTML (still present in the chat message payload the API
-  // script reads, regardless of display:none) matters.
-  .sheet-rolltemplate-ccmomentumsignal {
+  // The Momentum and Threat pool signal cards (see the pug comments above
+  // +rolltemplate('ccmomentumsignal')/+rolltemplate('ccthreatsignal')) are
+  // never meant to be seen - only their rendered HTML (still present in
+  // the chat message payload the API scripts read, regardless of
+  // display:none) matters.
+  .sheet-rolltemplate-ccmomentumsignal,
+  .sheet-rolltemplate-ccthreatsignal {
     display: none;
   }
