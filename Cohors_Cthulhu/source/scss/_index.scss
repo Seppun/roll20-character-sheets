@@ -191,4 +191,73 @@
       }
     }
   }
+
+  // Roll20 automatically collapses any repeating row too tall to fit its
+  // one-line compact summary (every multi-field row on this sheet -
+  // Weapons, Armor, Talents, Spells) behind a plain text "Modify" link, and
+  // appends a plain text "+Add Item" link after the whole section - both
+  // are Roll20's own native UI (classes repcontrol_edit/repcontrol_add),
+  // not something this sheet's markup renders itself, so they can only be
+  // restyled via CSS, not have their text/DOM changed. Same wording,
+  // dressed up to read as buttons matching the sheet's theme, with a small
+  // eagle-icon background image (not a unicode glyph - an emoji here would
+  // be the exact astral-plane-character mistake that once 500'd Roll20's
+  // save endpoint, see the Effect-face symbol's history above) instead of
+  // literal text.
+  //
+  // Uses its own icon asset (images/eagle-icon.png) rather than reusing
+  // eagle-spqr.png (the page watermark): that PNG's opacity is baked very
+  // low into its own alpha channel on purpose (it's meant to be a barely-
+  // visible watermark at 320px), so at a 14px icon size it was rendering
+  // as essentially invisible. This one is a solid parchment-colored
+  // silhouette (matching --cc-banner-text) sized for icon use, so it
+  // reads clearly against the button's dark maroon background.
+  .repcontrol_add,
+  .repcontrol_edit {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: var(--cc-banner);
+    color: var(--cc-banner-text);
+    border: 1px solid var(--cc-rule);
+    border-radius: 4px;
+    padding: 0.3rem 0.9rem;
+    margin: 0.3rem 0;
+    font-family: var(--cc-body-font);
+    font-weight: bold;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    cursor: pointer;
+
+    &:before {
+      content: '';
+      display: inline-block;
+      width: 18px;
+      height: 12px;
+      flex: 0 0 auto;
+      background: url('https://raw.githubusercontent.com/Seppun/roll20-character-sheets/Cohorscc/Cohors_Cthulhu/images/eagle-icon.png') no-repeat center / contain;
+    }
+
+    &:hover {
+      background: var(--cc-parchment);
+      color: var(--cc-ink);
+
+      // The icon is a background-image, so it doesn't pick up the `color`
+      // swap above like the text does - without this it stays parchment-
+      // colored against the new parchment background and disappears.
+      &:before {
+        background-image: url('https://raw.githubusercontent.com/Seppun/roll20-character-sheets/Cohorscc/Cohors_Cthulhu/images/eagle-icon-dark.png');
+      }
+    }
+
+    // Roll20 wraps the clickable text in its own <a>/<span> inside the
+    // element carrying these classes - normalize it so the link doesn't
+    // draw its own (differently colored, underlined) styling on top.
+    a,
+    span {
+      color: inherit;
+      text-decoration: none;
+    }
+  }
 }
