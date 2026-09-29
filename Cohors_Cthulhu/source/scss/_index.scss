@@ -153,20 +153,18 @@
       margin: 0;
     }
 
-    // Roll20 injects its own per-row wrapper/margin around repeating items
-    // (a .repcontrol div holding the row's delete "-" control, alongside
-    // Roll20's own default spacing on .repitem) that the margin:0 above
-    // doesn't fully reach - this is most of where "significant whitespace
-    // between items" was coming from on multi-line rows.
+    // The actual source of "significant whitespace between items": k-scaffold's
+    // own defaultStyles mixin sets `.repcontainer { display:grid; gap:
+    // var(--normal-gap) }` (a flat 1rem, i.e. 16px) - a gap the CSS Grid
+    // spec applies directly between .repcontainer's row children, which no
+    // amount of margin/padding on the rows themselves can override (gap is
+    // the grid CONTAINER's own property, not the children's). Confirmed by
+    // reading that mixin directly (fieldsets/_fieldsetStyling.scss) rather
+    // than guessing from the rendered page. The row divider border-bottom
+    // above already provides visual separation, so this is set to 0 rather
+    // than just a smaller gap.
     .repcontainer {
-      .repitem {
-        margin: 0 !important;
-      }
-
-      .repcontrol {
-        margin: 0;
-        padding: 0;
-      }
+      gap: 0;
     }
 
     input,
