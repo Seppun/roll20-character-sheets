@@ -1,11 +1,14 @@
 //- rolltemplate/_index.pug
 //- Chat output for a 2d20 roll (see initiateAttributeRoll/initiateSkillRoll/
-//- initiateFocusRoll/initiateWeaponRoll in views/_character.pug). Shows the
-//- dice, target number, successes, complications (if any), and pass/fail
-//- with Momentum generated. Weapon rolls also set is_weapon, which reveals
-//- a Damage section rolled in the very same message - Cohors Cthulhu attack
-//- rolls are opposed tests, so damage is rolled unconditionally alongside
-//- the attack rather than as a separate, gated follow-up roll.
+//- initiateFocusRoll/initiateWeaponRoll in views/_character.pug, and
+//- initiateSpellRoll in views/_spells.pug). Shows the dice, target number,
+//- successes, complications (if any), and pass/fail with Momentum
+//- generated. Weapon rolls also set is_weapon, which reveals a Damage
+//- section rolled in the very same message - Cohors Cthulhu attack rolls
+//- are opposed tests, so damage is rolled unconditionally alongside the
+//- attack rather than as a separate, gated follow-up roll. Spell rolls set
+//- is_spell instead, revealing a Cost section rolled the same way (the
+//- spell's Cost is always paid, pass or fail).
 +rolltemplate('ccskill')
   //- All visual styling lives on this inner wrapper, not on the
   //- rolltemplate's own root (.sheet-rolltemplate-ccskill) - see the SCSS
@@ -73,6 +76,26 @@
         .cc-roll-row
           span Weapon Effects:
           span {{effects_list}}
+    //- Spell Cost is rolled unconditionally alongside the casting test -
+    //- RAW pays it "whether or not [the caster] successfully cast it"
+    //- (see Casting a Battlefield Spell, page 66) - so it's always shown,
+    //- not gated behind a pass/fail check like the spell's own Effect.
+    +templateConditionalDisplay('is_spell')
+      .cc-roll-header.cc-roll-damage-header
+        span.cc-roll-skill Cost (paid regardless of outcome)
+      .cc-roll-body
+        .cc-roll-row
+          span Challenge Dice:
+          span {{computed::cost_dice_text}}
+        .cc-roll-row
+          span Mental Damage to Caster:
+          span {{computed::cost_total}}
+        +rollGreater({values: 'computed::cost_effect_count 0'})
+          .cc-roll-row.cc-roll-complication
+            span {{computed::cost_effects_summary}}
+        .cc-roll-row
+          span Cost Effects:
+          span {{cost_effects_list}}
 
 +scss('roll').
   // Roll templates render inside Roll20's chat pane, which sanitizes their

@@ -3,10 +3,6 @@
 //- The printed sheet has 6 fixed spell blocks; built as a repeating
 //- section here instead so casters aren't capped at 6.
 - const ccSpellbooks = require('./source/data/spells.json');
--
-  const ccSpellNamesByTradition = Object.fromEntries(
-    Object.entries(ccSpellbooks).map(([tradition, spells]) => [tradition, Object.keys(spells).sort()])
-  );
 +tab({name: 'spells', container: 'article', button: {content: 'Spells'}})
   .cc-page.cc-spells
 
@@ -93,35 +89,88 @@
             .cc-field
               span Name
               //- Three variants of the same underlying "name" attribute -
-              //- one <datalist> per magical tradition, each with only that
-              //- tradition's spells. Only one is ever visible at a time
-              //- (CSS below, driven by the hidden tradition marker), but
-              //- since all three share the same attribute name, they stay
-              //- in sync automatically and only one apply button is needed.
-              //- Like the Talents datalist, this is a native HTML combobox
-              //- instead of a plain <select> so it still accepts free text
-              //- for homebrew/flawed spells not in the book.
+              //- one plain <select> per magical tradition, each hardcoded
+              //- with only that tradition's spells (the list is short
+              //- enough that, unlike Talents, a real dropdown beats a
+              //- free-typed combobox - matches how Weapons/Armor work).
+              //- Only one is ever visible at a time (CSS below, driven by
+              //- the hidden tradition marker), but since all three share
+              //- the same attribute name, they stay in sync automatically.
+              //- A <select>'s own change event fires immediately (unlike
+              //- the old <datalist> input this replaced), so no separate
+              //- apply button is needed.
+              //-
+              //- Options are written out individually rather than looped
+              //- from ccSpellbooks, matching the same workaround already
+              //- used for the Weapons/Armor dropdowns - see the comment
+              //- above ccWeaponProfiles for why an `each` loop over
+              //- +option() silently breaks (a k-scaffold mixin bug).
               .cc-spell-name-row
                 +action({
-                  name: 'spell apply',
-                  class: 'cc-spell-apply',
-                  trigger: {triggeredFuncs: ['ccApplySpellPreset']}
+                  name: 'spell cast',
+                  class: 'cc-spell-cast roller',
+                  trigger: {triggeredFuncs: ['initiateSpellRoll']}
                 })
-                +text({
+                +select({
                   name: 'name',
-                  list: 'cc-spell-options-runic',
                   trigger: {triggeredFuncs: ['ccApplySpellPreset']}
                 }).cc-spell-name-runic
-                +text({
+                  +option({value: ''})
+                    | Select Spell
+                  +option({value: 'Blessing of Fylgjur'})
+                    | Blessing of Fylgjur
+                  +option({value: 'Bounty of Baldr'})
+                    | Bounty of Baldr
+                  +option({value: 'Curse of Loki'})
+                    | Curse of Loki
+                  +option({value: 'Hammer of Thunraz'})
+                    | Hammer of Thunraz
+                  +option({value: 'Ravens of Wodan'})
+                    | Ravens of Wodan
+                  +option({value: 'Swiftness of Sleipnir'})
+                    | Swiftness of Sleipnir
+                  +option({value: 'Wisdom of Frigg'})
+                    | Wisdom of Frigg
+                +select({
                   name: 'name',
-                  list: 'cc-spell-options-oracular',
                   trigger: {triggeredFuncs: ['ccApplySpellPreset']}
                 }).cc-spell-name-oracular
-                +text({
+                  +option({value: ''})
+                    | Select Spell
+                  +option({value: 'Augury'})
+                    | Augury
+                  +option({value: 'Guiding Hand'})
+                    | Guiding Hand
+                  +option({value: 'Invoke the Parcae'})
+                    | Invoke the Parcae
+                  +option({value: 'Prescience'})
+                    | Prescience
+                  +option({value: 'Scrying'})
+                    | Scrying
+                  +option({value: 'Second Sight'})
+                    | Second Sight
+                +select({
                   name: 'name',
-                  list: 'cc-spell-options-celtic',
                   trigger: {triggeredFuncs: ['ccApplySpellPreset']}
                 }).cc-spell-name-celtic
+                  +option({value: ''})
+                    | Select Spell
+                  +option({value: 'Bounties of the Dagda'})
+                    | Bounties of the Dagda
+                  +option({value: 'Cyclone of Cernunnos'})
+                    | Cyclone of Cernunnos
+                  +option({value: 'Gaze of Balor'})
+                    | Gaze of Balor
+                  +option({value: 'Gift of Arduinna'})
+                    | Gift of Arduinna
+                  +option({value: 'Horn of Néit'})
+                    | Horn of Néit
+                  +option({value: 'Roots of the Earth'})
+                    | Roots of the Earth
+                  +option({value: 'Spear of Lug'})
+                    | Spear of Lug
+                  +option({value: 'The Ogham Sign'})
+                    | The Ogham Sign
             .cc-field
               span Skill
               +text({name: 'skill'})
@@ -140,21 +189,24 @@
             .cc-field
               span Category
               +text({name: 'category'})
-          .cc-field
-            span Spell Effect
-            +textarea({name: 'effect'})
-          .cc-field
-            span Momentum
-            +textarea({name: 'momentum'})
-      datalist#cc-spell-options-runic
-        each spellName in ccSpellNamesByTradition.runic
-          option(value=spellName)
-      datalist#cc-spell-options-oracular
-        each spellName in ccSpellNamesByTradition.oracular
-          option(value=spellName)
-      datalist#cc-spell-options-celtic
-        each spellName in ccSpellNamesByTradition.celtic
-          option(value=spellName)
+          //- Effect/Momentum are the two longest fields in each block, so
+          //- they're collapsible behind a small eagle toggle - a plain
+          //- hidden checkbox styled to look like the toggle itself (rather
+          //- than a separate <label>), using the same "hidden input + CSS
+          //- general sibling selector" trick as the Stress Max marker and
+          //- the tradition marker above: the checkbox and the content div
+          //- are true siblings, so :checked can show/hide the content with
+          //- no sheet-worker/JS involvement. Unique per row since this is
+          //- inside the repeating section, so each spell's card collapses
+          //- independently.
+          +checkbox({name: 'effect collapsed', value: 1}).cc-spell-collapse-toggle
+          .cc-spell-collapse-content
+            .cc-field
+              span Spell Effect
+              +textarea({name: 'effect'}).cc-spell-textarea
+            .cc-field
+              span Momentum
+              +textarea({name: 'momentum'}).cc-spell-textarea
 
 +scss.
   .cc-spells {
@@ -205,29 +257,71 @@
     .cc-spell-name-row {
       display: flex;
       align-items: center;
-      gap: 0.2rem;
+      gap: 0.3rem;
 
-      input {
+      select {
         flex: 1 1 auto;
       }
     }
 
-    .cc-spell-apply {
+    .cc-spell-cast {
       background: none;
       border: none;
+      padding: 0;
+      color: inherit;
+      font-size: 1.1rem;
       cursor: pointer;
-      font-size: 0.9rem;
-      padding: 0 0.3rem 0 0;
-      color: var(--cc-ink);
 
       &:before {
-        content: '\21BB';
         opacity: 0.8;
       }
 
       &:hover:before {
         opacity: 1;
       }
+    }
+
+    // Small eagle toggle for the Effect/Momentum content below it - a
+    // native checkbox with its default appearance stripped and an eagle
+    // glyph drawn via :before instead, so no separate <label> is needed
+    // (the checkbox itself stays natively clickable). Unchecked (the
+    // default) = expanded; checked = collapsed, with the eagle rotating
+    // 180deg to show which way it's currently "folded".
+    .cc-spell-collapse-toggle {
+      appearance: none;
+      -webkit-appearance: none;
+      background: none;
+      border: none;
+      width: auto;
+      height: auto;
+      margin: 0 0 0.2rem;
+      padding: 0;
+      cursor: pointer;
+      font-size: 1rem;
+      line-height: 1;
+
+      &:before {
+        content: '\1F985';
+        display: inline-block;
+        opacity: 0.8;
+        transition: transform 150ms ease;
+      }
+
+      &:hover:before {
+        opacity: 1;
+      }
+
+      &:checked:before {
+        transform: rotate(180deg);
+      }
+    }
+
+    .cc-spell-collapse-toggle:checked ~ .cc-spell-collapse-content {
+      display: none;
+    }
+
+    .cc-spell-textarea {
+      font-size: 0.8rem;
     }
   }
 
@@ -282,3 +376,139 @@
     });
   };
   k.registerFuncs({ccApplySpellPreset});
+
+  // A spell's Difficulty is free text (see the pug comment above that
+  // field) so an opposed-test qualifier like "2, opposed by target's Will
+  // + Resilience" can be stored alongside the number - this pulls out just
+  // the leading number for the actual skill test.
+  const ccParseLeadingNumber = (text) => {
+    const match = String(text || '').match(/\d+/);
+    return match ? Number(match[0]) : 0;
+  };
+
+  // Spell Cost fields read like "4 Drain" or "5 Drain, Piercing 1" - a
+  // Challenge Dice count glued to its first damage effect, then any
+  // further effects comma-separated (see source/data/spells.json). Mirrors
+  // ccParseDamageEffects above for Weapons, but the count and its effect
+  // share one comma segment here instead of being their own segments.
+  const ccParseSpellCost = (text) => {
+    const segments = String(text || '').split(',').map((s) => s.trim()).filter(Boolean);
+    const [first, ...rest] = segments;
+    const match = (first || '').match(/^(\d+)\s*(.*)$/);
+    const diceCount = match ? Number(match[1]) : 0;
+    const firstEffect = match && match[2] ? match[2].trim() : '';
+    return {
+      diceCount,
+      effects: [firstEffect, ...rest].filter(Boolean),
+    };
+  };
+
+  // Casting roll: a standard 2d20 skill test (Spellcasting Attribute + the
+  // spell's own Skill, vs its Difficulty), with the spell's Cost rolled
+  // alongside it in the same message - like a Weapon's attack+damage, but
+  // gated on nothing, since RAW says the cost "applies after the
+  // spellcaster resolves the skill test... whether or not they
+  // successfully cast it" (see Casting a Battlefield Spell, page 66).
+  // ccChallengeDieFromD6 is defined in views/_character.pug's +module
+  // block - both end up in the same sheet-worker script scope.
+  const initiateSpellRoll = async ({trigger, attributes}) => {
+    const [section, rowID] = k.parseRepeatName(trigger.name);
+    const prefix = `${section}_${rowID}_`;
+    const spellName = attributes[`${prefix}name`] || 'Spell';
+    const skillName = attributes[`${prefix}skill`] || '';
+    const skillSlug = skillName.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
+    const skillRanks = Number(attributes[`${skillSlug}_ranks`]) || 0;
+
+    const castAttr = (attributes.spellcasting_attribute || '').toLowerCase();
+    const attributeRating = Number(attributes[`${castAttr}_rating`]) || 0;
+
+    const difficultyDefault = ccParseLeadingNumber(attributes[`${prefix}difficulty`]) || 1;
+    const {diceCount: costDiceCount, effects: costEffects} = ccParseSpellCost(attributes[`${prefix}cost`]);
+
+    const difficultyQuery = `?{Difficulty|${difficultyDefault}}`;
+    const complicationQuery = '?{Complication range (1-5)|1}';
+    const bonusDiceQuery = '?{Additional d20s bought (0-3)|0}';
+
+    const rollString = '&{template:ccskill} ' +
+      `{{character_name=@{character_name}}} ` +
+      `{{skill=${spellName}}} ` +
+      (skillName ? `{{focus=${skillName}}} ` : '') +
+      `{{attribute_choice=[[0+${attributeRating}]]}} ` +
+      `{{difficulty=[[0+${difficultyQuery}]]}} ` +
+      `{{complication_range=[[0+${complicationQuery}]]}} ` +
+      `{{roll1=[[(2+${bonusDiceQuery})d20]]}} ` +
+      `{{target_number=[[0]]}} ` +
+      `{{successes=[[0]]}} ` +
+      `{{dice_text=[[0]]}} ` +
+      `{{outcome=[[0]]}} ` +
+      `{{complications=[[0]]}} ` +
+      `{{bonus_momentum=[[0]]}} ` +
+      `{{is_spell=1}} ` +
+      `{{cost_dice=[[${Math.max(0, costDiceCount)}d6]]}} ` +
+      `{{cost_total=[[0]]}} ` +
+      `{{cost_effect_count=[[0]]}} ` +
+      `{{cost_dice_text=[[0]]}} ` +
+      `{{cost_effects_summary=[[0]]}} ` +
+      `{{cost_effects_list=${costEffects.join(', ') || 'None'}}}`;
+
+    const roll = await startRoll(rollString);
+
+    try {
+      const difficulty = Number(roll.results.difficulty.result) || 1;
+      const complicationRange = Number(roll.results.complication_range.result) || 1;
+
+      const roll1 = roll.results.roll1;
+      const dice = Array.isArray(roll1.dice) ?
+        roll1.dice :
+        (roll1.rolls && roll1.rolls[0] && roll1.rolls[0].results || []).map((r) => r.v);
+
+      // Crit only on a natural 1, per RAW - spellcasting has no Focus
+      // mechanic to widen that range the way a known Weapon Focus can.
+      const targetNumber = attributeRating + skillRanks;
+      const complicationThreshold = 21 - complicationRange;
+      const successCount = dice.filter((d) => d <= targetNumber).length +
+        dice.filter((d) => d <= 1).length;
+      const complicationCount = dice.filter((d) => d >= complicationThreshold).length;
+      const passed = successCount >= difficulty;
+
+      const costDiceRoll = roll.results.cost_dice;
+      const rawCostDice = Array.isArray(costDiceRoll.dice) ?
+        costDiceRoll.dice :
+        (costDiceRoll.rolls && costDiceRoll.rolls[0] && costDiceRoll.rolls[0].results || []).map((r) => r.v);
+
+      const converted = rawCostDice.map(ccChallengeDieFromD6);
+      const isVicious = costEffects.some((e) => /vicious/i.test(e));
+      const effectCount = converted.filter((c) => c.effect).length;
+      const totalCost = converted.reduce((sum, c) => sum + c.pips, 0) +
+        (isVicious ? effectCount : 0);
+      const effectsSummary = effectCount > 0 ?
+        `${effectCount}x Effect${costEffects.length ? ` - ${costEffects.join(', ')}` : ''}` :
+        'No Effects triggered';
+
+      finishRoll(roll.rollId, {
+        target_number: targetNumber,
+        successes: successCount,
+        dice_text: dice.join(', '),
+        outcome: passed ? 1 : 0,
+        bonus_momentum: passed ? Math.max(0, successCount - difficulty) : 0,
+        complications: complicationCount,
+        cost_total: totalCost,
+        cost_effect_count: effectCount,
+        cost_dice_text: converted.map((c) => c.symbol).join(' '),
+        cost_effects_summary: effectsSummary,
+      });
+    } catch (err) {
+      finishRoll(roll.rollId, {
+        target_number: '?',
+        successes: '?',
+        dice_text: `error: ${err.message}`,
+        outcome: 0,
+        complications: 0,
+        cost_total: '?',
+        cost_effect_count: '?',
+        cost_dice_text: `error: ${err.message}`,
+        cost_effects_summary: '',
+      });
+    }
+  };
+  k.registerFuncs({initiateSpellRoll});
