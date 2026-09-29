@@ -4,10 +4,35 @@
 @use 'sfc';
 
 // Inter, for everything on the sheet except .cc-banner's section-title
-// ribbons (which keep the serif --cc-header-font). Loaded the same way
-// Ars_Magica_5th already does for its own Google Fonts - a plain CSS
-// @import, proven to survive Roll20's paste sanitizer.
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+// ribbons (which keep the serif --cc-header-font). Loaded as direct
+// @font-face rules (both weights point at the same file - Google now
+// serves Inter as a single variable-font woff2, with font-weight here
+// just selecting which instance of it applies) rather than a plain CSS
+// @import of the Google Fonts stylesheet endpoint. The @import approach
+// (same pattern Ars_Magica_5th already uses successfully in its own,
+// unrelated main-sheet CSS) turned out to break roll template rendering
+// in the chat pane - the fonts loaded fine for the sheet itself, but the
+// roll card's own hardcoded `font-family: Georgia, serif` stopped taking
+// effect. Roll20 sanitizes roll-template CSS through a separate, stricter
+// filter than the main sheet (see README's "hard-won lessons"), and an
+// @import at-rule anywhere in the pasted stylesheet apparently trips it
+// the same way a stray CSS comment or data: URI does elsewhere in this
+// file's history - @font-face doesn't have that problem.
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2') format('woff2');
+}
 
 html {
   font-size: 16px;
