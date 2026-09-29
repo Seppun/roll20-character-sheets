@@ -22,11 +22,12 @@
 // workers turned out to have no sendChat() of their own (confirmed live:
 // calling it throws "sendChat is not defined"), so startRoll/a real dice
 // roll is the only way sheet-worker code can reach chat at all. This
-// script parses that hidden card's rendered HTML out of msg.content to
-// read the delta - fragile in the sense that any change to that specific
-// template's markup would need a matching change here, but the template
-// exists solely for this and is never touched for cosmetic reasons the
-// way the visible gameplay roll card has been.
+// script reads the delta from msg.inlinerolls[0].results.total - the API
+// never renders roll templates to HTML at all (that only happens
+// client-side, in a player's browser), so msg.content for a message
+// containing [[...]] just holds the raw template invocation with a
+// $[[0]] placeholder; the actually-computed value lives in the separate
+// inlinerolls array Roll20 attaches to the message instead.
 //
 // INSTALL: This is a separate piece from the character sheet's own
 // Layout/Style/Script boxes. In your Roll20 game: Game Settings > API
@@ -129,25 +130,31 @@ on('ready', () => {
 
   const formatDelta = (delta) => (delta > 0 ? `+${delta}` : `${delta}`);
 
-  // Pulls the numeric delta out of the hidden ccmomentumsignal card's
-  // rendered HTML. Two strategies, tried in order: the value is an inline
-  // roll ([[0+delta]] in the sheet worker), which Roll20 normally wraps in
-  // its own inlinerollresult span - but falls back to just grabbing
-  // whatever number sits inside our own named span, in case that wrapping
-  // ever differs from what's expected here.
-  const extractMomentumSignalDelta = (content) => {
-    if (!content.includes('sheet-rolltemplate-ccmomentumsignal')) { return null; }
-    const withInlineRoll = content.match(/sheet-rolltemplate-ccmomentumsignal[\s\S]*?class="inlinerollresult[^"]*"[^>]*>\s*(-?\d+)/);
-    if (withInlineRoll) { return Number(withInlineRoll[1]); }
-    const bareSpan = content.match(/class="[^"]*cc-momentum-signal-delta[^"]*"[^>]*>[\s\S]*?(-?\d+)/);
-    if (bareSpan) { return Number(bareSpan[1]); }
-    return null;
+  // Pulls the numeric delta out of the hidden ccmomentumsignal roll.
+  // msg.content for a message with an inline roll ([[0+delta]] in the
+  // sheet worker) holds the RAW template invocation with a $[[0]]
+  // placeholder, not rendered HTML - the API never renders templates to
+  // HTML at all (that's a client-side/browser step). The actual computed
+  // value lives in msg.inlinerolls, a separate array Roll20 populates for
+  // any message containing one or more [[...]] expressions.
+  const extractMomentumSignalDelta = (msg) => {
+    const content = String(msg.content || '');
+    if (!content.includes('template:ccmomentumsignal')) { return null; }
+    const rolls = Array.isArray(msg.inlinerolls) ? msg.inlinerolls : [];
+    if (!rolls.length) {
+      log(`[CCMomentum] ccmomentumsignal message with no inlinerolls - raw msg: ${JSON.stringify(msg)}`);
+      return null;
+    }
+    const total = rolls[0] && rolls[0].results && rolls[0].results.total;
+    if (!Number.isFinite(total)) {
+      log(`[CCMomentum] ccmomentumsignal inlinerolls[0] had no usable .results.total - raw msg: ${JSON.stringify(msg)}`);
+      return null;
+    }
+    return total;
   };
 
   const handleMessage = (msg) => {
-    const content = String(msg.content || '');
-
-    const signalDelta = extractMomentumSignalDelta(content);
+    const signalDelta = extractMomentumSignalDelta(msg);
     if (signalDelta !== null) {
       if (Number.isFinite(signalDelta) && signalDelta !== 0) {
         setPool(getPool() + signalDelta);
@@ -156,6 +163,7 @@ on('ready', () => {
       return;
     }
 
+    const content = String(msg.content || '');
     const trimmed = content.trim();
     const [command, ...args] = trimmed.split(/\s+/);
     if (!command) { return; }
