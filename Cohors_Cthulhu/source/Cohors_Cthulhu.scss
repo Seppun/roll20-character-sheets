@@ -10,7 +10,12 @@ html {
 
 body {
   @include scss.variables;
-  font-size: 1rem;
+  // Regular/base text size for the sheet. rem-based sizes elsewhere (tab
+  // buttons, table headers, small labels, etc.) are set relative to
+  // html's own 16px root above and are unaffected by this - only text
+  // that doesn't declare its own font-size (most field inputs/textareas)
+  // inherits this value.
+  font-size: 14px;
 
   .ui-dialog {
     .tab-content {
