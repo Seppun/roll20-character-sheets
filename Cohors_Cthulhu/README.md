@@ -216,3 +216,44 @@ and compare against a sheet you know works.
   both on the sheet lets you immediately spot a stale paste - if the two
   timestamps ever differ, you pasted an old copy of one file after
   updating the other.
+
+## Global Momentum pool (API script)
+
+Momentum in the 2d20 System is a shared party resource, not a
+per-character stat - it can't live as an attribute on this (or any)
+character sheet, since each character's sheet is its own isolated set of
+attributes with no visibility into any other character's. `api-scripts/`
+holds a small Roll20 API script, `ccmomentum.js`, that maintains a single
+game-wide Momentum pool instead, kept in sync automatically: every roll
+made from this sheet (Attribute/Skill/Focus/Weapon/Spell) sends a hidden
+`!ccmomentum-adjust N` chat command via the sheet worker's own `sendChat`
+(see `ccSendMomentumSignal` in `source/views/_character.pug`) whenever a
+roll generates Momentum, or spends it by buying additional d20s or (for
+spells) declaring Extra Momentum spent.
+
+This is a **separate piece from the character sheet itself** - it's not
+part of the compiled `Cohors_Cthulhu.html`/`.css`, and isn't pasted into
+the Custom Sheet Layout/Style boxes. Instead, in a Pro-tier game with the
+API sandbox enabled: Game Settings > API Scripts > New Script, paste in
+the whole contents of `api-scripts/ccmomentum.js`, Save Script. Without
+that script installed, the sheet's hidden signal is just an unrecognized
+"!" chat command that Roll20 quietly ignores - rolling still works fine,
+there's just no shared pool.
+
+Chat commands once installed: `!momentum` (announce the current value),
+and GM-only `!momentum-set N` / `!momentum-adjust N` for manual
+corrections. The pool displays in chat on every change, plus two passive
+displays that don't require re-opening chat: a pinned custom entry at the
+top of the Turn Order tracker (needs no setup), and, if the GM places any
+token/graphic named "Momentum Pool" on the current page, that token's
+bar1 is kept in sync too - closer to how a deck's remaining count sits
+visibly on the tabletop.
+
+**This piece specifically has not been tested in a live Roll20 game** -
+unlike the sheet itself (verified by rebuilding and rendering with
+Playwright), a Roll20 API script's `sendChat`/`state`/`findObjs`/etc.
+sandbox only exists inside an actual Roll20 session, which this
+development environment has no access to. The script's own internal logic
+was verified with mocked versions of those globals, but the real
+end-to-end path (sheet worker `sendChat` -> API script `chat:message` ->
+displays updating) needs a real playtest to confirm.

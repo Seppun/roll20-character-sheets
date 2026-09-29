@@ -524,12 +524,18 @@
         `${effectCount}x Effect${costEffects.length ? ` - ${costEffects.join(', ')}` : ''}` :
         'No Effects triggered';
 
+      const spellBonusMomentum = passed ? Math.max(0, successCount - difficulty) : 0;
+      const spellBonusDiceBought = Math.max(0, dice.length - 2);
+      // ccSendMomentumSignal is defined in views/_character.pug's +module
+      // block - both end up in the same sheet-worker script scope.
+      ccSendMomentumSignal(spellBonusMomentum - spellBonusDiceBought - extraMomentum);
+
       finishRoll(roll.rollId, {
         target_number: targetNumber,
         successes: successCount,
         dice_text: dice.join(', '),
         outcome: passed ? 1 : 0,
-        bonus_momentum: passed ? Math.max(0, successCount - difficulty) : 0,
+        bonus_momentum: spellBonusMomentum,
         complications: complicationCount,
         extra_momentum: extraMomentum,
         cost_total: totalCost,

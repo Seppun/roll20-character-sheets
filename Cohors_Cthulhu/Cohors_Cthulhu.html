@@ -847,7 +847,7 @@
         </div>
       </div>
     </div>
-    <div class="cc-footer"><span class="cc-build-html">HTML build: 2026-09-29 19:18:16 UTC</span><span class="cc-build-css"></span></div>
+    <div class="cc-footer"><span class="cc-build-html">HTML build: 2026-09-29 19:30:17 UTC</span><span class="cc-build-css"></span></div>
   </div>
       </article>
       <article class="tabs__container tabs--cohors-cthulhu__container tabs--cohors-cthulhu__container--spells" data-container-tab="cohors-cthulhu" data-tab="spells">
@@ -2778,6 +2778,28 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
     '|Reason,@{reason_rating}' +
     '|Will,@{will_rating}}';
   
+  // Momentum in Cohors Cthulhu (as in the wider 2d20 System) is a shared
+  // party resource, not a per-character stat, so it isn't tracked on this
+  // sheet at all - instead every roll that generates or spends it sends a
+  // hidden signal here for a companion Roll20 API script
+  // (api-scripts/ccmomentum.js in this repo) to keep a single game-wide
+  // pool in sync and display it to the table. delta is net: positive for
+  // Momentum a passed roll generates, negative for Momentum spent (buying
+  // additional d20s, or - for spells - declaring Extra Momentum spent).
+  // Harmless with no such script installed: it's just an unrecognized "!"
+  // chat command that Roll20 quietly drops. Sheet-worker sendChat() and
+  // the API's own chat handling can only be verified in a live Roll20
+  // game, not from this build/test environment, so this piece specifically
+  // needs a real playtest to confirm end to end.
+  const ccSendMomentumSignal = (delta) => {
+    if (!delta) { return; }
+    try {
+      sendChat('Cohors Cthulhu', `!ccmomentum-adjust ${delta}`);
+    } catch (err) {
+      console.log('[CC] sendChat failed (Momentum pool signal):', err.message);
+    }
+  };
+  
   // Shared 2d20 roll core, used for Attribute-only rolls, plain Skill
   // rolls (no focus), and Focus rolls. attributeExpr is either a literal
   // rating (attribute-only roll, no choice to make) or the ?{Attribute}
@@ -2845,6 +2867,14 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
         dice.filter((d) => d <= critMax).length;
       const complicationCount = dice.filter((d) => d >= complicationThreshold).length;
       const passed = successCount >= difficulty;
+      const bonusMomentum = passed ? Math.max(0, successCount - difficulty) : 0;
+  
+      // Buying additional d20s costs 1 Momentum each, win or lose (2d20
+      // RAW) - dice.length is 2 plus however many were bought via
+      // bonusDiceQuery above, so this recovers that count without needing
+      // its own roll-string field.
+      const bonusDiceBought = Math.max(0, dice.length - 2);
+      ccSendMomentumSignal(bonusMomentum - bonusDiceBought);
   
       // outcome is a plain 0/1 flag (rather than separate passed/failed
       // fields) because the Passed/Failed blocks are gated with the
@@ -2857,7 +2887,7 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
         successes: successCount,
         dice_text: dice.join(', '),
         outcome: passed ? 1 : 0,
-        bonus_momentum: passed ? Math.max(0, successCount - difficulty) : 0,
+        bonus_momentum: bonusMomentum,
         complications: complicationCount,
       };
   
@@ -3082,12 +3112,16 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
         targetNumber, successCount, complicationCount, passed, totalDamage, effectCount,
       });
   
+      const weaponBonusMomentum = passed ? Math.max(0, successCount - 1) : 0;
+      const weaponBonusDiceBought = Math.max(0, dice.length - 2);
+      ccSendMomentumSignal(weaponBonusMomentum - weaponBonusDiceBought);
+  
       finishRoll(roll.rollId, {
         target_number: targetNumber,
         successes: successCount,
         dice_text: dice.join(', '),
         outcome: passed ? 1 : 0,
-        bonus_momentum: passed ? Math.max(0, successCount - 1) : 0,
+        bonus_momentum: weaponBonusMomentum,
         complications: complicationCount,
         total_damage: totalDamage,
         effect_count: effectCount,
@@ -3300,12 +3334,18 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
         `${effectCount}x Effect${costEffects.length ? ` - ${costEffects.join(', ')}` : ''}` :
         'No Effects triggered';
   
+      const spellBonusMomentum = passed ? Math.max(0, successCount - difficulty) : 0;
+      const spellBonusDiceBought = Math.max(0, dice.length - 2);
+      // ccSendMomentumSignal is defined in views/_character.pug's +module
+      // block - both end up in the same sheet-worker script scope.
+      ccSendMomentumSignal(spellBonusMomentum - spellBonusDiceBought - extraMomentum);
+  
       finishRoll(roll.rollId, {
         target_number: targetNumber,
         successes: successCount,
         dice_text: dice.join(', '),
         outcome: passed ? 1 : 0,
-        bonus_momentum: passed ? Math.max(0, successCount - difficulty) : 0,
+        bonus_momentum: spellBonusMomentum,
         complications: complicationCount,
         extra_momentum: extraMomentum,
         cost_total: totalCost,
