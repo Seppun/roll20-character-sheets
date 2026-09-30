@@ -1,7 +1,13 @@
 @mixin variables {
-  --cc-page-bg: #f7f4ec;
-  --cc-parchment: #ece3cd;
-  --cc-parchment-dark: #ddd0ac;
+  // Lighter and less yellow than the original tan/khaki parchment tones -
+  // closer to a pale limestone/travertine (Roman building stone) than
+  // dyed paper, per request. Kept as three tones at similar RELATIVE
+  // contrast to each other as before (page < parchment < parchment-dark
+  // in saturation/darkness) so panel-vs-field-vs-header banding still
+  // reads clearly, just less golden overall.
+  --cc-page-bg: #f6f5f1;
+  --cc-parchment: #ebe9e2;
+  --cc-parchment-dark: #d7d3c6;
   --cc-ink: #2b2018;
   --cc-banner: #6b1420;
   --cc-banner-text: #f2e9d8;

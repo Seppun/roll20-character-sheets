@@ -16,6 +16,10 @@
 //    Momentum each, whether or not the roll then succeeds).
 // -1 per point of Extra Momentum a spellcaster declares spending (see the
 //    Cast button's "Extra Momentum spent" prompt on the Spells tab).
+// Capped at 6 in either direction (2d20 RAW: the Momentum pool can never
+// exceed 6, nor drop below 0) - enforced in setPool below, so every path
+// that changes the pool (the automatic signal, the manual commands, and a
+// GM's direct !momentum-set) all get it for free.
 //
 // The signal itself is a whispered, hidden (display:none) roll using a
 // dedicated template, ccmomentumsignal (rolltemplate/_index.pug) - sheet
@@ -65,6 +69,7 @@ on('ready', () => {
   const STATE_KEY = 'CCMomentum';
   const TURN_ORDER_ID = '-ccmomentum-pool';
   const TOKEN_NAME = 'momentum pool';
+  const MAX_POOL = 6;
 
   if (!state[STATE_KEY] || typeof state[STATE_KEY].pool !== 'number') {
     state[STATE_KEY] = {pool: 0};
@@ -73,13 +78,15 @@ on('ready', () => {
   const getPool = () => Number(state[STATE_KEY].pool) || 0;
 
   const setPool = (value) => {
-    state[STATE_KEY].pool = Math.max(0, Math.round(Number(value) || 0));
+    state[STATE_KEY].pool = Math.min(MAX_POOL, Math.max(0, Math.round(Number(value) || 0)));
   };
 
   // Any graphic on the current page named "Momentum Pool" gets its bar1
   // driven by the pool, the same way a deck shows its remaining count
   // directly on the tabletop. Entirely optional - if the GM never places
-  // one, this just finds nothing and does nothing.
+  // one, this just finds nothing and does nothing. bar1_max is the fixed
+  // cap (6), not the current value, so the bar actually shows a fill
+  // fraction (e.g. 3/6 = half full) instead of always looking maxed out.
   const updateTokenDisplay = () => {
     const page = Campaign() && Campaign().get('playerpageid');
     if (!page) { return; }
@@ -90,8 +97,8 @@ on('ready', () => {
       .forEach((token) => {
         token.set({
           bar1_value: pool,
-          bar1_max: pool,
-          tooltip: `Momentum Pool: ${pool}`,
+          bar1_max: MAX_POOL,
+          tooltip: `Momentum Pool: ${pool}/${MAX_POOL}`,
         });
       });
   };
@@ -124,11 +131,22 @@ on('ready', () => {
   const announce = (note) => {
     const value = getPool();
     const suffix = note ? ` (${note})` : '';
-    sendChat('Momentum Pool', `&{template:default} {{name=Momentum Pool}} {{Current=${value}${suffix}}}`);
+    sendChat('Momentum Pool', `&{template:default} {{name=Momentum Pool}} {{Current=${value}/${MAX_POOL}${suffix}}}`);
     refreshDisplays();
   };
 
   const formatDelta = (delta) => (delta > 0 ? `+${delta}` : `${delta}`);
+
+  // Applies delta and returns the amount the pool ACTUALLY changed by,
+  // which can differ from delta itself once the 0-6 cap clamps it (e.g.
+  // requesting +3 at a pool of 5 only really adds 1) - callers use this
+  // for the announcement so it never claims a bigger change than really
+  // happened.
+  const applyDelta = (delta) => {
+    const before = getPool();
+    setPool(before + delta);
+    return getPool() - before;
+  };
 
   // Pulls the numeric delta out of the hidden ccmomentumsignal roll.
   // msg.content for a message with an inline roll ([[0+delta]] in the
@@ -169,8 +187,10 @@ on('ready', () => {
     const signalDelta = extractMomentumSignalDelta(msg);
     if (signalDelta !== null) {
       if (Number.isFinite(signalDelta) && signalDelta !== 0) {
-        setPool(getPool() + signalDelta);
-        announce(formatDelta(signalDelta));
+        const actualDelta = applyDelta(signalDelta);
+        if (actualDelta !== 0) {
+          announce(formatDelta(actualDelta));
+        }
       }
       return;
     }
@@ -186,8 +206,10 @@ on('ready', () => {
     if (command === '!ccmomentum-adjust') {
       const delta = Number(args[0]);
       if (!Number.isFinite(delta) || delta === 0) { return; }
-      setPool(getPool() + delta);
-      announce(formatDelta(delta));
+      const actualDelta = applyDelta(delta);
+      if (actualDelta !== 0) {
+        announce(formatDelta(actualDelta));
+      }
       return;
     }
 
@@ -221,8 +243,8 @@ on('ready', () => {
         sendChat('Momentum Pool', `/w "${msg.who}" Usage: !momentum-adjust <number, may be negative>`);
         return;
       }
-      setPool(getPool() + delta);
-      announce(`${formatDelta(delta)}, GM correction`);
+      const actualDelta = applyDelta(delta);
+      announce(`${formatDelta(actualDelta)}, GM correction`);
       return;
     }
   };

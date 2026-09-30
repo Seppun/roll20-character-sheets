@@ -98,9 +98,9 @@ body {
   // of selector specificity or source order, but a plain @include here
   // wouldn't carry that through.
   @media print {
-    --cc-page-bg: #f7f4ec !important;
-    --cc-parchment: #ece3cd !important;
-    --cc-parchment-dark: #ddd0ac !important;
+    --cc-page-bg: #f6f5f1 !important;
+    --cc-parchment: #ebe9e2 !important;
+    --cc-parchment-dark: #d7d3c6 !important;
     --cc-ink: #2b2018 !important;
     --cc-banner: #6b1420 !important;
     --cc-banner-text: #f2e9d8 !important;

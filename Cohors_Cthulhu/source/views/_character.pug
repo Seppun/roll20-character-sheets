@@ -838,7 +838,12 @@
         display: inline-flex;
         align-items: center;
         gap: 0.25rem;
-        background: var(--cc-parchment-dark);
+        // Was --cc-parchment-dark, the exact same color as .cc-panel's own
+        // background (see _index.scss), so the button's border was the
+        // only thing distinguishing it from the section behind it -
+        // --cc-parchment (lighter) makes it read as a raised chip instead,
+        // matching the die icon buttons above it.
+        background: var(--cc-parchment);
         border: 1px solid var(--cc-rule);
         border-radius: 3px;
         padding: 0.05rem 0.35rem;

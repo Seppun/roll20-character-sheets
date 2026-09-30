@@ -230,7 +230,13 @@ such pool, kept in sync automatically by every roll made from this sheet
 
 - **Momentum** increases by the Momentum a passed roll generates, and
   decreases by additional d20s bought (all roll types) or, for spells,
-  Extra Momentum declared spent.
+  Extra Momentum declared spent. Capped at 6 in either direction (2d20
+  RAW: the Momentum pool can never exceed 6) - enforced centrally in
+  `ccmomentum.js`'s own `setPool`, so every path that changes the pool
+  (the automatic signal, the manual chat commands, and a GM's direct
+  `!momentum-set`) respects it, and announcements always report the
+  amount the pool actually changed by, not the amount requested, in case
+  the cap silently absorbed part or all of it.
 - **Threat** increases by the Complications a roll generates (2d20 RAW:
   each Complication generates 1 point of Threat for the GM). There's no
   automatic decrease - RAW never has a player spend Threat from their own
