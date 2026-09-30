@@ -11,8 +11,11 @@
   // between every entry reads as heavier than intended.
   --cc-rule-soft: rgba(138, 28, 43, 0.4);
   // Header font is reserved for .cc-banner (the section-title ribbons)
-  // only - everything else on the sheet uses --cc-body-font.
-  --cc-header-font: Georgia, 'Times New Roman', serif;
+  // only - everything else on the sheet uses --cc-body-font. Cinzel is
+  // loaded via @font-face in Cohors_Cthulhu.scss; Georgia/Times New Roman
+  // remain as the fallback stack for the moment before it loads (or if it
+  // fails to).
+  --cc-header-font: 'Cinzel', Georgia, 'Times New Roman', serif;
   --cc-body-font: 'Inter', sans-serif;
 }
 

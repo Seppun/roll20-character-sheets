@@ -4,9 +4,9 @@
 @use 'sfc';
 
 // Inter, for everything on the sheet except .cc-banner's section-title
-// ribbons (which keep the serif --cc-header-font). Loaded as direct
-// @font-face rules (both weights point at the same file - Google now
-// serves Inter as a single variable-font woff2, with font-weight here
+// ribbons (which use the serif --cc-header-font, Cinzel, below). Loaded as
+// direct @font-face rules (both weights point at the same file - Google
+// now serves Inter as a single variable-font woff2, with font-weight here
 // just selecting which instance of it applies) rather than a plain CSS
 // @import of the Google Fonts stylesheet endpoint. The @import approach
 // (same pattern Ars_Magica_5th already uses successfully in its own,
@@ -32,6 +32,28 @@
   font-weight: 700;
   font-display: swap;
   src: url('https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2') format('woff2');
+}
+
+// Cinzel, for .cc-banner's section-title ribbons only (--cc-header-font) -
+// a Roman-inscription-style display serif that fits Cohors Cthulhu's
+// theme better than the plain Georgia fallback it replaces. Unlike Inter,
+// Cinzel isn't served as a single variable-font file - regular (400) and
+// bold (700) are genuinely separate woff2 files (confirmed via distinct
+// content-length), since .cc-banner itself is always bold.
+@font-face {
+  font-family: 'Cinzel';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('https://fonts.gstatic.com/s/cinzel/v26/8vIU7ww63mVu7gtR-kwKxNvkNOjw-tbnfY3lDQ.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Cinzel';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('https://fonts.gstatic.com/s/cinzel/v26/8vIU7ww63mVu7gtR-kwKxNvkNOjw-jHgfY3lDQ.woff2') format('woff2');
 }
 
 html {
