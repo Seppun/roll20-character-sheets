@@ -477,6 +477,17 @@
       gap: 0.4rem;
     }
 
+    // Overrides the generic .cc-field column layout (label above value) to
+    // put Max's value on the same line as its label instead, since a
+    // standalone "MAX" heading with a boxed number underneath wastes
+    // vertical space this field doesn't need - it sits below the already
+    // full-width stress track, not beside other stacked fields.
+    .cc-stress-max {
+      flex-direction: row;
+      align-items: baseline;
+      gap: 0.4rem;
+    }
+
     .cc-stress-track {
       display: grid;
       grid-template-columns: repeat(10, 1fr);
@@ -521,6 +532,12 @@
       display: grid;
       grid-template-columns: repeat(5, 1fr);
       gap: 0.15rem;
+      // k-scaffold's fillLeft mixin centers its construct by default
+      // (--fillLeftAlignment: center, applied via align-self on the flex
+      // item), which pulls the boxes away from the left edge of their
+      // wider .cc-field container - override back to flex-start so they
+      // line up under the FORTUNE label instead.
+      align-self: flex-start;
       // Without an explicit gap, adjacent checked boxes share the same
       // fill/border color and their touching edges disappear, so what
       // should be distinct boxes reads as one solid blob - same fix as
