@@ -341,7 +341,16 @@
           span Name
           span Resistance
           span Qualities
-        +fieldset({name: 'armor'})
+        //- trigger.affects here handles deleting a row: Roll20 fires
+        //- remove:repeating_armor (with a removedInfo payload, no specific
+        //- row id) when a row is removed, which - now that the fieldset
+        //- itself declares a trigger - k-scaffold wires up the same way it
+        //- wires up any other attribute's change listener, recalculating
+        //- total_armor from whatever rows remain. Without this, only
+        //- EDITING a row's resistance (via that field's own trigger below)
+        //- ever recalculated total_armor - deleting the row it came from
+        //- left the old total in place until something else changed.
+        +fieldset({name: 'armor', trigger: {affects: ['total_armor']}})
           //- Options written out individually, not via an `each` loop -
           //- see the comment above ccWeaponProfiles for why.
           +select({
@@ -370,7 +379,13 @@
           span Keywords
           span Requirements
           span Description
-        +fieldset({name: 'talent'})
+        //- trigger.affects here handles deleting a talent row (e.g.
+        //- removing Unyielding) the same way the armor fieldset's own
+        //- trigger above handles deleting an armor row - see that comment
+        //- for the full explanation of why this is needed at the fieldset
+        //- level, not just on the Name field's own trigger below (which
+        //- only fires on EDITING a row, never on removing one).
+        +fieldset({name: 'talent', trigger: {affects: ['stress_max', 'stress_max_marker']}})
           //- The talent list (159 entries) is far too long for a plain
           //- dropdown, so this uses a text input paired with a <datalist>
           //- instead of k-scaffold's +select/+option - a native HTML
