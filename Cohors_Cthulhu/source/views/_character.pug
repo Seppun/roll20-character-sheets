@@ -714,7 +714,12 @@
           color: var(--cc-banner);
         }
 
+        // k-scaffold's roller mixin sets content:'T' by default - '0' is
+        // the cleaner-looking d20 glyph in Roll20's own dicefontd20 icon
+        // font (see https://wiki.roll20.net/CSS_Wizardry#Icon_Fonts),
+        // overridden here rather than in the vendored k-scaffold library.
         &:before {
+          content: '0';
           font-size: 1.5em;
           opacity: 1;
         }
@@ -780,6 +785,7 @@
         }
 
         &:before {
+          content: '0';
           font-size: 1.5em;
           opacity: 1;
         }
@@ -847,6 +853,7 @@
         }
 
         &:before {
+          content: '0';
           font-size: 1.4em;
           opacity: 0.9;
         }
@@ -884,6 +891,7 @@
         justify-self: center;
 
         &:before {
+          content: '0';
           opacity: 1;
         }
 

@@ -272,7 +272,11 @@
       font-size: 1.1rem;
       cursor: pointer;
 
+      // '0' is the cleaner-looking d20 glyph in Roll20's own dicefontd20
+      // icon font (k-scaffold's roller mixin defaults to 'T') - see the
+      // same override on .cc-attribute-roll in views/_character.pug.
       &:before {
+        content: '0';
         opacity: 0.8;
       }
 
