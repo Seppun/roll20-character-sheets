@@ -139,19 +139,43 @@
         //- .cc-stress-track below for how its "selected/unselected" fill
         //- coloring works) so a second, hidden radio group - one radio per
         //- box, sharing the same 1-20 values - can be interleaved as
-        //- siblings of the visible checkboxes. That hidden group's value
-        //- is kept equal to stress_max by reusing calcStressMax as its own
+        //- siblings of the visible ones. That hidden group's value is kept
+        //- equal to stress_max by reusing calcStressMax as its own
         //- calculation, so whichever one of its radios is "checked" marks
         //- the max-value boundary. Pure CSS can't compare two numbers, but
-        //- it CAN compare checkbox states via sibling selectors - the same
+        //- it CAN compare checked states via sibling selectors - the same
         //- trick fillLeft itself already uses for the selected/unselected
         //- split - so putting each box's own hidden radio right after it
         //- lets `:checked ~ .fill-left__radio` grey out (and, via
         //- pointer-events, disable) every visible box past the boundary.
+        //-
+        //- The visible track itself uses +radio, not +checkbox (which is
+        //- +fillLeft's own default widget for the non-noClear case this
+        //- was expanded from) - confirmed live and reproduced locally that
+        //- checkboxes here let a double-click net out to "nothing in the
+        //- whole group is checked" (checking then immediately unchecking
+        //- the same box), and with NOTHING checked, the CSS below has no
+        //- :checked anchor to peel any box's coloring off the shared
+        //- default - which is "selected"/filled, not "unselected"/empty -
+        //- so every box renders filled. A real radio group can't reach
+        //- that state at all: clicking an already-checked radio is a
+        //- native no-op, and clicking a different one always atomically
+        //- (un)checks exactly one radio in the group, so some box stays
+        //- checked from the first click onward. The trade-off is losing
+        //- "click the current top box again to clear by 1" - clicking any
+        //- lower box directly to jump straight to that value is a fair
+        //- replacement, and is also how stress_max_marker above already
+        //- works. The value=0 radio restores the "nothing taken yet"
+        //- all-empty look this replaces losing to that same double-click
+        //- bug - hidden the same way stress_max_marker is (see its own
+        //- display:none rule below), not a literal +hidden() input, since
+        //- a genuine type="hidden" input can never match :checked at all
+        //- (confirmed the hard way: that was the ORIGINAL value=0 marker
+        //- here, and it never once griyed out anything, live or locally).
         .cc-stress-track
-          +hidden({name: 'stress', value: 0}).fill-left__radio
+          +radio({name: 'stress', value: 0, checked: ''}).fill-left__radio.cc-fill-left-zero
           each value in Array.from({length: 20}, (_, i) => i + 1)
-            +checkbox({name: 'stress', value}).fill-left__radio
+            +radio({name: 'stress', value}).fill-left__radio
             +radio({
               name: 'stress max marker',
               value,
@@ -166,10 +190,14 @@
           +number({name: 'courage', readonly: true, trigger: {calculation: 'calcCourage'}})
         .cc-field
           span Fortune
-          +fillLeft({
-            radioObj: {name: 'fortune'},
-            valueArray: [1, 2, 3, 4, 5]
-          }).cc-fortune-track
+          //- Hand-expanded rather than using +fillLeft directly, same as
+          //- .cc-stress-track above and for the same reason (a real radio
+          //- group plus a proper, non-type=hidden value=0 anchor) - see
+          //- that block's comment for the full explanation.
+          .cc-fortune-track
+            +radio({name: 'fortune', value: 0, checked: ''}).fill-left__radio.cc-fill-left-zero
+            each value in [1, 2, 3, 4, 5]
+              +radio({name: 'fortune', value}).fill-left__radio
       .cc-vitals-armor
         .cc-field
           span Base Armour
@@ -505,6 +533,14 @@
       flex-direction: row;
       align-items: baseline;
       gap: 0.4rem;
+    }
+
+    // The value=0 anchor radio in both .cc-stress-track and
+    // .cc-fortune-track (see the pug comment above .cc-stress-track) never
+    // needs to be visible itself - only its checked state matters for the
+    // sibling-selector coloring below, same as .cc-stress-max-marker.
+    .cc-fill-left-zero {
+      display: none;
     }
 
     .cc-stress-track {
