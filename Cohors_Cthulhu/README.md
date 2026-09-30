@@ -283,14 +283,31 @@ instead.
 
 ## Printing / "Download as PDF"
 
-A Roll20 character sheet can't offer a real "Download as PDF" button -
-sheet workers only get a sandboxed API (`getAttrs`/`setAttrs`/`startRoll`/
-etc.), with no access to `window`, `document`, or any print/file-download
-API, so there's no way to trigger `window.print()` or load a PDF library
-from sheet code. Instead, this sheet ships a `@media print` stylesheet
-(`source/Cohors_Cthulhu.scss` and `source/scss/_index.scss`) that makes
-the *browser's own* Print dialog (Ctrl/Cmd+P, destination "Save as PDF")
-produce a clean, complete printout:
+A character sheet's own code can't drive a real "Download as PDF" button
+directly - sheet workers only get a sandboxed API (`getAttrs`/`setAttrs`/
+`startRoll`/etc.), with no access to `window`, `document`, or any print/
+file-download API, so there's no way to trigger `window.print()` or load
+a PDF library from sheet code. What a sheet *can* do is opt into Roll20's
+own native print feature: setting `"printable": true` in `sheet.json`
+(added here) turns on a real Print button on the character sheet dialog
+itself (Roll20's own UI, not something this sheet renders) - this was a
+2024 addition specifically opening up a feature previously exclusive to
+Roll20's own officially-curated sheets (like D&D 5e) to community sheet
+authors. That button runs with real page-level access no sheet's own JS
+ever gets, so it can correctly print just the sheet instead of the whole
+browser tab/window - a generic Ctrl/Cmd+P or right-click > Print instead
+prints everything visible on the Roll20 page (map, chat, sidebar) since
+those aren't something a sheet's own CSS has any power to hide.
+
+Getting that native button to appear is the important part - a sheet
+whose `sheet.json` doesn't set `printable: true` has no print button in
+the dialog at all, full stop, regardless of any print CSS. Once it exists
+though, it still hands off to the browser's own print pipeline
+(Ctrl/Cmd+P, destination "Save as PDF") for the actual rendering - which
+is where this sheet's own `@media print` stylesheet
+(`source/Cohors_Cthulhu.scss` and `source/scss/_index.scss`) takes over,
+making that printout clean and complete instead of a raw dump of
+whatever the live sheet UI happens to look like:
 
 - All three tabs (Character, Spells, Notes) print stacked one after
   another, instead of just whichever one happened to be open - Roll20's
@@ -310,9 +327,12 @@ produce a clean, complete printout:
   backgrounds and swap in a bordered, dark-ink-on-white look instead, so
   it stays legible no matter how that setting is configured.
 
-Verified locally via Playwright's print-media emulation and a headless
-`page.pdf()` render (confirmed all three tabs' content appears across the
-resulting pages, and that the light-on-dark elements above render as
-dark-on-white instead) - not something a real Roll20 session was needed
-for, since this only depends on standard browser print behavior, not
-anything Roll20-specific.
+The print CSS itself was verified locally via Playwright's print-media
+emulation and a headless `page.pdf()` render (confirmed all three tabs'
+content appears across the resulting pages, and that the light-on-dark
+elements above render as dark-on-white instead) - not something a real
+Roll20 session was needed for, since it only depends on standard browser
+print behavior, not anything Roll20-specific. Whether Roll20's own Print
+button actually appears and correctly isolates the sheet, on the other
+hand, can only be confirmed in a real Roll20 game - this development
+environment has no access to Roll20's own client UI at all.
