@@ -393,10 +393,14 @@
             class: 'cc-talent-apply',
             trigger: {triggeredFuncs: ['ccApplyTalentPreset']}
           })
+          //- affects recalculates Max Stress whenever a talent name
+          //- changes, in case it's Unyielding (see calcStressMax) - same
+          //- affects-on-repeating-row-field pattern as Armor's resistance
+          //- field above triggering total_armor.
           +text({
             name: 'name',
             list: 'cc-talent-options',
-            trigger: {triggeredFuncs: ['ccApplyTalentPreset']}
+            trigger: {triggeredFuncs: ['ccApplyTalentPreset'], affects: ['stress_max', 'stress_max_marker']}
           })
           +text({name: 'keywords'}).cc-talent-keywords
           +text({name: 'requirements'}).cc-talent-requirements
@@ -886,11 +890,19 @@
   k.registerFuncs({calcTotalArmor});
 
   // "Add your: Brawn + Resilience, or Will + Resilience (whichever is higher)."
+  // Plus +3 from the Unyielding talent ("You increase your maximum stress
+  // by +3") if the character has taken it - checked by name since talents
+  // are free text (a datalist, not a fixed dropdown - see the pug comment
+  // above the Name field), so this matches case/whitespace-insensitively
+  // the same way ccApplyTalentPreset's own lookup effectively does via the
+  // datalist's exact suggested spelling.
   const calcStressMax = ({attributes}) => {
     const resilience = Number(attributes.resilience_ranks) || 0;
     const brawn = Number(attributes.brawn_rating) || 0;
     const will = Number(attributes.will_rating) || 0;
-    return Math.max(brawn, will) + resilience;
+    const talents = attributes.repeating_talent || [];
+    const hasUnyielding = talents.some((row) => String(row.name || '').trim().toLowerCase() === 'unyielding');
+    return Math.max(brawn, will) + resilience + (hasUnyielding ? 3 : 0);
   };
   k.registerFuncs({calcStressMax});
 
