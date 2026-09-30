@@ -1,23 +1,23 @@
-// Cohors_Cthulhu.scss
+/* Cohors_Cthulhu.scss */
 @use 'k-scaffold' as k;
 @use './scss';
 @use 'sfc';
 
-// Inter, for everything on the sheet except .cc-banner's section-title
-// ribbons (which use the serif --cc-header-font, Cinzel, below). Loaded as
-// direct @font-face rules (both weights point at the same file - Google
-// now serves Inter as a single variable-font woff2, with font-weight here
-// just selecting which instance of it applies) rather than a plain CSS
-// @import of the Google Fonts stylesheet endpoint. The @import approach
-// (same pattern Ars_Magica_5th already uses successfully in its own,
-// unrelated main-sheet CSS) turned out to break roll template rendering
-// in the chat pane - the fonts loaded fine for the sheet itself, but the
-// roll card's own hardcoded `font-family: Georgia, serif` stopped taking
-// effect. Roll20 sanitizes roll-template CSS through a separate, stricter
-// filter than the main sheet (see README's "hard-won lessons"), and an
-// @import at-rule anywhere in the pasted stylesheet apparently trips it
-// the same way a stray CSS comment or data: URI does elsewhere in this
-// file's history - @font-face doesn't have that problem.
+/* Inter, for everything on the sheet except .cc-banner's section-title
+   ribbons (which use the serif --cc-header-font, Cinzel, below). Loaded as
+   direct @font-face rules (both weights point at the same file - Google
+   now serves Inter as a single variable-font woff2, with font-weight here
+   just selecting which instance of it applies) rather than a plain CSS
+   @import of the Google Fonts stylesheet endpoint. The @import approach
+   (same pattern Ars_Magica_5th already uses successfully in its own,
+   unrelated main-sheet CSS) turned out to break roll template rendering
+   in the chat pane - the fonts loaded fine for the sheet itself, but the
+   roll card's own hardcoded `font-family: Georgia, serif` stopped taking
+   effect. Roll20 sanitizes roll-template CSS through a separate, stricter
+   filter than the main sheet (see README's "hard-won lessons"), and an
+   @import at-rule anywhere in the pasted stylesheet apparently trips it
+   the same way a stray CSS comment or data: URI once did elsewhere in
+   this file's history - @font-face doesn't have that problem. */
 @font-face {
   font-family: 'Inter';
   font-style: normal;
@@ -34,12 +34,12 @@
   src: url('https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2') format('woff2');
 }
 
-// Cinzel, for .cc-banner's section-title ribbons only (--cc-header-font) -
-// a Roman-inscription-style display serif that fits Cohors Cthulhu's
-// theme better than the plain Georgia fallback it replaces. Unlike Inter,
-// Cinzel isn't served as a single variable-font file - regular (400) and
-// bold (700) are genuinely separate woff2 files (confirmed via distinct
-// content-length), since .cc-banner itself is always bold.
+/* Cinzel, for .cc-banner's section-title ribbons only (--cc-header-font) -
+   a Roman-inscription-style display serif that fits Cohors Cthulhu's
+   theme better than the plain Georgia fallback it replaces. Unlike Inter,
+   Cinzel isn't served as a single variable-font file - regular (400) and
+   bold (700) are genuinely separate woff2 files (confirmed via distinct
+   content-length), since .cc-banner itself is always bold. */
 @font-face {
   font-family: 'Cinzel';
   font-style: normal;
@@ -63,19 +63,19 @@ html {
 
 body {
   @include scss.variables;
-  // Regular/base text size for the sheet. rem-based sizes elsewhere (tab
-  // buttons, table headers, small labels, etc.) are set relative to
-  // html's own 16px root above and are unaffected by this - only text
-  // that doesn't declare its own font-size (most field inputs/textareas)
-  // inherits this value.
+  /* Regular/base text size for the sheet. rem-based sizes elsewhere (tab
+     buttons, table headers, small labels, etc.) are set relative to
+     html's own 16px root above and are unaffected by this - only text
+     that doesn't declare its own font-size (most field inputs/textareas)
+     inherits this value. */
   font-size: 14px;
 
   .ui-dialog {
     .tab-content {
       .charsheet {
-        // Sheet-wide default font - anything that doesn't set its own
-        // font-family (most spans/labels, not just the explicit
-        // --cc-body-font rules on field inputs) inherits this.
+        /* Sheet-wide default font - anything that doesn't set its own
+           font-family (most spans/labels, not just the explicit
+           --cc-body-font rules on field inputs) inherits this. */
         font-family: var(--cc-body-font);
         @include k.defaultStyles;
         @include scss.generic;
@@ -88,15 +88,15 @@ body {
     @include scss.dark;
   }
 
-  // Force the light palette when printing, regardless of the Dark Mode
-  // toggle - a dark background wastes ink/toner and most printers render
-  // it poorly anyway. Values are duplicated from scss/_variables.scss's
-  // light @mixin variables (rather than @include-ing it here) since this
-  // needs !important to win over .sheet-darkmode's own (non-important)
-  // custom property values for the SAME body element - !important always
-  // beats a non-important rule for the same element/property regardless
-  // of selector specificity or source order, but a plain @include here
-  // wouldn't carry that through.
+  /* Force the light palette when printing, regardless of the Dark Mode
+     toggle - a dark background wastes ink/toner and most printers render
+     it poorly anyway. Values are duplicated from scss/_variables.scss's
+     light @mixin variables (rather than @include-ing it here) since this
+     needs !important to win over .sheet-darkmode's own (non-important)
+     custom property values for the SAME body element - !important always
+     beats a non-important rule for the same element/property regardless
+     of selector specificity or source order, but a plain @include here
+     wouldn't carry that through. */
   @media print {
     --cc-page-bg: #f6f5f1 !important;
     --cc-parchment: #ebe9e2 !important;
@@ -109,11 +109,11 @@ body {
   }
 }
 
-// Roll templates render in the chat pane, outside .ui-dialog .tab-content
-// .charsheet, so their styles must stay unnested - nesting sfc.roll under
-// .charsheet above would scope .sheet-rolltemplate-ccskill to the sheet
-// only and it would never apply in chat. The roll template's own rules
-// use hardcoded colors (not var(...)) since Roll20's chat-pane CSS
-// sanitizer strips CSS custom properties, and since the --cc-* custom
-// properties are only defined within the sheet's own DOM anyway.
+/* Roll templates render in the chat pane, outside .ui-dialog .tab-content
+   .charsheet, so their styles must stay unnested - nesting sfc.roll under
+   .charsheet above would scope .sheet-rolltemplate-ccskill to the sheet
+   only and it would never apply in chat. The roll template's own rules
+   use hardcoded colors (not var(...)) since Roll20's chat-pane CSS
+   sanitizer strips CSS custom properties, and since the --cc-* custom
+   properties are only defined within the sheet's own DOM anyway. */
 @include sfc.roll;

@@ -7,16 +7,22 @@ const kOpts = {
     testDestination: './__tests__',
     source: './source',
     pugOptions: { "require": require, "fs": fs },
-    // 'compressed' strips CSS comments (among other things). Roll20's
-    // roll-template CSS pipeline has a known, documented bug where a
-    // /* ... */ comment block ANYWHERE in the pasted stylesheet silently
-    // breaks styling for roll templates specifically, while the sheet's
-    // own CSS keeps working fine (see Roll20 forum threads on
-    // "rolltemplate styling not registering" / "CSS does not apply to
-    // roll templates"). k-scaffold's own default styles (materialIcons)
-    // include a couple of harmless comments that were enough to trigger
-    // this - not something we authored or can remove from our own source.
-    scssOptions: { style: 'compressed' },
+    // Previously compiled with style: 'compressed' to strip CSS comments,
+    // after an earlier debugging session found that a /* ... */ comment
+    // ANYWHERE in the pasted stylesheet (even k-scaffold's own harmless
+    // "/* Preferred icon size */" comment in its bundled materialIcons
+    // styles) silently broke roll-template styling in chat, while the
+    // sheet's own CSS kept working fine. Re-tested live in a scratch
+    // Roll20 sandbox campaign (a minimal custom sheet with a rolltemplate
+    // styled via a child-wrapper rule, preceded by that exact comment
+    // text) and the roll template rendered correctly - Roll20 no longer
+    // reproduces the bug. Switched back to 'expanded' so the shipped CSS
+    // stays human-readable with real comments, matching the .scss/.pug
+    // source. If roll-template styling ever silently breaks again, the
+    // CSS comments (not custom properties, which have their own separate,
+    // still-live restriction inside +scss('roll') - see that file) are
+    // the first thing to re-suspect.
+    scssOptions: { style: 'expanded' },
 };
 
 if (process.argv[2] === '--watch') {

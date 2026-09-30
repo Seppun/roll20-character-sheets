@@ -142,28 +142,28 @@
   span.cc-threat-signal-delta {{ccthreatdelta}}
 
 +scss('roll').
-  // Roll templates render inside Roll20's chat pane, which sanitizes their
-  // CSS through a stricter, older filter than the main sheet - CSS custom
-  // properties (var()) are not on its allowlist and get the whole
-  // declaration silently dropped. Plain hardcoded colors only in here.
-  //
-  // Roll20 also auto-prepends "sheet-" to every class used INSIDE a roll
-  // template at render time - confirmed by inspecting the live rendered
-  // chat DOM, where our own class="cc-roll-header" came out as
-  // class="sheet-cc-roll-header", class="character_name" (from the
-  // characterLink mixin) came out as class="sheet-character_name", etc.
-  // Every selector below other than the rolltemplate's own
-  // sheet-rolltemplate-<name> wrapper (which we author with that prefix
-  // ourselves - Roll20 doesn't add a second one) and .inlinerollresult
-  // (Roll20's own built-in class, never prefixed) needs a matching
-  // "sheet-" prefix or it silently never matches anything.
-  //
-  // Critically: visual styling (background/border/font/padding) does NOT
-  // reliably apply when placed directly on .sheet-rolltemplate-ccskill
-  // itself - it needs to live on a child wrapper div instead. Confirmed
-  // against an old hand-authored prototype of this same sheet that did
-  // get roll template styling working, which put all of its visual rules
-  // on a nested .sheet-template wrapper rather than the rolltemplate root.
+  /* Roll templates render inside Roll20's chat pane, which sanitizes their
+     CSS through a stricter, older filter than the main sheet - CSS custom
+     properties (var()) are not on its allowlist and get the whole
+     declaration silently dropped. Plain hardcoded colors only in here.
+
+     Roll20 also auto-prepends "sheet-" to every class used INSIDE a roll
+     template at render time - confirmed by inspecting the live rendered
+     chat DOM, where our own class="cc-roll-header" came out as
+     class="sheet-cc-roll-header", class="character_name" (from the
+     characterLink mixin) came out as class="sheet-character_name", etc.
+     Every selector below other than the rolltemplate's own
+     sheet-rolltemplate-<name> wrapper (which we author with that prefix
+     ourselves - Roll20 doesn't add a second one) and .inlinerollresult
+     (Roll20's own built-in class, never prefixed) needs a matching
+     "sheet-" prefix or it silently never matches anything.
+
+     Critically: visual styling (background/border/font/padding) does NOT
+     reliably apply when placed directly on .sheet-rolltemplate-ccskill
+     itself - it needs to live on a child wrapper div instead. Confirmed
+     against an old hand-authored prototype of this same sheet that did
+     get roll template styling working, which put all of its visual rules
+     on a nested .sheet-template wrapper rather than the rolltemplate root. */
   .sheet-rolltemplate-ccskill .sheet-cc-roll-card {
     font-family: Georgia, serif;
     background: #ece3cd;
@@ -178,11 +178,11 @@
       font-size: 1rem;
     }
 
-    // computed::fieldname values render as Roll20's standard inline-roll
-    // spans (hoverable, with their own tooltip breakdown), which come
-    // with Roll20's default yellow highlight box - strip that back down
-    // to plain text so they match the rest of the card. Mirrors
-    // Achtung!_Cthulhu_2d20's own .inlinerollresult overrides.
+    /* computed::fieldname values render as Roll20's standard inline-roll
+       spans (hoverable, with their own tooltip breakdown), which come
+       with Roll20's default yellow highlight box - strip that back down
+       to plain text so they match the rest of the card. Mirrors
+       Achtung!_Cthulhu_2d20's own .inlinerollresult overrides. */
     .inlinerollresult {
       background-color: transparent !important;
       border: 0 transparent !important;
@@ -220,9 +220,9 @@
       font-size: 0.9rem;
     }
 
-    // Challenge Dice results (the †/‡/–/☠ symbols) are the main thing a
-    // player scans for after a damage/cost roll, so they read larger than
-    // the rest of the row text around them.
+    /* Challenge Dice results (the †/‡/–/☠ symbols) are the main thing a
+       player scans for after a damage/cost roll, so they read larger than
+       the rest of the row text around them. */
     .sheet-cc-roll-dice-result {
       font-size: 1.4rem;
     }
@@ -251,11 +251,11 @@
     }
   }
 
-  // The Momentum and Threat pool signal cards (see the pug comments above
-  // +rolltemplate('ccmomentumsignal')/+rolltemplate('ccthreatsignal')) are
-  // never meant to be seen - only their rendered HTML (still present in
-  // the chat message payload the API scripts read, regardless of
-  // display:none) matters.
+  /* The Momentum and Threat pool signal cards (see the pug comments above
+     +rolltemplate('ccmomentumsignal')/+rolltemplate('ccthreatsignal')) are
+     never meant to be seen - only their rendered HTML (still present in
+     the chat message payload the API scripts read, regardless of
+     display:none) matters. */
   .sheet-rolltemplate-ccmomentumsignal,
   .sheet-rolltemplate-ccthreatsignal {
     display: none;

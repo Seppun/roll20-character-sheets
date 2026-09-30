@@ -1,10 +1,10 @@
 @mixin variables {
-  // Lighter and less yellow than the original tan/khaki parchment tones -
-  // closer to a pale limestone/travertine (Roman building stone) than
-  // dyed paper, per request. Kept as three tones at similar RELATIVE
-  // contrast to each other as before (page < parchment < parchment-dark
-  // in saturation/darkness) so panel-vs-field-vs-header banding still
-  // reads clearly, just less golden overall.
+  /* Lighter and less yellow than the original tan/khaki parchment tones -
+     closer to a pale limestone/travertine (Roman building stone) than
+     dyed paper, per request. Kept as three tones at similar RELATIVE
+     contrast to each other as before (page < parchment < parchment-dark
+     in saturation/darkness) so panel-vs-field-vs-header banding still
+     reads clearly, just less golden overall. */
   --cc-page-bg: #f6f5f1;
   --cc-parchment: #ebe9e2;
   --cc-parchment-dark: #d7d3c6;
@@ -12,15 +12,15 @@
   --cc-banner: #6b1420;
   --cc-banner-text: #f2e9d8;
   --cc-rule: #8a1c2b;
-  // Same color as --cc-rule, softened - used for dividers between
-  // repeating rows (Weapons/Armor/Talents), where a full-strength line
-  // between every entry reads as heavier than intended.
+  /* Same color as --cc-rule, softened - used for dividers between
+     repeating rows (Weapons/Armor/Talents), where a full-strength line
+     between every entry reads as heavier than intended. */
   --cc-rule-soft: rgba(138, 28, 43, 0.4);
-  // Header font is reserved for .cc-banner (the section-title ribbons)
-  // only - everything else on the sheet uses --cc-body-font. Cinzel is
-  // loaded via @font-face in Cohors_Cthulhu.scss; Georgia/Times New Roman
-  // remain as the fallback stack for the moment before it loads (or if it
-  // fails to).
+  /* Header font is reserved for .cc-banner (the section-title ribbons)
+     only - everything else on the sheet uses --cc-body-font. Cinzel is
+     loaded via @font-face in Cohors_Cthulhu.scss; Georgia/Times New Roman
+     remain as the fallback stack for the moment before it loads (or if it
+     fails to). */
   --cc-header-font: 'Cinzel', Georgia, 'Times New Roman', serif;
   --cc-body-font: 'Inter', sans-serif;
 }

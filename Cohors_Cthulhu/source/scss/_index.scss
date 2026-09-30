@@ -9,22 +9,22 @@
 }
 
 @mixin generic {
-  // Slight off-white page background (instead of Roll20's default white),
-  // plus a maroon Imperial eagle/SPQR watermark tucked in the top-right
-  // corner, barely visible - same "&" trick as everywhere else in this
-  // mixin, since Cohors_Cthulhu.scss includes this mixin directly inside
-  // .charsheet, so "&" here means .charsheet itself. This applies across
-  // every tab (Character/Spells/Notes), since they all live inside the
-  // same .charsheet root. The watermark's low opacity is baked into the
-  // PNG's own alpha channel (not a CSS opacity), so it composites over
-  // --cc-page-bg without needing a separate layer/pseudo-element.
+  /* Slight off-white page background (instead of Roll20's default white),
+     plus a maroon Imperial eagle/SPQR watermark tucked in the top-right
+     corner, barely visible - same "&" trick as everywhere else in this
+     mixin, since Cohors_Cthulhu.scss includes this mixin directly inside
+     .charsheet, so "&" here means .charsheet itself. This applies across
+     every tab (Character/Spells/Notes), since they all live inside the
+     same .charsheet root. The watermark's low opacity is baked into the
+     PNG's own alpha channel (not a CSS opacity), so it composites over
+     --cc-page-bg without needing a separate layer/pseudo-element. */
   & {
     background: var(--cc-page-bg) url('https://raw.githubusercontent.com/Seppun/roll20-character-sheets/Cohorscc/Cohors_Cthulhu/images/eagle-spqr.png') no-repeat top right / 320px auto;
   }
 
-  // k-scaffold's tabs mixin adds no default styling for the nav buttons
-  // (by design, so every sheet themes them itself) - without this, tabs
-  // render as plain unstyled inline text with no visible separation.
+  /* k-scaffold's tabs mixin adds no default styling for the nav buttons
+     (by design, so every sheet themes them itself) - without this, tabs
+     render as plain unstyled inline text with no visible separation. */
   .tabs__nav-list {
     gap: 0.3rem;
     padding: 0;
@@ -39,8 +39,8 @@
     border: 1px solid var(--cc-rule);
     border-bottom: none;
     border-radius: 4px 4px 0 0;
-    // Not banner text, so --cc-body-font (Inter) applies, unlike
-    // .cc-banner just below.
+    /* Not banner text, so --cc-body-font (Inter) applies, unlike
+       .cc-banner just below. */
     font-family: var(--cc-body-font);
     font-weight: bold;
     text-transform: uppercase;
@@ -60,22 +60,22 @@
   }
 
   .cc-banner {
-    // Background is a PNG render of an original brush-stroke ribbon (not
-    // traced from the official sheet's art), hosted in this repo at
-    // images/banner-brush.png and loaded via a raw.githubusercontent.com
-    // URL. This was originally an inline data: URI (first SVG, then PNG),
-    // but Roll20's CSS pipeline treats ANY inline data: URI background
-    // image as a security violation and discards ALL roll-template
-    // styling for the whole pasted stylesheet when it finds one anywhere
-    // in the file - confirmed directly via the console error "Potential
-    // CSS security violation; character sheet template styling thrown
-    // out" persisting even after switching formats, and by the fact that
-    // neither of this repo's other, proven-working sheets (Achtung!_
-    // Cthulhu_2d20, Ars_Magica_5th) uses a single inline data: URI image
-    // anywhere in their CSS - both host every image externally instead.
-    // No background-color here: the ribbon shape's transparent cutouts
-    // must show whatever sits behind it (page/panel background), or the
-    // rough silhouette disappears behind a solid rectangle.
+    /* Background is a PNG render of an original brush-stroke ribbon (not
+       traced from the official sheet's art), hosted in this repo at
+       images/banner-brush.png and loaded via a raw.githubusercontent.com
+       URL. This was originally an inline data: URI (first SVG, then PNG),
+       but Roll20's CSS pipeline treats ANY inline data: URI background
+       image as a security violation and discards ALL roll-template
+       styling for the whole pasted stylesheet when it finds one anywhere
+       in the file - confirmed directly via the console error "Potential
+       CSS security violation; character sheet template styling thrown
+       out" persisting even after switching formats, and by the fact that
+       neither of this repo's other, proven-working sheets (Achtung!_
+       Cthulhu_2d20, Ars_Magica_5th) uses a single inline data: URI image
+       anywhere in their CSS - both host every image externally instead.
+       No background-color here: the ribbon shape's transparent cutouts
+       must show whatever sits behind it (page/panel background), or the
+       rough silhouette disappears behind a solid rectangle. */
     background: url('https://raw.githubusercontent.com/Seppun/roll20-character-sheets/Cohorscc/Cohors_Cthulhu/images/banner-brush.png') no-repeat center / 100% 100%;
     color: var(--cc-banner-text);
     font-family: var(--cc-header-font);
@@ -123,15 +123,15 @@
 
   .cc-panel {
     border: 1px solid var(--cc-rule);
-    // --cc-parchment-dark as a solid fallback color, with a subtle,
-    // seamlessly-tileable stone texture layered on top (procedurally
-    // generated, not a photo - see images/stone-texture.png) for a
-    // worn-limestone feel matching the Roman theme (Cinzel banners, the
-    // SPQR eagle watermark) - kept low-contrast on purpose so it doesn't
-    // fight with text legibility, same reasoning as this sheet's other
-    // background images (hosted externally, never inlined as a data:
-    // URI - see the .cc-banner comment below for why that specifically
-    // breaks roll-template styling).
+    /* --cc-parchment-dark as a solid fallback color, with a subtle,
+       seamlessly-tileable stone texture layered on top (procedurally
+       generated, not a photo - see images/stone-texture.png) for a
+       worn-limestone feel matching the Roman theme (Cinzel banners, the
+       SPQR eagle watermark) - kept low-contrast on purpose so it doesn't
+       fight with text legibility, same reasoning as this sheet's other
+       background images (hosted externally, never inlined as a data:
+       URI - see the .cc-banner comment above for why that specifically
+       breaks roll-template styling). */
     background: var(--cc-parchment-dark) url('https://raw.githubusercontent.com/Seppun/roll20-character-sheets/Cohorscc/Cohors_Cthulhu/images/stone-texture.png') repeat;
     padding: 0.4rem;
     margin-bottom: 0.4rem;
@@ -162,16 +162,16 @@
       margin: 0;
     }
 
-    // The actual source of "significant whitespace between items": k-scaffold's
-    // own defaultStyles mixin sets `.repcontainer { display:grid; gap:
-    // var(--normal-gap) }` (a flat 1rem, i.e. 16px) - a gap the CSS Grid
-    // spec applies directly between .repcontainer's row children, which no
-    // amount of margin/padding on the rows themselves can override (gap is
-    // the grid CONTAINER's own property, not the children's). Confirmed by
-    // reading that mixin directly (fieldsets/_fieldsetStyling.scss) rather
-    // than guessing from the rendered page. The row divider border-bottom
-    // above already provides visual separation, so this is set to 0 rather
-    // than just a smaller gap.
+    /* The actual source of "significant whitespace between items": k-scaffold's
+       own defaultStyles mixin sets `.repcontainer { display:grid; gap:
+       var(--normal-gap) }` (a flat 1rem, i.e. 16px) - a gap the CSS Grid
+       spec applies directly between .repcontainer's row children, which no
+       amount of margin/padding on the rows themselves can override (gap is
+       the grid CONTAINER's own property, not the children's). Confirmed by
+       reading that mixin directly (fieldsets/_fieldsetStyling.scss) rather
+       than guessing from the rendered page. The row divider border-bottom
+       above already provides visual separation, so this is set to 0 rather
+       than just a smaller gap. */
     .repcontainer {
       gap: 0;
     }
@@ -215,26 +215,26 @@
     }
   }
 
-  // Roll20 automatically collapses any repeating row too tall to fit its
-  // one-line compact summary (every multi-field row on this sheet -
-  // Weapons, Armor, Talents, Spells) behind a plain text "Modify" link, and
-  // appends a plain text "+Add Item" link after the whole section - both
-  // are Roll20's own native UI (classes repcontrol_edit/repcontrol_add),
-  // not something this sheet's markup renders itself, so they can only be
-  // restyled via CSS, not have their text/DOM changed. Same wording,
-  // dressed up to read as buttons matching the sheet's theme, with a small
-  // eagle-icon background image (not a unicode glyph - an emoji here would
-  // be the exact astral-plane-character mistake that once 500'd Roll20's
-  // save endpoint, see the Effect-face symbol's history above) instead of
-  // literal text.
-  //
-  // Uses its own icon asset (images/eagle-icon.png) rather than reusing
-  // eagle-spqr.png (the page watermark): that PNG's opacity is baked very
-  // low into its own alpha channel on purpose (it's meant to be a barely-
-  // visible watermark at 320px), so at a 14px icon size it was rendering
-  // as essentially invisible. This one is a solid parchment-colored
-  // silhouette (matching --cc-banner-text) sized for icon use, so it
-  // reads clearly against the button's dark maroon background.
+  /* Roll20 automatically collapses any repeating row too tall to fit its
+     one-line compact summary (every multi-field row on this sheet -
+     Weapons, Armor, Talents, Spells) behind a plain text "Modify" link, and
+     appends a plain text "+Add Item" link after the whole section - both
+     are Roll20's own native UI (classes repcontrol_edit/repcontrol_add),
+     not something this sheet's markup renders itself, so they can only be
+     restyled via CSS, not have their text/DOM changed. Same wording,
+     dressed up to read as buttons matching the sheet's theme, with a small
+     eagle-icon background image (not a unicode glyph - an emoji here would
+     be the exact astral-plane-character mistake that once 500'd Roll20's
+     save endpoint, see the Effect-face symbol's history above) instead of
+     literal text.
+
+     Uses its own icon asset (images/eagle-icon.png) rather than reusing
+     eagle-spqr.png (the page watermark): that PNG's opacity is baked very
+     low into its own alpha channel on purpose (it's meant to be a barely-
+     visible watermark at 320px), so at a 14px icon size it was rendering
+     as essentially invisible. This one is a solid parchment-colored
+     silhouette (matching --cc-banner-text) sized for icon use, so it
+     reads clearly against the button's dark maroon background. */
   .repcontrol_add,
   .repcontrol_edit {
     display: inline-flex;
@@ -245,10 +245,10 @@
     border: 1px solid var(--cc-rule);
     border-radius: 4px;
     padding: 0.1rem 0.4rem;
-    // Right margin (not just the vertical margin every wrapped row of
-    // these needs) so Modify and +Add Item don't sit flush against each
-    // other when they end up side by side - Roll20 renders them as plain
-    // adjacent inline elements with no gap of its own.
+    /* Right margin (not just the vertical margin every wrapped row of
+       these needs) so Modify and +Add Item don't sit flush against each
+       other when they end up side by side - Roll20 renders them as plain
+       adjacent inline elements with no gap of its own. */
     margin: 0.2rem 0.5rem 0.2rem 0;
     font-family: var(--cc-body-font);
     font-weight: bold;
@@ -270,17 +270,17 @@
       background: var(--cc-parchment);
       color: var(--cc-ink);
 
-      // The icon is a background-image, so it doesn't pick up the `color`
-      // swap above like the text does - without this it stays parchment-
-      // colored against the new parchment background and disappears.
+      /* The icon is a background-image, so it doesn't pick up the `color`
+         swap above like the text does - without this it stays parchment-
+         colored against the new parchment background and disappears. */
       &:before {
         background-image: url('https://raw.githubusercontent.com/Seppun/roll20-character-sheets/Cohorscc/Cohors_Cthulhu/images/eagle-icon-dark.png');
       }
     }
 
-    // Roll20 wraps the clickable text in its own <a>/<span> inside the
-    // element carrying these classes - normalize it so the link doesn't
-    // draw its own (differently colored, underlined) styling on top.
+    /* Roll20 wraps the clickable text in its own <a>/<span> inside the
+       element carrying these classes - normalize it so the link doesn't
+       draw its own (differently colored, underlined) styling on top. */
     a,
     span {
       color: inherit;
@@ -288,14 +288,14 @@
     }
   }
 
-  // Roll20's own "+Add Item" wording is verbose for how small this button
-  // now is - shortened to just "Add" without touching Roll20's own DOM
-  // (which, per the comment above, this sheet has no access to): the
-  // classic text-replacement trick of collapsing the real text node to
-  // zero size and supplying replacement text via a pseudo-element
-  // instead. font-size:0 (not display:none/visibility:hidden) is what
-  // makes this work - those would remove the link's own clickable text
-  // node from the layout instead of just shrinking it to nothing.
+  /* Roll20's own "+Add Item" wording is verbose for how small this button
+     now is - shortened to just "Add" without touching Roll20's own DOM
+     (which, per the comment above, this sheet has no access to): the
+     classic text-replacement trick of collapsing the real text node to
+     zero size and supplying replacement text via a pseudo-element
+     instead. font-size:0 (not display:none/visibility:hidden) is what
+     makes this work - those would remove the link's own clickable text
+     node from the layout instead of just shrinking it to nothing. */
   .repcontrol_add {
     a,
     span {
@@ -308,21 +308,21 @@
     }
   }
 
-  // "Download as PDF" isn't something a Roll20 character sheet can offer
-  // as an actual button - sheet workers only get a sandboxed API
-  // (getAttrs/setAttrs/startRoll/etc.), with no access to window,
-  // document, or any file-download/print API, so there's no way to
-  // trigger window.print() or load a PDF library from sheet code. This
-  // print stylesheet is the practical alternative: it makes the browser's
-  // own Print dialog (Ctrl/Cmd+P, destination "Save as PDF") produce a
-  // clean, complete printout instead of a random snapshot of whichever
-  // tab happened to be open, styled with UI chrome that means nothing on
-  // paper.
+  /* "Download as PDF" isn't something a Roll20 character sheet can offer
+     as an actual button - sheet workers only get a sandboxed API
+     (getAttrs/setAttrs/startRoll/etc.), with no access to window,
+     document, or any file-download/print API, so there's no way to
+     trigger window.print() or load a PDF library from sheet code. This
+     print stylesheet is the practical alternative: it makes the browser's
+     own Print dialog (Ctrl/Cmd+P, destination "Save as PDF") produce a
+     clean, complete printout instead of a random snapshot of whichever
+     tab happened to be open, styled with UI chrome that means nothing on
+     paper. */
   @media print {
-    // Tab navigation and Roll20's native repeating-section "Modify"/"+Add
-    // Item" controls are purely interactive - neither does anything on a
-    // printed page. The build-timestamp footer is developer-only debug
-    // info, not something a player printing their sheet needs to see.
+    /* Tab navigation and Roll20's native repeating-section "Modify"/"+Add
+       Item" controls are purely interactive - neither does anything on a
+       printed page. The build-timestamp footer is developer-only debug
+       info, not something a player printing their sheet needs to see. */
     .tabs__header,
     .repcontrol_add,
     .repcontrol_edit,
@@ -330,35 +330,35 @@
       display: none !important;
     }
 
-    // k-scaffold's own tabsStyling hides every tab except the active one
-    // via .tabs__container:not(.k-active-tab) { display: none !important; }
-    // - a printed sheet should be the whole character, not a snapshot of
-    // whichever tab happened to be open, so show all three (Character,
-    // Spells, Notes) stacked one after another. Both rules are
-    // !important, so it comes down to specificity, not source order (a
-    // plain .tabs__container here loses - :not(...)'s specificity equals
-    // its argument's, so :not(.k-active-tab) counts as an extra class,
-    // making k-scaffold's selector one class heavier than this one would
-    // otherwise be - confirmed empirically, the tabs stayed hidden without
-    // this). .tabs__container.tabs__container matches the exact same
-    // specificity (repeating a class selector is valid CSS and simply
-    // counts twice), and this rule compiles later, so it wins the tie.
+    /* k-scaffold's own tabsStyling hides every tab except the active one
+       via .tabs__container:not(.k-active-tab) { display: none !important; }
+       - a printed sheet should be the whole character, not a snapshot of
+       whichever tab happened to be open, so show all three (Character,
+       Spells, Notes) stacked one after another. Both rules are
+       !important, so it comes down to specificity, not source order (a
+       plain .tabs__container here loses - :not(...)'s specificity equals
+       its argument's, so :not(.k-active-tab) counts as an extra class,
+       making k-scaffold's selector one class heavier than this one would
+       otherwise be - confirmed empirically, the tabs stayed hidden without
+       this). .tabs__container.tabs__container matches the exact same
+       specificity (repeating a class selector is valid CSS and simply
+       counts twice), and this rule compiles later, so it wins the tie. */
     .tabs__container.tabs__container {
       display: block !important;
     }
 
-    // .cc-banner, .cc-table's header row, and .cc-rep-header (the column
-    // headers atop Weapons/Armor/Talents) all use light text over a dark
-    // background (an image for .cc-banner, a solid color for the other
-    // two) - if the browser/printer doesn't render backgrounds (a common
-    // default, and not something this stylesheet can force reliably),
-    // that text is invisible on white paper. Drop the background and use
-    // a bordered, dark-ink-on-white look instead, which stays legible
-    // regardless of any "print background graphics" setting. The
-    // attribute/skill roll buttons normally sit as a light chip against
-    // that dark th background (see their own comments further up), so
-    // they need the same treatment for the same reason once that backdrop
-    // is gone.
+    /* .cc-banner, .cc-table's header row, and .cc-rep-header (the column
+       headers atop Weapons/Armor/Talents) all use light text over a dark
+       background (an image for .cc-banner, a solid color for the other
+       two) - if the browser/printer doesn't render backgrounds (a common
+       default, and not something this stylesheet can force reliably),
+       that text is invisible on white paper. Drop the background and use
+       a bordered, dark-ink-on-white look instead, which stays legible
+       regardless of any "print background graphics" setting. The
+       attribute/skill roll buttons normally sit as a light chip against
+       that dark th background (see their own comments further up), so
+       they need the same treatment for the same reason once that backdrop
+       is gone. */
     .cc-banner {
       background: none !important;
       color: var(--cc-rule) !important;
@@ -380,17 +380,17 @@
       color: var(--cc-rule) !important;
     }
 
-    // Best-effort request to keep the Stress/Fortune trackers' filled-box
-    // background-color (a solid color, not an image, so more browsers
-    // honor this than they do for .cc-banner's background-image above).
+    /* Best-effort request to keep the Stress/Fortune trackers' filled-box
+       background-color (a solid color, not an image, so more browsers
+       honor this than they do for .cc-banner's background-image above). */
     .fill-left__radio {
       print-color-adjust: exact;
       -webkit-print-color-adjust: exact;
     }
 
-    // Avoid a repeating row or an entire panel getting cut in half across
-    // a page boundary where a printer can reasonably avoid it (a taller-
-    // than-one-page panel will still split - there's no way around that).
+    /* Avoid a repeating row or an entire panel getting cut in half across
+       a page boundary where a printer can reasonably avoid it (a taller-
+       than-one-page panel will still split - there's no way around that). */
     .cc-panel,
     .cc-rep-table .repitem,
     tr {
