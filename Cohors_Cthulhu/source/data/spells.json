@@ -6,7 +6,7 @@
       "cost": "4 Drain",
       "duration": "Instant",
       "category": "Ward spell",
-      "effect": "The spell immediately removes stress equal to the spellcaster's power rating from all allies within Close range. In addition, any defeated allies within Close range immediately recover from defeat, though they still retain any injuries they have suffered.\n\nFlawed: A flawed version of this spell removes stress from all creatures within Close range, not just allies.",
+      "effect": "Removes stress equal to the caster's power rating from all allies within Close range; any defeated allies within range immediately recover from defeat, keeping any injuries already suffered.\n\nFlawed: affects all creatures within Close range, not only allies.",
       "momentum": "For 2 Momentum, all affected allies remove a single physical or mental injury each.\n\nFor 2 Momentum, the spell affects allies within Medium range instead."
     },
     "Bounty of Baldr": {
@@ -15,7 +15,7 @@
       "cost": "3 Drain",
       "duration": "A number of rounds equal to the spellcaster's power rating",
       "category": "Ward spell",
-      "effect": "While this spell remains in effect, any attacks against the spellcaster or any of the spellcaster's allies within Close range increase in difficulty by +2.",
+      "effect": "For the duration, attacks against the caster or any ally within Close range have their difficulty increased by 2.",
       "momentum": "All affected characters gain +X Cover resistance, where X is the amount of Momentum spent."
     },
     "Curse of Loki": {
@@ -24,7 +24,7 @@
       "cost": "5 Drain; in addition, each damage effect rolled on the cost generates 1 Threat",
       "duration": "Instant",
       "category": "Attack spell",
-      "effect": "The spellcaster inflicts power+2 mental damage with the Stun damage effect on all enemies within Close range.\n\nFlawed: A flawed version of this spell affects all creatures within range, not just all enemies.",
+      "effect": "Inflicts power+2 mental damage with the Stun effect on all enemies within Close range.\n\nFlawed: affects all creatures within range, not only enemies.",
       "momentum": "For 2 Momentum, add the Persistent 6 damage effect to the damage.\n\nFor 2 Momentum, add the Snare damage effect to the damage."
     },
     "Hammer of Thunraz": {
@@ -33,7 +33,7 @@
       "cost": "4 Drain, Piercing 1",
       "duration": "Instant",
       "category": "Attack spell",
-      "effect": "The spell targets a single enemy or object within Medium range and inflicts power+2 physical damage, with the Area damage effect, upon that target.",
+      "effect": "Targets one enemy or object within Medium range, inflicting power+2 physical damage with the Area effect.",
       "momentum": "For 1 Momentum, replace the Area damage effect with the Piercing 2 damage effect.\n\nFor 2 Momentum, add the Vicious damage effect.\n\nFor 2 Momentum, add the Stun damage effect."
     },
     "Ravens of Wodan": {
@@ -42,7 +42,7 @@
       "cost": "4 Drain, Piercing 1",
       "duration": "A number of rounds equal to the spellcaster's power rating",
       "category": "Ward spell",
-      "effect": "While the spell remains in effect, the spellcaster and all of the spellcaster's allies within Close range receive additional Morale resistance equal to the spellcaster's power rating.",
+      "effect": "For the duration, the caster and all allies within Close range gain bonus Morale resistance equal to the caster's power rating.",
       "momentum": "For 2 Momentum, each affected allied target inflicts +2 damage on all melee attacks they make.\n\nFor 3 Momentum each, the spellcaster may give one or more affected allies 1 additional nonrefreshing Fortune point each, which is lost at the end of the spell's duration if it has not been used."
     },
     "Swiftness of Sleipnir": {
@@ -51,7 +51,7 @@
       "cost": "3 Drain",
       "duration": "Instant",
       "category": "Blessing spell",
-      "effect": "The spellcaster and any allies within Close range may immediately move up to 2 zones. In addition, whenever an ally chooses to implement Keep the Initiative before the spellcaster's next turn, it costs 0 Momentum for them to do so.",
+      "effect": "The caster and any allies within Close range may immediately move up to 2 zones. Before the caster's next turn, any affected ally may use Keep the Initiative at no Momentum cost.",
       "momentum": "For 2 Momentum, each affected character may take an additional minor action for free on their next turn."
     },
     "Wisdom of Frigg": {
@@ -60,7 +60,7 @@
       "cost": "3 Drain, Stun",
       "duration": "Instant",
       "category": "Divination spell",
-      "effect": "The spellcaster targets a single creature within Medium range. The spellcaster gains +3 bonus Momentum, which they may spend only to Obtain Information about the creature or to use the Create Truth major action; the created truth must reflect knowledge of one of the targeted creature's weaknesses.",
+      "effect": "Targets one creature within Medium range. The caster gains +3 bonus Momentum, spendable only to Obtain Information about that creature or to Create a Truth reflecting a known weakness of it.",
       "momentum": "For 2 Momentum, if the creature has the Invulnerable special rule, it loses that rule for a number of rounds equal to the spellcaster's power rating.\n\nFor 2 Momentum, until the end of the scene, any attacks the spellcaster or their allies make against the targeted creature gain either the Intense or the Vicious damage effect (spellcaster's choice)."
     }
   },
@@ -71,7 +71,7 @@
       "cost": "3 Drain",
       "duration": "Up to twenty-four hours",
       "category": "Manifestation spell",
-      "effect": "The spellcaster spends ten minutes consulting the movements of birds to ascertain whether the auspices are favorable or unfavorable. The GM determines which of the following auspices applies:\n\nAuspicious: Fortune favors the current course of action. For the duration of the spell, the spellcaster can re-roll any number of dice from a single skill test, and then the spell ends.\n\nInauspicious: Following the current course of action is to act in opposition to the fates, but the augur is forewarned. For the spell's duration, when the GM spends Threat to Create a Truth - such as by introducing a complication or via the Change of Circumstance option - the spellcaster can ignore the effects of that truth, and then the spell ends.",
+      "effect": "After a ten-minute casting, the GM secretly determines the result:\n\nAuspicious: once during the spell's duration, the caster may re-roll any number of dice on a single skill test; the spell then ends.\n\nInauspicious: once during the spell's duration, when the GM spends Threat to Create a Truth (including via Change of Circumstance), the caster may ignore that truth's effects; the spell then ends.",
       "momentum": "For 2 Momentum, the duration increases by twenty-four hours.\n\nFor 2 Momentum, the spellcaster, not the GM, determines the choice of auspices."
     },
     "Guiding Hand": {
@@ -80,7 +80,7 @@
       "cost": "2 Drain, Piercing 1",
       "duration": "Twenty-four hours",
       "category": "Blessing spell",
-      "effect": "The oracle whispers a portent of events to come, which can help an ally alter their fate. The spellcaster chooses an ally within Close range. For the duration of the spell, any time the ally's player spends a Fortune point, that point can roll 1 Challenge Die. If the result is an effect, the Fortune point is immediately returned to the ally. The ally regains only 1 Fortune, no matter how many effect results are rolled.",
+      "effect": "Choose an ally within Close range. For the duration, whenever that ally spends a Fortune point, roll 1 Challenge Die; on an effect, the spent point is immediately refunded (capped at 1 Fortune refunded regardless of how many effects are rolled).",
       "momentum": "For 2 Momentum, increase the duration by twenty-four hours.\n\nFor 2 Momentum, the ally's player rolls 2 Challenge Dice instead of 1."
     },
     "Invoke the Parcae": {
@@ -89,7 +89,7 @@
       "cost": "4 Drain, Stun",
       "duration": "Instant",
       "category": "Blessing or curse spell",
-      "effect": "This spell allows an oracle to make a plea to the Parcae to modify the oracle's fate or the fate of another. As a reaction to any skill test performed within Close range, whether the test was made by friend or foe, the oracle can attempt to invoke the Parcae, and their player chooses one of the following spell effects:\n\nCritical Success: You may change the roll result of a single d20 from the skill test to 1 (generating two successes automatically).\n\nComplication: You may change the roll result of a single d20 from the skill test to 20, generating a complication.\n\nRe-Roll: You may force the ally or enemy to re-roll all of the dice from the skill test before determining the outcome.\n\nAfter the oracle casts this spell, the target gains the scar The Fates Must Be Balanced until the oracle rolls a complication on a skill test. The Fates Must Be Balanced increases the complication range of the target's skill tests by +1 until it is removed or healed.",
+      "effect": "As a reaction to any skill test within Close range (ally or enemy), choose one effect:\n\nCritical Success: change one d20 result on that test to 1 (two automatic successes).\n\nComplication: change one d20 result on that test to 20 (generates a complication).\n\nRe-Roll: force all dice on that test to be re-rolled before resolving it.\n\nThe target then gains the scar The Fates Must Be Balanced (complication range of their tests +1) until the caster rolls a complication on a skill test, which removes it.",
       "momentum": "For 2 Momentum, choose two of this spell's spell effects when you invoke the Parcae.\n\nFor 2 Momentum, you can invoke the Parcae as a reaction to skill tests performed within Medium range.\n\nFor 3 Momentum, you can invoke the Parcae for tests performed within Long range."
     },
     "Prescience": {
@@ -98,7 +98,7 @@
       "cost": "4 Drain",
       "duration": "Up to twenty-four hours",
       "category": "Blessing spell",
-      "effect": "The spell gives the oracle visions of future events. For the duration of the spell, the oracle has the truth Vision of the Future, which they can use at any point within that time frame. After the oracle benefits from this truth on a single skill test, the spell ends.",
+      "effect": "For the duration, the caster holds the truth Vision of the Future, usable at any point within that time. The spell ends once that truth benefits a single skill test.",
       "momentum": "For 2 Momentum, the spell does not end when the oracle benefits from the Vision of the Future truth.\n\nFor 2 Momentum, the oracle receives a vision of another character's future and can give the Vision of the Future truth to that character instead."
     },
     "Scrying": {
@@ -107,7 +107,7 @@
       "cost": "2 Drain, Piercing 1",
       "duration": "A number of rounds equal to the oracle's power rating",
       "category": "Divination spell",
-      "effect": "The oracle selects an object or location they are aware of within Close range. The oracle can study the object or location - even parts of it that are hidden from view or obscured, such as the words on a scroll sealed in a case, the contents of a locked container, or the interior of a closed room. The oracle may continue to study the object, or switch their attention to another object within range (once per round at most), for the duration of the spell. Momentum spent to Obtain Information while this spell is in effect may reveal things a person could not normally see.",
+      "effect": "Select a known object or location within Close range to study, including hidden or obscured parts of it (sealed, locked, or enclosed). May switch focus to another target within range up to once per round for the duration. Momentum spent to Obtain Information while active can reveal things not normally visible.",
       "momentum": "Unlike the costs of most spells, Scrying's cost increases by +1 Challenge Die for each Momentum spent on either of the following options:\n\nFor 1 Momentum, the oracle may select an object within Medium range. For 2 Momentum, they may select an object within Long range. For 3 Momentum, they may select an object in any location they are familiar with on Earth. In all cases, the oracle must be aware of the object or location before using this spell.\n\nFor 3 Momentum, the oracle may instead choose an object within Reach and gain limited knowledge about that object's past. Additional Momentum spent to Obtain Information may be used to ask questions about the object's history, whether recent or distant. The GM's answers to these questions may be cryptic, and some past events may be unpleasant or even dangerous to see. The range of the spell may not be increased if this option is used."
     },
     "Second Sight": {
@@ -116,7 +116,7 @@
       "cost": "3 Drain, Piercing 1",
       "duration": "One hour",
       "category": "Blessing spell",
-      "effect": "The oracle targets themself or one allied character within Close range. Targeted characters reduce the difficulty of skill tests using vision by 2, ignore any difficulty or complication range increases caused by darkness, and can attempt skill tests that would otherwise be impossible due to darkness. For the duration of the spell, targeted characters gain the See the Unseen truth.",
+      "effect": "Targets the caster or one ally within Close range. For the duration, the target reduces the difficulty of vision-based tests by 2, ignores darkness-caused difficulty/complication increases, can attempt tests otherwise impossible due to darkness, and gains the See the Unseen truth.",
       "momentum": "For 1 to 5 Momentum, choose one additional allied character to be targeted by the spell for each Momentum spent."
     }
   },
@@ -127,7 +127,7 @@
       "cost": "4 Drain",
       "duration": "Instant",
       "category": "Ward spell",
-      "effect": "All allies within Close range immediately remove stress equal to the druid's power rating.",
+      "effect": "All allies within Close range immediately remove stress equal to the caster's power rating.",
       "momentum": "For 1 Momentum, all defeated allies within range return from defeat immediately.\n\nFor 2 Momentum, all affected allies remove a single injury (physical or mental).\n\nFor 2 Momentum, the spell affects allies within Medium range instead."
     },
     "Cyclone of Cernunnos": {
@@ -136,7 +136,7 @@
       "cost": "4 Drain, Piercing 1",
       "duration": "A number of rounds equal to the spellcaster's power rating",
       "category": "Summoning spell",
-      "effect": "The spell conjures a cyclone of wind into a zone within Medium range. The cyclone receives its own turn in the action order, but it cannot be attacked or suffer damage in any way. When first cast, and at the start of the cyclone's turn, it inflicts power+1 physical damage with the Piercing 1 and Stun damage effects on all creatures and damageable objects within Close range of it, and then it moves to an adjacent zone. Damage inflicted on supernatural creatures also has the Vicious damage effect. Each time the cyclone moves, the spellcaster may choose the direction if they are within Medium range of it. If the spellcaster is farther than Medium range, the cyclone remains stationary; the GM may spend 1 Threat to move the cyclone instead. However, as the cyclone's distance from the druid increases, so does the druid's control fade: the vortex begins shifting and veering randomly before blowing itself out.\n\nFlawed: A flawed version of this spell does not allow the spellcaster to control the cyclone, and it does not require the GM to spend any Threat to move the cyclone.",
+      "effect": "Summons a cyclone into a zone within Medium range; it acts on its own turn in the action order and cannot be attacked or damaged. On cast, and at the start of each of its turns, it inflicts power+1 physical damage (Piercing 1, Stun; also Vicious against supernatural creatures) on all creatures and damageable objects within Close range of it, then moves to an adjacent zone. The caster chooses its direction while within Medium range of it; beyond that range it holds position unless the GM spends 1 Threat to move it.\n\nFlawed: the caster cannot direct the cyclone, and the GM may move it without spending Threat.",
       "momentum": "The spellcaster may increase the damage the cyclone inflicts by +1 per Momentum spent."
     },
     "Gaze of Balor": {
@@ -145,7 +145,7 @@
       "cost": "5 Drain, Stun",
       "duration": "Instant",
       "category": "Attack spell",
-      "effect": "Targeting a single enemy within Medium range, the Gaze of Balor inflicts power+2 mental damage with the Intense damage effect.",
+      "effect": "Targets one enemy within Medium range, inflicting power+2 mental damage with the Intense effect.",
       "momentum": "For 2 Momentum, add the Drain damage effect.\n\nFor 2 Momentum, add the Persistent 6 damage effect."
     },
     "Gift of Arduinna": {
@@ -154,7 +154,7 @@
       "cost": "4 Drain",
       "duration": "A total number of rounds equal to the spellcaster's power rating, divided evenly among the affected targets (rounding down all fractions)",
       "category": "Blessing spell",
-      "effect": "The spell may affect the spellcaster and any of the spellcaster's allies within Close range, up to a total number of targets equal to the spellcaster's power rating. For the spell's duration, affected targets may move up to 1 additional zone whenever they move as a minor or major action. Affected targets may also take an additional minor action for free each turn. They are also able to pass swiftly, ignore the effects of fatigue, rearm on the double, and perform twice as effectively as they normally would in combat. They are also able to pass through wooded terrain, over broken ground, and across streams unhindered.",
+      "effect": "Affects the caster and allies within Close range, up to a number of targets equal to the caster's power rating. For the duration, affected targets gain +1 zone of movement whenever they move (minor or major action), may take one additional free minor action each turn, and move through wooded terrain, broken ground, and streams without hindrance.",
       "momentum": "For every 2 Momentum spent, the spellcaster or a single affected ally may take an additional major action during one of their own turns, provided the turn takes place before the spell's duration ends. No character may gain more than one additional major action this way."
     },
     "Horn of Néit": {
@@ -163,7 +163,7 @@
       "cost": "4 Drain",
       "duration": "A number of rounds equal to the spellcaster's power rating",
       "category": "Curse spell",
-      "effect": "This spell targets all enemy creatures within Medium range of the spellcaster. The spellcaster rolls a number of Challenge Dice equal to their power rating and compares the number of effects rolled to each target's ranks in Athletics. For a target larger than a human, add that target's scale to their Athletics ranks. Each creature whose Athletics ranks is lower than the number of effects rolled suffers the Snare damage effect and cannot take any physical actions other than trying to break free. Breaking free requires passing an Agility+Athletics or Brawn+Athletics test with a difficulty equal to the number of effects rolled. Ensnared creatures are freed automatically at the close of the spell's duration.",
+      "effect": "Targets all enemies within Medium range. Roll Challenge Dice equal to the caster's power rating; compare the number of effects to each target's Athletics ranks (add scale for larger-than-human targets). Any target with fewer Athletics ranks than effects rolled suffers Snare and can only act to break free, requiring an Agility+Athletics or Brawn+Athletics test at a difficulty equal to the effects rolled. Ensnared targets are freed automatically when the spell ends.",
       "momentum": "For each Momentum spent, one additional creature within Long range is also affected.\n\nFor each Momentum spent, the spellcaster rolls +1 Challenge Die."
     },
     "The Ogham Sign": {
@@ -172,7 +172,7 @@
       "cost": "5 Drain, Piercing 1",
       "duration": "Instant",
       "category": "Banishment spell",
-      "effect": "This spell targets a single supernatural creature within Medium range, inflicting power+2 mental damage with the Drain and Piercing 2 damage effects, even if the creature is normally immune to mental attacks (creatures normally immune to mental attacks count as having a Courage of 6). If the creature suffers one or more mental injuries from this spell, then it loses the benefits of its Invulnerable special rule for the remainder of the current scene. If the creature is defeated by the spell, it vanishes, banished to its realm of origin.",
+      "effect": "Targets one supernatural creature within Medium range, inflicting power+2 mental damage with Drain and Piercing 2, even against creatures normally immune to mental attacks (treat their Courage as 6 for this purpose). A target that suffers a mental injury from this spell loses Invulnerable for the rest of the scene. A target defeated by this spell is banished to its realm of origin.",
       "momentum": "For 2 Momentum, add the Intense damage effect.\n\nFor 2 Momentum, add the Stun damage effect."
     },
     "Roots of the Earth": {
@@ -181,7 +181,7 @@
       "cost": "3 Drain, Stun",
       "duration": "Instant",
       "category": "Blessing spell",
-      "effect": "The spell may affect the spellcaster and any of the spellcaster's allies within Close range, up to a total number of targets equal to half the spellcaster's power rating (rounding up). The affected characters vanish and instantly reappear at any point in line of sight within Long range.",
+      "effect": "Affects the caster and allies within Close range, up to a number of targets equal to half the caster's power rating (round up). Affected characters teleport instantly to any point within Long range that they have line of sight to.",
       "momentum": "For 2 Momentum, all creatures transported by the spell receive +2 Cover resistance until the start of the spellcaster's next turn."
     },
     "Spear of Lug": {
@@ -190,7 +190,7 @@
       "cost": "5 Drain, Piercing 1",
       "duration": "Instant",
       "category": "Attack spell",
-      "effect": "The spell targets a single enemy or object within Medium range, inflicting power+2 physical damage with the Piercing 3 damage effect.",
+      "effect": "Targets one enemy or object within Medium range, inflicting power+2 physical damage with Piercing 3.",
       "momentum": "For 2 Momentum, add the Intense damage effect.\n\nFor 2 Momentum, add the Vicious damage effect."
     }
   }
