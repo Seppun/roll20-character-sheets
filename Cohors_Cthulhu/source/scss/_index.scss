@@ -236,7 +236,11 @@
     border: 1px solid var(--cc-rule);
     border-radius: 4px;
     padding: 0.3rem 0.9rem;
-    margin: 0.3rem 0;
+    // Right margin (not just the vertical margin every wrapped row of
+    // these needs) so Modify and +Add Item don't sit flush against each
+    // other when they end up side by side - Roll20 renders them as plain
+    // adjacent inline elements with no gap of its own.
+    margin: 0.3rem 0.6rem 0.3rem 0;
     font-family: var(--cc-body-font);
     font-weight: bold;
     font-size: 0.8rem;

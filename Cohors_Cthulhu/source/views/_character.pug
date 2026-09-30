@@ -592,10 +592,21 @@
         text-align: left;
       }
 
+      // Made to read as an actual button (a light chip against the header's
+      // --cc-banner background, inverting on hover) rather than plain
+      // uppercase header text with no click affordance - and the roller
+      // die icon (dicefontd20's 'T' glyph, see k-scaffold's roller mixin)
+      // enlarged well past the surrounding text, since at the old 0.8em/
+      // 0.7 opacity of an already-small 0.7rem header it rendered as
+      // little more than a faint dot.
       .cc-attribute-roll {
-        background: none;
-        border: none;
-        padding: 0;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        background: rgba(255, 255, 255, 0.15);
+        border: 1px solid var(--cc-banner-text);
+        border-radius: 4px;
+        padding: 0.15rem 0.5rem;
         color: inherit;
         font: inherit;
         text-transform: inherit;
@@ -603,12 +614,13 @@
         cursor: pointer;
 
         &:hover {
-          text-decoration: underline;
+          background: var(--cc-banner-text);
+          color: var(--cc-banner);
         }
 
         &:before {
-          font-size: 0.8em;
-          opacity: 0.7;
+          font-size: 1.5em;
+          opacity: 1;
         }
       }
 
@@ -643,10 +655,16 @@
         border-bottom: none;
       }
 
+      // Same "make it read as a button, enlarge the die icon" treatment as
+      // .cc-attribute-roll above - see its comment for why.
       .cc-skill-name-roll {
-        background: none;
-        border: none;
-        padding: 0;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        background: rgba(255, 255, 255, 0.15);
+        border: 1px solid var(--cc-banner-text);
+        border-radius: 4px;
+        padding: 0.15rem 0.5rem;
         color: inherit;
         font: inherit;
         text-transform: inherit;
@@ -654,12 +672,13 @@
         cursor: pointer;
 
         &:hover {
-          text-decoration: underline;
+          background: var(--cc-banner-text);
+          color: var(--cc-banner);
         }
 
         &:before {
-          font-size: 0.8em;
-          opacity: 0.7;
+          font-size: 1.5em;
+          opacity: 1;
         }
       }
 
@@ -703,10 +722,18 @@
         background: var(--cc-parchment) !important;
       }
 
+      // Same "make it read as a button, enlarge the die icon" treatment as
+      // .cc-attribute-roll above, adapted for parchment (not banner)
+      // background - a compact pill rather than that one's bigger chip,
+      // since many of these wrap per skill row and need to stay small.
       .cc-focus-roll {
-        background: none;
-        border: none;
-        padding: 0;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        background: var(--cc-parchment-dark);
+        border: 1px solid var(--cc-rule);
+        border-radius: 3px;
+        padding: 0.05rem 0.35rem;
         color: var(--cc-ink);
         font-style: italic;
         font-size: inherit;
@@ -714,13 +741,13 @@
         cursor: pointer;
 
         &:hover {
-          color: var(--cc-rule);
-          text-decoration: underline;
+          background: var(--cc-banner);
+          color: var(--cc-banner-text);
         }
 
         &:before {
-          font-size: 0.75em;
-          opacity: 0.6;
+          font-size: 1.4em;
+          opacity: 0.9;
         }
       }
     }
