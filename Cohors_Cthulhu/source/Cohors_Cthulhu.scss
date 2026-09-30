@@ -87,6 +87,26 @@ body {
   &.sheet-darkmode {
     @include scss.dark;
   }
+
+  // Force the light palette when printing, regardless of the Dark Mode
+  // toggle - a dark background wastes ink/toner and most printers render
+  // it poorly anyway. Values are duplicated from scss/_variables.scss's
+  // light @mixin variables (rather than @include-ing it here) since this
+  // needs !important to win over .sheet-darkmode's own (non-important)
+  // custom property values for the SAME body element - !important always
+  // beats a non-important rule for the same element/property regardless
+  // of selector specificity or source order, but a plain @include here
+  // wouldn't carry that through.
+  @media print {
+    --cc-page-bg: #f7f4ec !important;
+    --cc-parchment: #ece3cd !important;
+    --cc-parchment-dark: #ddd0ac !important;
+    --cc-ink: #2b2018 !important;
+    --cc-banner: #6b1420 !important;
+    --cc-banner-text: #f2e9d8 !important;
+    --cc-rule: #8a1c2b !important;
+    --cc-rule-soft: rgba(138, 28, 43, 0.4) !important;
+  }
 }
 
 // Roll templates render in the chat pane, outside .ui-dialog .tab-content

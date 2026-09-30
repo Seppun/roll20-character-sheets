@@ -278,4 +278,95 @@
       text-decoration: none;
     }
   }
+
+  // "Download as PDF" isn't something a Roll20 character sheet can offer
+  // as an actual button - sheet workers only get a sandboxed API
+  // (getAttrs/setAttrs/startRoll/etc.), with no access to window,
+  // document, or any file-download/print API, so there's no way to
+  // trigger window.print() or load a PDF library from sheet code. This
+  // print stylesheet is the practical alternative: it makes the browser's
+  // own Print dialog (Ctrl/Cmd+P, destination "Save as PDF") produce a
+  // clean, complete printout instead of a random snapshot of whichever
+  // tab happened to be open, styled with UI chrome that means nothing on
+  // paper.
+  @media print {
+    // Tab navigation and Roll20's native repeating-section "Modify"/"+Add
+    // Item" controls are purely interactive - neither does anything on a
+    // printed page. The build-timestamp footer is developer-only debug
+    // info, not something a player printing their sheet needs to see.
+    .tabs__header,
+    .repcontrol_add,
+    .repcontrol_edit,
+    .cc-footer {
+      display: none !important;
+    }
+
+    // k-scaffold's own tabsStyling hides every tab except the active one
+    // via .tabs__container:not(.k-active-tab) { display: none !important; }
+    // - a printed sheet should be the whole character, not a snapshot of
+    // whichever tab happened to be open, so show all three (Character,
+    // Spells, Notes) stacked one after another. Both rules are
+    // !important, so it comes down to specificity, not source order (a
+    // plain .tabs__container here loses - :not(...)'s specificity equals
+    // its argument's, so :not(.k-active-tab) counts as an extra class,
+    // making k-scaffold's selector one class heavier than this one would
+    // otherwise be - confirmed empirically, the tabs stayed hidden without
+    // this). .tabs__container.tabs__container matches the exact same
+    // specificity (repeating a class selector is valid CSS and simply
+    // counts twice), and this rule compiles later, so it wins the tie.
+    .tabs__container.tabs__container {
+      display: block !important;
+    }
+
+    // .cc-banner, .cc-table's header row, and .cc-rep-header (the column
+    // headers atop Weapons/Armor/Talents) all use light text over a dark
+    // background (an image for .cc-banner, a solid color for the other
+    // two) - if the browser/printer doesn't render backgrounds (a common
+    // default, and not something this stylesheet can force reliably),
+    // that text is invisible on white paper. Drop the background and use
+    // a bordered, dark-ink-on-white look instead, which stays legible
+    // regardless of any "print background graphics" setting. The
+    // attribute/skill roll buttons normally sit as a light chip against
+    // that dark th background (see their own comments further up), so
+    // they need the same treatment for the same reason once that backdrop
+    // is gone.
+    .cc-banner {
+      background: none !important;
+      color: var(--cc-rule) !important;
+      border: 1px solid var(--cc-rule);
+      text-shadow: none !important;
+    }
+
+    .cc-table th,
+    .cc-rep-header {
+      background: none !important;
+      color: var(--cc-rule) !important;
+      border-bottom: 2px solid var(--cc-rule);
+    }
+
+    .cc-attribute-roll,
+    .cc-skill-name-roll {
+      background: none !important;
+      border-color: var(--cc-rule) !important;
+      color: var(--cc-rule) !important;
+    }
+
+    // Best-effort request to keep the Stress/Fortune trackers' filled-box
+    // background-color (a solid color, not an image, so more browsers
+    // honor this than they do for .cc-banner's background-image above).
+    .fill-left__radio {
+      print-color-adjust: exact;
+      -webkit-print-color-adjust: exact;
+    }
+
+    // Avoid a repeating row or an entire panel getting cut in half across
+    // a page boundary where a printer can reasonably avoid it (a taller-
+    // than-one-page panel will still split - there's no way around that).
+    .cc-panel,
+    .cc-rep-table .repitem,
+    tr {
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+  }
 }

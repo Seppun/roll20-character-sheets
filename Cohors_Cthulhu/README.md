@@ -280,3 +280,39 @@ itself had a separate live playtest yet - a Roll20 API script's
 Roll20 session, which this development environment has no access to, so
 its internal logic was verified with mocked versions of those globals
 instead.
+
+## Printing / "Download as PDF"
+
+A Roll20 character sheet can't offer a real "Download as PDF" button -
+sheet workers only get a sandboxed API (`getAttrs`/`setAttrs`/`startRoll`/
+etc.), with no access to `window`, `document`, or any print/file-download
+API, so there's no way to trigger `window.print()` or load a PDF library
+from sheet code. Instead, this sheet ships a `@media print` stylesheet
+(`source/Cohors_Cthulhu.scss` and `source/scss/_index.scss`) that makes
+the *browser's own* Print dialog (Ctrl/Cmd+P, destination "Save as PDF")
+produce a clean, complete printout:
+
+- All three tabs (Character, Spells, Notes) print stacked one after
+  another, instead of just whichever one happened to be open - Roll20's
+  own tab-hiding CSS (`.tabs__container:not(.k-active-tab)`) is
+  overridden for print specifically.
+- Purely interactive chrome - the tab nav, Roll20's native "Modify"/"+Add
+  Item" repeating-section controls, and the build-timestamp footer - is
+  hidden, since none of it does anything on paper.
+- Dark Mode is forced off for print regardless of the toggle, to avoid
+  wasting ink/toner on a dark background most printers render poorly
+  anyway.
+- Banner ribbons, table header rows, and the attribute/skill roll buttons
+  normally use light text over a dark background/image. Browsers/printers
+  commonly don't print background colors or images by default (a "print
+  background graphics" setting most people leave off), which would make
+  that text invisible on white paper - print styles drop those
+  backgrounds and swap in a bordered, dark-ink-on-white look instead, so
+  it stays legible no matter how that setting is configured.
+
+Verified locally via Playwright's print-media emulation and a headless
+`page.pdf()` render (confirmed all three tabs' content appears across the
+resulting pages, and that the light-on-dark elements above render as
+dark-on-white instead) - not something a real Roll20 session was needed
+for, since this only depends on standard browser print behavior, not
+anything Roll20-specific.
