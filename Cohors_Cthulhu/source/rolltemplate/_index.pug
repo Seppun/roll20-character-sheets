@@ -93,6 +93,14 @@
     //- (see Casting a Battlefield Spell, page 66) - so it's always shown,
     //- not gated behind a pass/fail check like the spell's own Effect.
     +templateConditionalDisplay('is_spell')
+      //- Dabbling spellcasters may pay Threat, per Effect rolled on the
+      //- casting pool above, to raise their power rating from 1 to 3 for
+      //- this cast (see initiateSpellRoll in views/_spells.pug) - only
+      //- ever nonzero when that choice was actually made, same "only show
+      //- it if it triggered" treatment as Weapon Effects/Cost Effects.
+      +rollGreater({values: 'computed::dabbling_power_threat 0'})
+        .cc-roll-row.cc-roll-complication
+          span {{computed::dabbling_power_threat}} threat generated as a result of increasing your spellcasting power
       .cc-roll-header.cc-roll-damage-header
         span.cc-roll-skill Cost (paid regardless of outcome)
       .cc-roll-body

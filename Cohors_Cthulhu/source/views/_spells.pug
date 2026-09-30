@@ -461,6 +461,16 @@
     const {diceCount: costDiceCount, effects: costEffects} = ccParseSpellCost(attributes[`${prefix}cost`]);
     const costDicePerMomentum = ccSpellMomentumCostDice[spellName] || 0;
 
+    // A Dabbling spellcaster's base power rating is 1, but they may raise
+    // it to 3 for a given cast - RAW's price for that is generating 1
+    // Threat for every Effect the casting roll turns up (a natural 1 on a
+    // d20 in this system, same dice already used for the crit check
+    // below), not a flat cost - so this can't be resolved until after the
+    // dice are in. Traditional/Research casters have a fixed power rating
+    // (see calcBasePower) and never see this choice at all.
+    const isDabbling = attributes.spellcasting_type === 'dabbling';
+    const spellPowerQuery = '?{Set Spell Power|1|3}';
+
     const difficultyQuery = `?{Difficulty|${difficultyDefault}}`;
     const complicationQuery = '?{Complication range (1-5)|1}';
     const bonusDiceQuery = '?{Additional d20s bought (0-3)|0}';
@@ -480,6 +490,7 @@
       `{{complication_range=[[0+${complicationQuery}]]}} ` +
       `{{roll1=[[(2+${bonusDiceQuery})d20]]}} ` +
       `{{extra_momentum=[[0+${extraMomentumQuery}]]}} ` +
+      (isDabbling ? `{{spell_power=[[0+${spellPowerQuery}]]}} ` : '') +
       `{{target_number=[[0]]}} ` +
       `{{successes=[[0]]}} ` +
       `{{dice_text=[[0]]}} ` +
@@ -487,6 +498,7 @@
       `{{complications=[[0]]}} ` +
       `{{bonus_momentum=[[0]]}} ` +
       `{{momentum_spent=[[0]]}} ` +
+      `{{dabbling_power_threat=[[0]]}} ` +
       `{{is_spell=1}} ` +
       `{{cost_dice=[[(${Math.max(0, costDiceCount)}+(${extraMomentumQuery})*${costDicePerMomentum})d6]]}} ` +
       `{{cost_total=[[0]]}} ` +
@@ -507,13 +519,23 @@
         (roll1.rolls && roll1.rolls[0] && roll1.rolls[0].results || []).map((r) => r.v);
 
       // Crit only on a natural 1, per RAW - spellcasting has no Focus
-      // mechanic to widen that range the way a known Weapon Focus can.
+      // mechanic to widen that range the way a known Weapon Focus can. A
+      // natural 1 is also this system's "Effect" on a d20 pool (the same
+      // dice this casting roll uses) - reused below for the Dabbling
+      // power-boost cost.
       const targetNumber = attributeRating + skillRanks;
       const complicationThreshold = 21 - complicationRange;
-      const successCount = dice.filter((d) => d <= targetNumber).length +
-        dice.filter((d) => d <= 1).length;
+      const castingEffectCount = dice.filter((d) => d <= 1).length;
+      const successCount = dice.filter((d) => d <= targetNumber).length + castingEffectCount;
       const complicationCount = dice.filter((d) => d >= complicationThreshold).length;
       const passed = successCount >= difficulty;
+
+      // Dabbling spellcasters may raise their base power rating from 1 to
+      // 3 for this cast (see calcBasePower) - RAW's price is 1 Threat per
+      // Effect the casting roll generates, so it's only ever paid when
+      // that choice is actually made, not merely available.
+      const spellPower = isDabbling ? (Number(roll.results.spell_power.result) || 1) : 0;
+      const dabblingPowerThreat = spellPower === 3 ? castingEffectCount : 0;
 
       const costDiceRoll = roll.results.cost_dice;
       const rawCostDice = Array.isArray(costDiceRoll.dice) ?
@@ -536,7 +558,7 @@
       await ccSendMomentumSignal(spellBonusMomentum - spellBonusDiceBought - extraMomentum);
       // ccSendThreatSignal is defined in views/_character.pug's +module
       // block, alongside ccSendMomentumSignal - both end up in scope here.
-      await ccSendThreatSignal(complicationCount);
+      await ccSendThreatSignal(complicationCount + dabblingPowerThreat);
 
       finishRoll(roll.rollId, {
         target_number: targetNumber,
@@ -547,6 +569,7 @@
         complications: complicationCount,
         extra_momentum: extraMomentum,
         momentum_spent: spellBonusDiceBought + extraMomentum,
+        dabbling_power_threat: dabblingPowerThreat,
         cost_total: totalCost,
         cost_effect_count: effectCount,
         cost_dice_text: converted.map((c) => c.symbol).join(' '),
