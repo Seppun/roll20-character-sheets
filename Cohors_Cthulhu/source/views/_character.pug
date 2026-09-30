@@ -126,10 +126,24 @@
 
     .cc-panel.cc-truths-scars
       .cc-banner Personal Truths &amp; Scars
+      //- 3 columns (not 5) so each field is wider/easier to read from -
+      //- with 5 truths + 5 scars that's 4 rows total (3+3+3+1), which is
+      //- exactly the "4 rows" asked for once the grid is 3-wide, with no
+      //- need to add more fields. Rows 1-2 (truth 1-5 and scar 1) always
+      //- show; rows 3-4 (scar 2-5) sit behind the expand toggle below,
+      //- via the standard checkbox-hack (:checked sibling selector) -
+      //- same technique as .cc-stress-max-marker elsewhere in this file,
+      //- just with a plain visible checkbox/label instead of a hidden one.
       .cc-truths-scars-grid
         each n in [1, 2, 3, 4, 5]
           +text({name: `truth ${n}`}).cc-truth
-        each n in [1, 2, 3, 4, 5]
+        +text({name: 'scar 1'}).cc-scar
+      +checkbox({name: 'truths scars expanded', id: 'cc-truths-scars-expand'}).cc-truths-scars-checkbox
+      label.cc-truths-scars-toggle(for='cc-truths-scars-expand')
+        span.cc-truths-scars-arrow
+        span Scars 2-5
+      .cc-truths-scars-grid.cc-truths-scars-extra
+        each n in [2, 3, 4, 5]
           +text({name: `scar ${n}`}).cc-scar
 
     .cc-panel.cc-vitals
@@ -496,7 +510,7 @@
     }
     .cc-truths-scars-grid {
       display: grid;
-      grid-template-columns: repeat(5, 1fr);
+      grid-template-columns: repeat(3, 1fr);
       gap: 0.3rem;
 
       .cc-truth,
@@ -508,6 +522,52 @@
         color: var(--cc-ink);
         padding: 0.15rem 0.1rem;
       }
+    }
+
+    // Hidden not via display:none directly on the input (Roll20/browsers
+    // sometimes fight custom checkbox styling worse that way) but via
+    // the same visually-hidden-but-still-:checked-able pattern already
+    // used for .cc-stress-max-marker above - it just needs to exist and
+    // be toggleable, never to be seen itself.
+    .cc-truths-scars-checkbox {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .cc-truths-scars-extra {
+      display: none;
+    }
+
+    .cc-truths-scars-checkbox:checked ~ .cc-truths-scars-extra {
+      display: grid;
+    }
+
+    .cc-truths-scars-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.3rem;
+      margin-top: 0.3rem;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      color: var(--cc-rule);
+      cursor: pointer;
+
+      .cc-truths-scars-arrow {
+        display: inline-block;
+        transition: transform 150ms ease-out;
+
+        &:before {
+          content: '\25BE'; // ▾ - a plain BMP character, not an emoji/astral one (see README's "hard-won lessons" for why that distinction matters here)
+        }
+      }
+    }
+
+    .cc-truths-scars-checkbox:checked ~ .cc-truths-scars-toggle .cc-truths-scars-arrow {
+      transform: rotate(180deg);
     }
 
     .cc-vitals {
@@ -692,11 +752,17 @@
       }
 
       // Same "make it read as a button, enlarge the die icon" treatment as
-      // .cc-attribute-roll above - see its comment for why.
+      // .cc-attribute-roll above - see its comment for why. A fixed width
+      // (rather than sizing to each skill name's own text, which made
+      // every button a different width - "Stealth" vs "Engineering")
+      // keeps the whole column uniform; sized to fit the longest name
+      // (Engineering/Observation, 11 characters) with room to spare.
       .cc-skill-name-roll {
         display: inline-flex;
         align-items: center;
+        justify-content: flex-start;
         gap: 0.3rem;
+        width: 8.5rem;
         background: rgba(255, 255, 255, 0.15);
         border: 1px solid var(--cc-banner-text);
         border-radius: 4px;
@@ -705,6 +771,7 @@
         font: inherit;
         text-transform: inherit;
         letter-spacing: inherit;
+        white-space: nowrap;
         cursor: pointer;
 
         &:hover {
@@ -800,21 +867,31 @@
         align-items: center;
       }
 
+      // Same "make it read as a button" treatment as .cc-attribute-roll/
+      // .cc-skill-name-roll/.cc-focus-roll (see their comments) - a small
+      // square chip rather than a wider pill, since this column is only
+      // 1.6rem wide and carries no text, just the die icon itself.
       .cc-weapon-roll {
-        background: none;
-        border: none;
-        padding: 0;
-        color: inherit;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 1.4rem;
+        height: 1.4rem;
+        background: var(--cc-parchment-dark);
+        border: 1px solid var(--cc-rule);
+        border-radius: 4px;
+        color: var(--cc-ink);
         font-size: 1.1rem;
         cursor: pointer;
         justify-self: center;
 
         &:before {
-          opacity: 0.8;
+          opacity: 1;
         }
 
-        &:hover:before {
-          opacity: 1;
+        &:hover {
+          background: var(--cc-banner);
+          color: var(--cc-banner-text);
         }
       }
     }

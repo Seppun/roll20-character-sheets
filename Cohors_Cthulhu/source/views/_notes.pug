@@ -39,6 +39,15 @@
     textarea {
       width: 100%;
       min-height: 6rem;
+      // Belongings originally had the only bordered textarea on this
+      // page (an actual box, rather than k-scaffold's plain default
+      // underline) - applied to every field here now for a consistent
+      // look, but fainter (--cc-rule-soft, the same softened tone used
+      // for repeating-row dividers) everywhere except Belongings itself,
+      // which keeps its original full-strength border.
+      background: transparent;
+      border: 1px solid var(--cc-rule-soft);
+      color: var(--cc-ink);
     }
 
     .cc-journal textarea {
@@ -46,10 +55,6 @@
     }
 
     .cc-belongings textarea {
-      min-height: 6rem;
-      width: 100%;
-      background: transparent;
-      border: 1px solid var(--cc-rule);
-      color: var(--cc-ink);
+      border-color: var(--cc-rule);
     }
   }
