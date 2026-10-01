@@ -124,15 +124,25 @@
   .cc-panel {
     border: 1px solid var(--cc-rule);
     /* --cc-parchment-dark as a solid fallback color, with a subtle,
-       seamlessly-tileable marble texture layered on top (a user-supplied
-       photo, cropped and blended at the edges to tile without a visible
-       seam - see images/stone-texture.png) for a worn-stone feel matching
-       the Roman theme (Cinzel banners, the SPQR eagle watermark) - kept
-       low-contrast on purpose so it doesn't fight with text legibility,
-       same reasoning as this sheet's other background images (hosted
-       externally, never inlined as a data: URI - see the .cc-banner
-       comment above for why that specifically breaks roll-template
-       styling). */
+       seamlessly-tileable travertine texture layered on top (see images/
+       stone-texture.png) for a worn-stone feel matching the Roman theme
+       (Cinzel banners, the SPQR eagle watermark) - kept low-contrast on
+       purpose so it doesn't fight with text legibility, same reasoning as
+       this sheet's other background images (hosted externally, never
+       inlined as a data: URI - see the .cc-banner comment above for why
+       that specifically breaks roll-template styling).
+
+       KNOWN TEMPORARY PLACEHOLDER: this texture is AI-generated, used
+       here explicitly at the repo owner's direction ("we will use it for
+       now") while they source a properly-licensed or human-made
+       replacement before any real submission - see this repo's own
+       README ("AI Policy"), which the current file does not comply with.
+       De-trended a genuine top-to-bottom brightness gradient baked into
+       the source image before the usual offset+blend seamless-tiling
+       technique (see the marble-photo commit this replaced for that
+       technique's own explanation) - without that step, the gradient
+       itself (not just high-frequency content) produced a visible seam
+       band no amount of blend-radius tuning could hide. */
     background: var(--cc-parchment-dark) url('https://raw.githubusercontent.com/Seppun/roll20-character-sheets/Cohorscc/Cohors_Cthulhu/images/stone-texture.png') repeat;
     padding: 0.4rem;
     margin-bottom: 0.4rem;
