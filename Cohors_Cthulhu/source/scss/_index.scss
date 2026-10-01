@@ -330,8 +330,21 @@
      zero size and supplying replacement text via a pseudo-element
      instead. font-size:0 (not display:none/visibility:hidden) is what
      makes this work - those would remove the link's own clickable text
-     node from the layout instead of just shrinking it to nothing. */
+     node from the layout instead of just shrinking it to nothing.
+
+     font-size:0 on the container itself, not just on a/span, because
+     Roll20 doesn't always wrap this text the same way: confirmed live
+     that once a repeating section already has one or more rows, the
+     "+Add Item" text renders as "+Add" directly inside .repcontrol_add
+     with no a/span wrapper at all, which the a/span-only rule never
+     zeroed - showing our own "Add" pseudo-element text right next to
+     Roll20's own real "+Add" text ("Add +Add"). Zeroing the container
+     itself covers both DOM shapes regardless of which one Roll20 picks;
+     :after's own explicit font-size still overrides back up from the
+     inherited 0, same as before. */
   .repcontrol_add {
+    font-size: 0;
+
     a,
     span {
       font-size: 0;
