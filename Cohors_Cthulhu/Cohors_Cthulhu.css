@@ -1683,7 +1683,7 @@ body .ui-dialog .tab-content .charsheet .cc-character .cc-footer {
   opacity: 0.6;
 }
 body .ui-dialog .tab-content .charsheet .cc-character .cc-build-css::after {
-  content: "CSS build: 2026-10-01 20:05:18 UTC";
+  content: "CSS build: 2026-10-01 20:31:36 UTC";
 }
 body .ui-dialog .tab-content .charsheet .cc-character .cc-truths-scars-grid {
   display: grid;
@@ -1750,6 +1750,9 @@ body .ui-dialog .tab-content .charsheet .cc-character .cc-stress-max {
   align-items: baseline;
   gap: 0.4rem;
 }
+body .ui-dialog .tab-content .charsheet .cc-character .cc-stress-max + .cc-stress-max {
+  margin-top: 0.15rem;
+}
 body .ui-dialog .tab-content .charsheet .cc-character .cc-fill-left-zero {
   display: none;
 }
@@ -1813,6 +1816,13 @@ body .ui-dialog .tab-content .charsheet .cc-character .cc-fatigue-track .fill-le
   border: 1px solid var(--cc-rule);
   padding: 0;
   margin: 0;
+}
+body .ui-dialog .tab-content .charsheet .cc-character .cc-fatigue-track .cc-fatigue-max-marker {
+  display: none;
+}
+body .ui-dialog .tab-content .charsheet .cc-character .cc-fatigue-track .cc-fatigue-max-marker:checked ~ .fill-left__radio {
+  opacity: 0.35;
+  pointer-events: none;
 }
 body .ui-dialog .tab-content .charsheet .cc-character .cc-fatigue-ignore {
   flex-direction: row;
@@ -2253,7 +2263,7 @@ body {
   opacity: 0.6;
 }
 .cc-character .cc-build-css::after {
-  content: "CSS build: 2026-10-01 20:05:18 UTC";
+  content: "CSS build: 2026-10-01 20:31:36 UTC";
 }
 .cc-character .cc-truths-scars-grid {
   display: grid;
@@ -2320,6 +2330,9 @@ body {
   align-items: baseline;
   gap: 0.4rem;
 }
+.cc-character .cc-stress-max + .cc-stress-max {
+  margin-top: 0.15rem;
+}
 .cc-character .cc-fill-left-zero {
   display: none;
 }
@@ -2383,6 +2396,13 @@ body {
   border: 1px solid var(--cc-rule);
   padding: 0;
   margin: 0;
+}
+.cc-character .cc-fatigue-track .cc-fatigue-max-marker {
+  display: none;
+}
+.cc-character .cc-fatigue-track .cc-fatigue-max-marker:checked ~ .fill-left__radio {
+  opacity: 0.35;
+  pointer-events: none;
 }
 .cc-character .cc-fatigue-ignore {
   flex-direction: row;

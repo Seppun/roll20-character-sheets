@@ -213,6 +213,13 @@
         //- out anything, live or locally).
         .cc-stress-track
           +radio({name: 'stress', value: 0, checked: ''}).fill-left__radio.cc-fill-left-zero
+          //- A value=0 member of its own, same reason .cc-fill-left-zero
+          //- exists above - without one, a brand-new character (every
+          //- rating still 0, so calcStressMax returns 0) would have NO
+          //- radio in this group matching the calculated value, so NOTHING
+          //- would ever be :checked and every stress box would stay
+          //- enabled despite a Max Stress of 0.
+          +radio({name: 'stress max marker', value: 0, trigger: {calculation: 'calcStressMax'}}).cc-stress-max-marker
           each value in Array.from({length: 20}, (_, i) => i + 1)
             +action({
               name: `stress box ${value}`,
@@ -224,8 +231,19 @@
               value,
               trigger: {calculation: 'calcStressMax'}
             }).cc-stress-max-marker
+        //- "Max" is the character's raw stress capacity (brawn/will +
+        //- resilience + Unyielding, see calcStressMaxBase) - unaffected by
+        //- Fatigue. "Current Max" is that same value less current Fatigue
+        //- (calcStressMax, floored at 0) - the actual ceiling the Stress
+        //- track itself is limited to right now (see .cc-stress-max-marker
+        //- below). Two separate attributes/fields rather than one
+        //- relabeled field so a player can always see both the character's
+        //- innate maximum and how much Fatigue is currently eating into it.
         .cc-field.cc-stress-max
           span Max
+          +number({name: 'stress max base', readonly: true, trigger: {calculation: 'calcStressMaxBase'}})
+        .cc-field.cc-stress-max
+          span Current Max
           +number({name: 'stress max', readonly: true, trigger: {calculation: 'calcStressMax'}})
         //- Fatigue (page 41): each point temporarily reduces Max Stress by
         //- 1 (floored at 0 by calcStressMax - reaching 0 there means
@@ -236,17 +254,34 @@
         //- value-mirroring radio group, see that block's comment for the
         //- full explanation) - the 'affects' on each box's trigger is the
         //- only difference, re-running calcStressMax since Fatigue
-        //- changes it.
+        //- changes it. Fatigue also can't exceed the character's raw Max
+        //- Stress (calcStressMaxBase, NOT the Fatigue-reduced Current Max -
+        //- that would be self-referential, Fatigue capping its own cap) -
+        //- .cc-fatigue-max-marker below greys out/disables every box past
+        //- that boundary, the same way .cc-stress-max-marker already does
+        //- for the Stress track above.
         .cc-vitals-fatigue
           .cc-banner Fatigue
           .cc-fatigue-track
             +radio({name: 'fatigue', value: 0, checked: ''}).fill-left__radio.cc-fill-left-zero
+            //- A value=0 member of its own, same reason the value=0
+            //- .cc-stress-max-marker above exists - without one, a
+            //- character with no raw Max Stress at all (calcStressMaxBase
+            //- returns 0) would have NO radio in this group matching the
+            //- calculated value, so every Fatigue box would stay enabled
+            //- despite there being no Stress capacity to cap it against.
+            +radio({name: 'fatigue max marker', value: 0, trigger: {calculation: 'calcStressMaxBase'}}).cc-fatigue-max-marker
             each value in Array.from({length: 20}, (_, i) => i + 1)
               +action({
                 name: `fatigue box ${value}`,
                 trigger: {triggeredFuncs: ['ccTrackBoxClick'], affects: ['stress_max', 'stress_max_marker']}
               }).fill-left__radio
               +radio({name: 'fatigue', value}).cc-track-value-marker
+              +radio({
+                name: 'fatigue max marker',
+                value,
+                trigger: {calculation: 'calcStressMaxBase'}
+              }).cc-fatigue-max-marker
           .cc-field.cc-fatigue-ignore
             //- "Fatigue can also be temporarily ignored" - checking this
             //- stops it from reducing Max Stress (see calcStressMax)
@@ -299,8 +334,8 @@
     - const ccBonusDamageAttributes = ['brawn', 'insight', 'will']
     -
       const ccRatingAffects = {
-        brawn: ['brawn_bonus_damage', 'base_armour', 'total_armor', 'stress_max', 'stress_max_marker'],
-        will: ['will_bonus_damage', 'courage', 'stress_max', 'stress_max_marker', 'power_rating'],
+        brawn: ['brawn_bonus_damage', 'base_armour', 'total_armor', 'stress_max_base', 'stress_max', 'stress_max_marker', 'fatigue_max_marker'],
+        will: ['will_bonus_damage', 'courage', 'stress_max_base', 'stress_max', 'stress_max_marker', 'fatigue_max_marker', 'power_rating'],
         insight: ['insight_bonus_damage', 'power_rating'],
         reason: ['power_rating'],
       }
@@ -357,7 +392,7 @@
           +skill('medicine', ['Contagion', 'Faith Healing', 'Field Treatment', 'Pharmacia', 'Surgery'])
           +skill('observation', ['Hearing', 'Instincts', 'Sight', 'Smell and Taste'])
           +skill('persuasion', ['Charm', 'Deception', 'Innuendo', 'Intimidation', 'Invocation', 'Negotiation', 'Rhetoric'])
-          +skill('resilience', ['Discipline', 'Fortitude', 'Immunity'], ['stress_max', 'stress_max_marker'])
+          +skill('resilience', ['Discipline', 'Fortitude', 'Immunity'], ['stress_max_base', 'stress_max', 'stress_max_marker', 'fatigue_max_marker'])
           +skill('stealth', ['Concealment', 'Disguise', 'Escape Artistry', 'Lock Picking', 'Sleight of Hand', 'Sneak'])
           +skill('survival', ['Animal Handling', 'Boating', 'Foraging', 'Hunting', 'Mysticism', 'Navigation', 'Tracking', 'Woodcraft'])
           +skill('tactics', ['Cavalry', 'Infantry', 'Leadership', 'Navy', 'Omen Reading', 'Scouting'])
@@ -499,7 +534,7 @@
         //- for the full explanation of why this is needed at the fieldset
         //- level, not just on the Name field's own trigger below (which
         //- only fires on EDITING a row, never on removing one).
-        +fieldset({name: 'talent', trigger: {affects: ['stress_max', 'stress_max_marker']}})
+        +fieldset({name: 'talent', trigger: {affects: ['stress_max_base', 'stress_max', 'stress_max_marker', 'fatigue_max_marker']}})
           //- The talent list (159 entries) is far too long for a plain
           //- dropdown, so this uses a text input paired with a <datalist>
           //- instead of k-scaffold's +select/+option - a native HTML
@@ -523,13 +558,13 @@
             trigger: {triggeredFuncs: ['ccApplyTalentPreset']}
           })
           //- affects recalculates Max Stress whenever a talent name
-          //- changes, in case it's Unyielding (see calcStressMax) - same
-          //- affects-on-repeating-row-field pattern as Armor's resistance
-          //- field above triggering total_armor.
+          //- changes, in case it's Unyielding (see calcStressMaxBase) -
+          //- same affects-on-repeating-row-field pattern as Armor's
+          //- resistance field above triggering total_armor.
           +text({
             name: 'name',
             list: 'cc-talent-options',
-            trigger: {triggeredFuncs: ['ccApplyTalentPreset'], affects: ['stress_max', 'stress_max_marker']}
+            trigger: {triggeredFuncs: ['ccApplyTalentPreset'], affects: ['stress_max_base', 'stress_max', 'stress_max_marker', 'fatigue_max_marker']}
           })
           +text({name: 'keywords'}).cc-talent-keywords
           +text({name: 'requirements'}).cc-talent-requirements
@@ -657,14 +692,21 @@
     }
 
     // Overrides the generic .cc-field column layout (label above value) to
-    // put Max's value on the same line as its label instead, since a
+    // put each value on the same line as its label instead, since a
     // standalone "MAX" heading with a boxed number underneath wastes
     // vertical space this field doesn't need - it sits below the already
-    // full-width stress track, not beside other stacked fields.
+    // full-width stress track, not beside other stacked fields. Two of
+    // these stack now (Max, Current Max) - .cc-field has no margin-bottom
+    // of its own for the second one to collapse against, so give it a
+    // small top margin directly instead.
     .cc-stress-max {
       flex-direction: row;
       align-items: baseline;
       gap: 0.4rem;
+
+      + .cc-stress-max {
+        margin-top: 0.15rem;
+      }
     }
 
     // The value=0 anchor radio in .cc-stress-track/.cc-fortune-track/
@@ -775,8 +817,11 @@
     // Same construction as .cc-stress-track above (20 action-button boxes,
     // hidden value=0 anchor, hidden value-mirroring radios driving
     // fill-left coloring) - see that block's comment for the full
-    // explanation. Fatigue has no stress_max-style ceiling of its own to
-    // grey out past, so there's no max-marker pairing here.
+    // explanation. .cc-fatigue-max-marker is the same max-marker pairing
+    // .cc-stress-max-marker uses on the Stress track, just keyed to
+    // calcStressMaxBase (the character's raw Max Stress) instead of
+    // calcStressMax, so Fatigue is capped at that raw max rather than at
+    // its own already-Fatigue-reduced Current Max.
     .cc-fatigue-track {
       display: grid;
       grid-template-columns: repeat(10, 1fr);
@@ -790,6 +835,15 @@
         border: 1px solid var(--cc-rule);
         padding: 0;
         margin: 0;
+      }
+
+      .cc-fatigue-max-marker {
+        display: none;
+      }
+
+      .cc-fatigue-max-marker:checked ~ .fill-left__radio {
+        opacity: 0.35;
+        pointer-events: none;
       }
     }
 
@@ -1325,23 +1379,34 @@
   // are free text (a datalist, not a fixed dropdown - see the pug comment
   // above the Name field), so this matches case/whitespace-insensitively
   // the same way ccApplyTalentPreset's own lookup effectively does via the
-  // datalist's exact suggested spelling. Fatigue (page 41) then
-  // temporarily reduces this by 1 per point suffered, floored at 0 - RAW
-  // says reaching 0 this way means Defeated, which this sheet has no
-  // separate tracked state to flag, so it's left as a Max Stress of 0 for
-  // the player/GM to notice and resolve narratively. "Ignore Fatigue"
-  // suppresses this reduction without discarding the tracked fatigue
-  // value, since the fatigue itself hasn't been removed, just pushed
-  // through for now (see the pug comment above the Fatigue tracker).
-  const calcStressMax = ({attributes}) => {
+  // datalist's exact suggested spelling. This is the character's raw/
+  // un-reduced Max Stress - shared by calcStressMax below (which further
+  // reduces it for Fatigue) and calcStressMaxBase's own "Max" field/
+  // .cc-fatigue-max-marker, which both need the UN-reduced number (Fatigue
+  // capping its own, already-Fatigue-reduced cap would be self-referential).
+  const ccStressMaxBase = (attributes) => {
     const resilience = Number(attributes.resilience_ranks) || 0;
     const brawn = Number(attributes.brawn_rating) || 0;
     const will = Number(attributes.will_rating) || 0;
     const talents = attributes.repeating_talent || [];
     const hasUnyielding = talents.some((row) => String(row.name || '').trim().toLowerCase() === 'unyielding');
-    const base = Math.max(brawn, will) + resilience + (hasUnyielding ? 3 : 0);
+    return Math.max(brawn, will) + resilience + (hasUnyielding ? 3 : 0);
+  };
+
+  const calcStressMaxBase = ({attributes}) => ccStressMaxBase(attributes);
+  k.registerFuncs({calcStressMaxBase});
+
+  // Fatigue (page 41): each point temporarily reduces Max Stress by 1,
+  // floored at 0 - RAW says reaching 0 this way means Defeated, which this
+  // sheet has no separate tracked state to flag, so it's left as a
+  // Current Max of 0 for the player/GM to notice and resolve narratively.
+  // "Ignore Fatigue" suppresses this reduction without discarding the
+  // tracked fatigue value, since the fatigue itself hasn't been removed,
+  // just pushed through for now (see the pug comment above the Fatigue
+  // tracker).
+  const calcStressMax = ({attributes}) => {
     const fatigue = attributes.fatigue_ignored ? 0 : (Number(attributes.fatigue) || 0);
-    return Math.max(0, base - fatigue);
+    return Math.max(0, ccStressMaxBase(attributes) - fatigue);
   };
   k.registerFuncs({calcStressMax});
 
