@@ -266,8 +266,8 @@
 
     // Same carved-stone-block look as the Focus/Weapon roll buttons (see
     // --cc-stone-* in scss/_variables.scss and .cc-weapon-roll in
-    // views/_character.pug, including the same square hairline-crack SVG
-    // and weathering spots) instead of the old bare, backgroundless icon.
+    // views/_character.pug, including the same square pitted-pore fleck
+    // pattern) instead of the old bare, backgroundless icon.
     .cc-spell-cast {
       display: inline-flex;
       align-items: center;
@@ -275,9 +275,14 @@
       width: 1.4rem;
       height: 1.4rem;
       background-image:
-        url('https://raw.githubusercontent.com/Seppun/roll20-character-sheets/Cohorscc/Cohors_Cthulhu/images/stone-crack-square.svg'),
-        radial-gradient(circle at 22% 75%, rgba(255, 255, 255, 0.3) 0%, transparent 18%),
-        radial-gradient(circle at 78% 25%, rgba(0, 0, 0, 0.1) 0%, transparent 16%),
+        radial-gradient(circle at 61% 17%, rgba(74, 53, 30, 0.6) 0%, transparent 6%),
+        radial-gradient(circle at 27% 68%, rgba(92, 74, 48, 0.5) 0%, transparent 4%),
+        radial-gradient(circle at 83% 19%, rgba(92, 74, 48, 0.5) 0%, transparent 3%),
+        radial-gradient(circle at 11% 29%, rgba(92, 74, 48, 0.5) 0%, transparent 3%),
+        radial-gradient(circle at 7% 25%, rgba(109, 80, 52, 0.55) 0%, transparent 2%),
+        radial-gradient(circle at 54% 27%, rgba(109, 80, 52, 0.55) 0%, transparent 2%),
+        radial-gradient(circle at 78% 9%, rgba(109, 80, 52, 0.55) 0%, transparent 2%),
+        radial-gradient(circle at 68% 37%, rgba(109, 80, 52, 0.55) 0%, transparent 1%),
         linear-gradient(145deg, var(--cc-stone-light) 0%, var(--cc-stone-dark) 100%);
       background-repeat: no-repeat;
       background-size: 100% 100%;

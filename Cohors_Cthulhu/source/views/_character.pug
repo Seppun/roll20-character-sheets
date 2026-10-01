@@ -1051,21 +1051,33 @@
       // instead of the old flat --cc-parchment ("limestone") chip - a
       // compact pill rather than .cc-skill-name-roll's bigger one, since
       // many of these wrap per skill row and need to stay small. The
-      // hairline crack (inline SVG, traced in the same meandering style
-      // as the real cracks in images/stone-texture.png rather than a
-      // repeating geometric stripe) plus the two soft radial-gradient
-      // "weathering" spots sit on top of the stone-light/dark gradient;
-      // the border/box-shadow pair is deliberately thin and single-layer
-      // (vs. an earlier, heavier 2px/triple-shadow version) so the bevel
-      // reads as worn stone rather than a thick picture frame.
+      // small dark flecks are plain radial-gradient dots (no image file,
+      // no data: URI - both of those are confirmed to silently break
+      // Roll20 roll-template styling sheet-wide, see README.md) standing
+      // in for travertine's actual pitted pores, replacing an earlier
+      // meandering "crack line" SVG that didn't read as real stone. The
+      // border/box-shadow pair is deliberately thin and single-layer (vs.
+      // an earlier, heavier 2px/triple-shadow version) so the bevel reads
+      // as worn stone rather than a thick picture frame.
       .cc-focus-roll {
         display: inline-flex;
         align-items: center;
         gap: 0.25rem;
         background-image:
-          url('https://raw.githubusercontent.com/Seppun/roll20-character-sheets/Cohorscc/Cohors_Cthulhu/images/stone-crack-wide.svg'),
-          radial-gradient(circle at 22% 75%, rgba(255, 255, 255, 0.3) 0%, transparent 10%),
-          radial-gradient(circle at 78% 25%, rgba(0, 0, 0, 0.1) 0%, transparent 9%),
+          radial-gradient(circle at 41% 31%, rgba(74, 53, 30, 0.6) 0%, transparent 5%),
+          radial-gradient(circle at 85% 56%, rgba(92, 74, 48, 0.5) 0%, transparent 4%),
+          radial-gradient(circle at 54% 41%, rgba(92, 74, 48, 0.5) 0%, transparent 4%),
+          radial-gradient(circle at 56% 71%, rgba(92, 74, 48, 0.5) 0%, transparent 3%),
+          radial-gradient(circle at 79% 45%, rgba(92, 74, 48, 0.5) 0%, transparent 3%),
+          radial-gradient(circle at 21% 67%, rgba(92, 74, 48, 0.5) 0%, transparent 3%),
+          radial-gradient(circle at 63% 59%, rgba(92, 74, 48, 0.5) 0%, transparent 3%),
+          radial-gradient(circle at 76% 11%, rgba(109, 80, 52, 0.55) 0%, transparent 2%),
+          radial-gradient(circle at 81% 26%, rgba(109, 80, 52, 0.55) 0%, transparent 2%),
+          radial-gradient(circle at 71% 19%, rgba(109, 80, 52, 0.55) 0%, transparent 2%),
+          radial-gradient(circle at 16% 85%, rgba(109, 80, 52, 0.55) 0%, transparent 2%),
+          radial-gradient(circle at 93% 12%, rgba(109, 80, 52, 0.55) 0%, transparent 1%),
+          radial-gradient(circle at 61% 59%, rgba(109, 80, 52, 0.55) 0%, transparent 1%),
+          radial-gradient(circle at 85% 79%, rgba(109, 80, 52, 0.55) 0%, transparent 1%),
           linear-gradient(145deg, var(--cc-stone-light) 0%, var(--cc-stone-dark) 100%);
         background-repeat: no-repeat;
         background-size: 100% 100%;
@@ -1115,9 +1127,9 @@
       // in scss/_variables.scss and the comment there) - a small square
       // chip rather than a wider pill, since this column is only 1.6rem
       // wide and carries no text, just the die icon itself. Uses the
-      // square variant of the hairline crack SVG and wider-spread
-      // weathering spots (since the chip itself is much smaller than
-      // .cc-focus-roll's pill).
+      // square variant of the pitted-pore fleck pattern (fewer, slightly
+      // bigger dots than .cc-focus-roll's pill, since the chip itself is
+      // much smaller).
       .cc-weapon-roll {
         display: inline-flex;
         align-items: center;
@@ -1125,9 +1137,14 @@
         width: 1.4rem;
         height: 1.4rem;
         background-image:
-          url('https://raw.githubusercontent.com/Seppun/roll20-character-sheets/Cohorscc/Cohors_Cthulhu/images/stone-crack-square.svg'),
-          radial-gradient(circle at 22% 75%, rgba(255, 255, 255, 0.3) 0%, transparent 18%),
-          radial-gradient(circle at 78% 25%, rgba(0, 0, 0, 0.1) 0%, transparent 16%),
+          radial-gradient(circle at 61% 17%, rgba(74, 53, 30, 0.6) 0%, transparent 6%),
+          radial-gradient(circle at 27% 68%, rgba(92, 74, 48, 0.5) 0%, transparent 4%),
+          radial-gradient(circle at 83% 19%, rgba(92, 74, 48, 0.5) 0%, transparent 3%),
+          radial-gradient(circle at 11% 29%, rgba(92, 74, 48, 0.5) 0%, transparent 3%),
+          radial-gradient(circle at 7% 25%, rgba(109, 80, 52, 0.55) 0%, transparent 2%),
+          radial-gradient(circle at 54% 27%, rgba(109, 80, 52, 0.55) 0%, transparent 2%),
+          radial-gradient(circle at 78% 9%, rgba(109, 80, 52, 0.55) 0%, transparent 2%),
+          radial-gradient(circle at 68% 37%, rgba(109, 80, 52, 0.55) 0%, transparent 1%),
           linear-gradient(145deg, var(--cc-stone-light) 0%, var(--cc-stone-dark) 100%);
         background-repeat: no-repeat;
         background-size: 100% 100%;
