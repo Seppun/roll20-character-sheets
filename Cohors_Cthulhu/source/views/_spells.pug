@@ -405,11 +405,12 @@
   // ccParseDamageEffects above for Weapons, but the count and its effect
   // share one comma segment here instead of being their own segments.
   //
-  // "Drain" is filtered out of the returned effects: every spell's Cost is
-  // Drain (that's just naming the damage as mental/Drain-type, per the
-  // rulebook's Spell Format section), so it always applies and isn't a
-  // bonus effect that should only show up when an Effect face is rolled -
-  // unlike a genuine extra like Piercing or Stun.
+  // Drain is a genuine cost effect like Piercing or Stun, not an always-on
+  // label - it only applies when an Effect face is actually rolled on the
+  // Cost dice, same as any other named effect, so it's kept in the
+  // returned list (previously filtered out here on the mistaken
+  // assumption that every spell's Cost is inherently Drain-type damage
+  // regardless of the dice).
   const ccParseSpellCost = (text) => {
     const segments = String(text || '').split(',').map((s) => s.trim()).filter(Boolean);
     const [first, ...rest] = segments;
@@ -418,7 +419,7 @@
     const firstEffect = match && match[2] ? match[2].trim() : '';
     return {
       diceCount,
-      effects: [firstEffect, ...rest].filter((e) => e && !/^drain\b/i.test(e)),
+      effects: [firstEffect, ...rest].filter(Boolean),
     };
   };
 
