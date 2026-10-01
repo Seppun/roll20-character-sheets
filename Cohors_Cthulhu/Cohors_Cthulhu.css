@@ -230,6 +230,15 @@ body {
      fails to). */
   --cc-header-font: 'Cinzel', Georgia, 'Times New Roman', serif;
   --cc-body-font: 'Inter', sans-serif;
+  /* Background fill that distinguishes a player-editable field (Name,
+     Culture, attribute Ratings, Weapons/Armor/Talents rows, etc.) from a
+     calculated/readonly one (Stress Max, Courage, attribute Bonus Damage,
+     etc.), which keeps the plain transparent look - see .cc-field's
+     ":read-write" rule in scss/_index.scss and its siblings in the
+     Attributes/Skills/rep-table CSS. A single variable here, rather than
+     a literal rgba() repeated at every one of those call sites, so the
+     opacity (currently 50%, per request) can be tuned in one place. */
+  --cc-editable-fill: rgba(255, 255, 255, 0.5);
   /* Regular/base text size for the sheet. rem-based sizes elsewhere (tab
      buttons, table headers, small labels, etc.) are set relative to
      html's own 16px root above and are unaffected by this - only text
@@ -1334,6 +1343,11 @@ body .ui-dialog .tab-content .charsheet .cc-field > select {
   color: var(--cc-ink);
   padding: 0.1rem 0.1rem;
 }
+body .ui-dialog .tab-content .charsheet .cc-field > input:read-write,
+body .ui-dialog .tab-content .charsheet .cc-field > textarea:read-write,
+body .ui-dialog .tab-content .charsheet .cc-field > select {
+  background: var(--cc-editable-fill);
+}
 body .ui-dialog .tab-content .charsheet .cc-panel {
   border: 1px solid var(--cc-rule);
   /* --cc-parchment-dark as a solid fallback color, with a subtle,
@@ -1404,6 +1418,11 @@ body .ui-dialog .tab-content .charsheet .cc-rep-table select {
   border: 1px solid var(--cc-rule);
   color: var(--cc-ink);
   border-radius: 2px;
+}
+body .ui-dialog .tab-content .charsheet .cc-rep-table input:read-write,
+body .ui-dialog .tab-content .charsheet .cc-rep-table textarea:read-write,
+body .ui-dialog .tab-content .charsheet .cc-rep-table select {
+  background: var(--cc-editable-fill);
 }
 body .ui-dialog .tab-content .charsheet .cc-table {
   width: 100%;
@@ -1633,7 +1652,7 @@ body .ui-dialog .tab-content .charsheet .cc-character .cc-footer {
   opacity: 0.6;
 }
 body .ui-dialog .tab-content .charsheet .cc-character .cc-build-css::after {
-  content: "CSS build: 2026-10-01 15:33:15 UTC";
+  content: "CSS build: 2026-10-01 16:00:58 UTC";
 }
 body .ui-dialog .tab-content .charsheet .cc-character .cc-truths-scars-grid {
   display: grid;
@@ -1867,6 +1886,9 @@ body .ui-dialog .tab-content .charsheet .cc-character .cc-attributes-table .cc-a
   color: var(--cc-ink);
   border-radius: 2px;
 }
+body .ui-dialog .tab-content .charsheet .cc-character .cc-attributes-table .cc-attribute-rating {
+  background: var(--cc-editable-fill);
+}
 body .ui-dialog .tab-content .charsheet .cc-character .cc-attributes-table .cc-attribute-bonus-damage.cc-disabled {
   display: inline-block;
   width: 3rem;
@@ -1910,7 +1932,7 @@ body .ui-dialog .tab-content .charsheet .cc-character .cc-skills-table .cc-skill
 body .ui-dialog .tab-content .charsheet .cc-character .cc-skills-table .cc-skill-ranks {
   width: 3rem;
   text-align: center;
-  background: transparent;
+  background: var(--cc-editable-fill);
   border: 1px solid var(--cc-rule);
   color: var(--cc-ink);
 }
@@ -2183,7 +2205,7 @@ body {
   opacity: 0.6;
 }
 .cc-character .cc-build-css::after {
-  content: "CSS build: 2026-10-01 15:33:15 UTC";
+  content: "CSS build: 2026-10-01 16:00:58 UTC";
 }
 .cc-character .cc-truths-scars-grid {
   display: grid;
@@ -2417,6 +2439,9 @@ body {
   color: var(--cc-ink);
   border-radius: 2px;
 }
+.cc-character .cc-attributes-table .cc-attribute-rating {
+  background: var(--cc-editable-fill);
+}
 .cc-character .cc-attributes-table .cc-attribute-bonus-damage.cc-disabled {
   display: inline-block;
   width: 3rem;
@@ -2460,7 +2485,7 @@ body {
 .cc-character .cc-skills-table .cc-skill-ranks {
   width: 3rem;
   text-align: center;
-  background: transparent;
+  background: var(--cc-editable-fill);
   border: 1px solid var(--cc-rule);
   color: var(--cc-ink);
 }

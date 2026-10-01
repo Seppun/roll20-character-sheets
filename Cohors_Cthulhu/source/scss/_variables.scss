@@ -23,6 +23,15 @@
      fails to). */
   --cc-header-font: 'Cinzel', Georgia, 'Times New Roman', serif;
   --cc-body-font: 'Inter', sans-serif;
+  /* Background fill that distinguishes a player-editable field (Name,
+     Culture, attribute Ratings, Weapons/Armor/Talents rows, etc.) from a
+     calculated/readonly one (Stress Max, Courage, attribute Bonus Damage,
+     etc.), which keeps the plain transparent look - see .cc-field's
+     ":read-write" rule in scss/_index.scss and its siblings in the
+     Attributes/Skills/rep-table CSS. A single variable here, rather than
+     a literal rgba() repeated at every one of those call sites, so the
+     opacity (currently 50%, per request) can be tuned in one place. */
+  --cc-editable-fill: rgba(255, 255, 255, 0.5);
 }
 
 @mixin dark {

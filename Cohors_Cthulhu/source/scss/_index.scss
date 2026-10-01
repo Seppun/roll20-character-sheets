@@ -119,6 +119,21 @@
       color: var(--cc-ink);
       padding: 0.1rem 0.1rem;
     }
+
+    // Distinguishes a player-editable field from a calculated/readonly one
+    // (Stress Max, Courage, Base/Total Armor, etc, all declared with
+    // readonly:true - see calcStressMax and friends) with a light fill,
+    // leaving the readonly ones at the plain transparent look above.
+    // <select> has no readonly concept of its own in HTML/CSS (every
+    // <select> matches :read-only by elimination, never :read-write, since
+    // the spec only defines that pair for text-editing widgets) - every
+    // select on this sheet is a real player choice, so it always gets the
+    // fill rather than being gated behind :read-write like input/textarea.
+    > input:read-write,
+    > textarea:read-write,
+    > select {
+      background: var(--cc-editable-fill);
+    }
   }
 
   .cc-panel {
@@ -195,6 +210,15 @@
       border: 1px solid var(--cc-rule);
       color: var(--cc-ink);
       border-radius: 2px;
+    }
+
+    // Every field in these rows (Weapons/Armor/Talents) is player-entered -
+    // no readonly/calculated row exists in any of these three tables -
+    // same distinction as .cc-field's own :read-write rule.
+    input:read-write,
+    textarea:read-write,
+    select {
+      background: var(--cc-editable-fill);
     }
   }
 

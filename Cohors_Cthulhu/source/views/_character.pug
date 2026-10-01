@@ -943,6 +943,13 @@
         border-radius: 2px;
       }
 
+      // Rating is always player-entered; Bonus Damage is readonly:true
+      // (calcAttributeBonusDamage) and stays at the plain transparent
+      // look above - same distinction as .cc-field's own :read-write rule.
+      .cc-attribute-rating {
+        background: var(--cc-editable-fill);
+      }
+
       .cc-attribute-bonus-damage.cc-disabled {
         display: inline-block;
         width: 3rem;
@@ -999,10 +1006,12 @@
         }
       }
 
+      // Always player-entered - no calculated/readonly counterpart exists
+      // in this table, unlike Attributes' Rating/Bonus Damage pair.
       .cc-skill-ranks {
         width: 3rem;
         text-align: center;
-        background: transparent;
+        background: var(--cc-editable-fill);
         border: 1px solid var(--cc-rule);
         color: var(--cc-ink);
       }
