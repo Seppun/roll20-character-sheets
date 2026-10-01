@@ -240,19 +240,19 @@ body {
      opacity (currently 50%, per request) can be tuned in one place. */
   --cc-editable-fill: rgba(255, 255, 255, 0.5);
   /* Carved-stone-block look for the die-roll buttons (Focus, Weapon,
-     Spell Cast) - colors sampled directly from the actual panel texture
-     pixels (images/stone-texture.png), not guessed: --cc-stone-light/dark
-     are the texture's own highlight and mid-face tones, so the button
-     face reads as the same stone as the panel behind it, and
-     --cc-stone-bezel is a light, thin border (not a heavy dark frame)
-     so the button still registers as a distinct raised block without
-     looking like a painted-on chip. The hairline crack pattern on each
-     button (its own inline SVG background, see .cc-focus-roll etc.) uses
-     #6d5034, sampled from the texture's own darkest/crack pixels - kept
-     as a literal color rather than a variable since it lives inside a
-     static data-URI string. */
-  --cc-stone-light: #edd5b7;
-  --cc-stone-dark: #cdb189;
+     Spell Cast). Both gradient stops are the panel texture's own typical
+     face color (images/stone-texture.png, sampled mid-tone ~#e7ceb0)
+     blended toward white (45%/22%), so the button reads as a distinctly
+     LIGHTER block of the same stone sitting on top of the panel, rather
+     than a darker inset chip. --cc-stone-bezel is a light, thin border
+     (not a heavy dark frame) so the button still registers as a raised
+     object without looking like a painted-on chip. The hairline crack
+     pattern on each button (its own inline SVG background, see
+     .cc-focus-roll etc.) uses #6d5034, sampled from the texture's own
+     darkest/crack pixels - kept as a literal color rather than a variable
+     since it lives inside a static data-URI string. */
+  --cc-stone-light: #f2e4d3;
+  --cc-stone-dark: #edd9c1;
   --cc-stone-bezel: #8a7252;
   /* Regular/base text size for the sheet. rem-based sizes elsewhere (tab
      buttons, table headers, small labels, etc.) are set relative to
@@ -1681,7 +1681,7 @@ body .ui-dialog .tab-content .charsheet .cc-character .cc-footer {
   opacity: 0.6;
 }
 body .ui-dialog .tab-content .charsheet .cc-character .cc-build-css::after {
-  content: "CSS build: 2026-10-01 18:05:44 UTC";
+  content: "CSS build: 2026-10-01 18:12:09 UTC";
 }
 body .ui-dialog .tab-content .charsheet .cc-character .cc-truths-scars-grid {
   display: grid;
@@ -2005,7 +2005,10 @@ body .ui-dialog .tab-content .charsheet .cc-character .cc-focus-item .cc-focus-r
   cursor: pointer;
 }
 body .ui-dialog .tab-content .charsheet .cc-character .cc-focus-item .cc-focus-roll:hover {
-  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%20136%2024%27%3E%3Cpath%20d%3D%27M%200.0%2C9.0%20L%2017.0%2C11.4%20L%2034.0%2C11.3%20L%2051.0%2C6.7%20L%2068.0%2C6.8%20L%2085.0%2C10.7%20L%20102.0%2C10.2%20L%20119.0%2C9.9%20L%20136.0%2C8.0%27%20stroke%3D%27%236d5034%27%20stroke-width%3D%271.1%27%20fill%3D%27none%27%20stroke-linecap%3D%27round%27%20opacity%3D%270.55%27/%3E%3Cpath%20d%3D%27M%200.0%2C17.0%20L%2019.4%2C17.5%20L%2038.9%2C18.1%20L%2058.3%2C18.3%20L%2077.7%2C18.9%20L%2097.1%2C18.1%20L%20116.6%2C18.9%20L%20136.0%2C14.9%27%20stroke%3D%27%236d5034%27%20stroke-width%3D%271.1%27%20fill%3D%27none%27%20stroke-linecap%3D%27round%27%20opacity%3D%270.55%27/%3E%3C/svg%3E"), radial-gradient(circle at 22% 75%, rgba(255, 255, 255, 0.3) 0%, transparent 10%), radial-gradient(circle at 78% 25%, rgba(0, 0, 0, 0.1) 0%, transparent 9%), linear-gradient(145deg, var(--cc-stone-dark) 0%, var(--cc-stone-light) 100%);
+  background-image: none;
+  background-color: var(--cc-banner);
+  border-color: var(--cc-banner);
+  color: var(--cc-banner-text);
 }
 body .ui-dialog .tab-content .charsheet .cc-character .cc-focus-item .cc-focus-roll:before {
   content: "0";
@@ -2043,7 +2046,10 @@ body .ui-dialog .tab-content .charsheet .cc-character .cc-rep-weapons .cc-weapon
   opacity: 1;
 }
 body .ui-dialog .tab-content .charsheet .cc-character .cc-rep-weapons .cc-weapon-roll:hover {
-  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2022%2022%27%3E%3Cpath%20d%3D%27M%200.0%2C8.0%20L%204.4%2C6.7%20L%208.8%2C6.1%20L%2013.2%2C7.5%20L%2017.6%2C6.3%20L%2022.0%2C5.9%27%20stroke%3D%27%236d5034%27%20stroke-width%3D%271.1%27%20fill%3D%27none%27%20stroke-linecap%3D%27round%27%20opacity%3D%270.55%27/%3E%3Cpath%20d%3D%27M%200.0%2C15.0%20L%204.4%2C14.3%20L%208.8%2C13.6%20L%2013.2%2C15.6%20L%2017.6%2C13.3%20L%2022.0%2C15.1%27%20stroke%3D%27%236d5034%27%20stroke-width%3D%271.1%27%20fill%3D%27none%27%20stroke-linecap%3D%27round%27%20opacity%3D%270.55%27/%3E%3C/svg%3E"), radial-gradient(circle at 22% 75%, rgba(255, 255, 255, 0.3) 0%, transparent 18%), radial-gradient(circle at 78% 25%, rgba(0, 0, 0, 0.1) 0%, transparent 16%), linear-gradient(145deg, var(--cc-stone-dark) 0%, var(--cc-stone-light) 100%);
+  background-image: none;
+  background-color: var(--cc-banner);
+  border-color: var(--cc-banner);
+  color: var(--cc-banner-text);
 }
 body .ui-dialog .tab-content .charsheet .cc-character .cc-rep-armor .cc-rep-header,
 body .ui-dialog .tab-content .charsheet .cc-character .cc-rep-armor fieldset,
@@ -2144,7 +2150,10 @@ body .ui-dialog .tab-content .charsheet .cc-spells .cc-spell-cast:before {
   opacity: 1;
 }
 body .ui-dialog .tab-content .charsheet .cc-spells .cc-spell-cast:hover {
-  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2022%2022%27%3E%3Cpath%20d%3D%27M%200.0%2C8.0%20L%204.4%2C6.7%20L%208.8%2C6.1%20L%2013.2%2C7.5%20L%2017.6%2C6.3%20L%2022.0%2C5.9%27%20stroke%3D%27%236d5034%27%20stroke-width%3D%271.1%27%20fill%3D%27none%27%20stroke-linecap%3D%27round%27%20opacity%3D%270.55%27/%3E%3Cpath%20d%3D%27M%200.0%2C15.0%20L%204.4%2C14.3%20L%208.8%2C13.6%20L%2013.2%2C15.6%20L%2017.6%2C13.3%20L%2022.0%2C15.1%27%20stroke%3D%27%236d5034%27%20stroke-width%3D%271.1%27%20fill%3D%27none%27%20stroke-linecap%3D%27round%27%20opacity%3D%270.55%27/%3E%3C/svg%3E"), radial-gradient(circle at 22% 75%, rgba(255, 255, 255, 0.3) 0%, transparent 18%), radial-gradient(circle at 78% 25%, rgba(0, 0, 0, 0.1) 0%, transparent 16%), linear-gradient(145deg, var(--cc-stone-dark) 0%, var(--cc-stone-light) 100%);
+  background-image: none;
+  background-color: var(--cc-banner);
+  border-color: var(--cc-banner);
+  color: var(--cc-banner-text);
 }
 body .ui-dialog .tab-content .charsheet .cc-spells .cc-spell-collapse-toggle {
   appearance: none;
@@ -2247,7 +2256,7 @@ body {
   opacity: 0.6;
 }
 .cc-character .cc-build-css::after {
-  content: "CSS build: 2026-10-01 18:05:44 UTC";
+  content: "CSS build: 2026-10-01 18:12:09 UTC";
 }
 .cc-character .cc-truths-scars-grid {
   display: grid;
@@ -2571,7 +2580,10 @@ body {
   cursor: pointer;
 }
 .cc-character .cc-focus-item .cc-focus-roll:hover {
-  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%20136%2024%27%3E%3Cpath%20d%3D%27M%200.0%2C9.0%20L%2017.0%2C11.4%20L%2034.0%2C11.3%20L%2051.0%2C6.7%20L%2068.0%2C6.8%20L%2085.0%2C10.7%20L%20102.0%2C10.2%20L%20119.0%2C9.9%20L%20136.0%2C8.0%27%20stroke%3D%27%236d5034%27%20stroke-width%3D%271.1%27%20fill%3D%27none%27%20stroke-linecap%3D%27round%27%20opacity%3D%270.55%27/%3E%3Cpath%20d%3D%27M%200.0%2C17.0%20L%2019.4%2C17.5%20L%2038.9%2C18.1%20L%2058.3%2C18.3%20L%2077.7%2C18.9%20L%2097.1%2C18.1%20L%20116.6%2C18.9%20L%20136.0%2C14.9%27%20stroke%3D%27%236d5034%27%20stroke-width%3D%271.1%27%20fill%3D%27none%27%20stroke-linecap%3D%27round%27%20opacity%3D%270.55%27/%3E%3C/svg%3E"), radial-gradient(circle at 22% 75%, rgba(255, 255, 255, 0.3) 0%, transparent 10%), radial-gradient(circle at 78% 25%, rgba(0, 0, 0, 0.1) 0%, transparent 9%), linear-gradient(145deg, var(--cc-stone-dark) 0%, var(--cc-stone-light) 100%);
+  background-image: none;
+  background-color: var(--cc-banner);
+  border-color: var(--cc-banner);
+  color: var(--cc-banner-text);
 }
 .cc-character .cc-focus-item .cc-focus-roll:before {
   content: "0";
@@ -2609,7 +2621,10 @@ body {
   opacity: 1;
 }
 .cc-character .cc-rep-weapons .cc-weapon-roll:hover {
-  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2022%2022%27%3E%3Cpath%20d%3D%27M%200.0%2C8.0%20L%204.4%2C6.7%20L%208.8%2C6.1%20L%2013.2%2C7.5%20L%2017.6%2C6.3%20L%2022.0%2C5.9%27%20stroke%3D%27%236d5034%27%20stroke-width%3D%271.1%27%20fill%3D%27none%27%20stroke-linecap%3D%27round%27%20opacity%3D%270.55%27/%3E%3Cpath%20d%3D%27M%200.0%2C15.0%20L%204.4%2C14.3%20L%208.8%2C13.6%20L%2013.2%2C15.6%20L%2017.6%2C13.3%20L%2022.0%2C15.1%27%20stroke%3D%27%236d5034%27%20stroke-width%3D%271.1%27%20fill%3D%27none%27%20stroke-linecap%3D%27round%27%20opacity%3D%270.55%27/%3E%3C/svg%3E"), radial-gradient(circle at 22% 75%, rgba(255, 255, 255, 0.3) 0%, transparent 18%), radial-gradient(circle at 78% 25%, rgba(0, 0, 0, 0.1) 0%, transparent 16%), linear-gradient(145deg, var(--cc-stone-dark) 0%, var(--cc-stone-light) 100%);
+  background-image: none;
+  background-color: var(--cc-banner);
+  border-color: var(--cc-banner);
+  color: var(--cc-banner-text);
 }
 .cc-character .cc-rep-armor .cc-rep-header,
 .cc-character .cc-rep-armor fieldset,
@@ -2711,7 +2726,10 @@ body {
   opacity: 1;
 }
 .cc-spells .cc-spell-cast:hover {
-  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2022%2022%27%3E%3Cpath%20d%3D%27M%200.0%2C8.0%20L%204.4%2C6.7%20L%208.8%2C6.1%20L%2013.2%2C7.5%20L%2017.6%2C6.3%20L%2022.0%2C5.9%27%20stroke%3D%27%236d5034%27%20stroke-width%3D%271.1%27%20fill%3D%27none%27%20stroke-linecap%3D%27round%27%20opacity%3D%270.55%27/%3E%3Cpath%20d%3D%27M%200.0%2C15.0%20L%204.4%2C14.3%20L%208.8%2C13.6%20L%2013.2%2C15.6%20L%2017.6%2C13.3%20L%2022.0%2C15.1%27%20stroke%3D%27%236d5034%27%20stroke-width%3D%271.1%27%20fill%3D%27none%27%20stroke-linecap%3D%27round%27%20opacity%3D%270.55%27/%3E%3C/svg%3E"), radial-gradient(circle at 22% 75%, rgba(255, 255, 255, 0.3) 0%, transparent 18%), radial-gradient(circle at 78% 25%, rgba(0, 0, 0, 0.1) 0%, transparent 16%), linear-gradient(145deg, var(--cc-stone-dark) 0%, var(--cc-stone-light) 100%);
+  background-image: none;
+  background-color: var(--cc-banner);
+  border-color: var(--cc-banner);
+  color: var(--cc-banner-text);
 }
 .cc-spells .cc-spell-collapse-toggle {
   appearance: none;

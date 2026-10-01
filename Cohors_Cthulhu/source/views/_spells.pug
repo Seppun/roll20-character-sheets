@@ -299,12 +299,13 @@
         opacity: 1;
       }
 
+      // Flat maroon fill (same --cc-banner/--cc-banner-text pairing used
+      // on .cc-attribute-roll's hover) rather than the stone texture.
       &:hover {
-        background-image:
-          url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2022%2022%27%3E%3Cpath%20d%3D%27M%200.0%2C8.0%20L%204.4%2C6.7%20L%208.8%2C6.1%20L%2013.2%2C7.5%20L%2017.6%2C6.3%20L%2022.0%2C5.9%27%20stroke%3D%27%236d5034%27%20stroke-width%3D%271.1%27%20fill%3D%27none%27%20stroke-linecap%3D%27round%27%20opacity%3D%270.55%27/%3E%3Cpath%20d%3D%27M%200.0%2C15.0%20L%204.4%2C14.3%20L%208.8%2C13.6%20L%2013.2%2C15.6%20L%2017.6%2C13.3%20L%2022.0%2C15.1%27%20stroke%3D%27%236d5034%27%20stroke-width%3D%271.1%27%20fill%3D%27none%27%20stroke-linecap%3D%27round%27%20opacity%3D%270.55%27/%3E%3C/svg%3E"),
-          radial-gradient(circle at 22% 75%, rgba(255, 255, 255, 0.3) 0%, transparent 18%),
-          radial-gradient(circle at 78% 25%, rgba(0, 0, 0, 0.1) 0%, transparent 16%),
-          linear-gradient(145deg, var(--cc-stone-dark) 0%, var(--cc-stone-light) 100%);
+        background-image: none;
+        background-color: var(--cc-banner);
+        border-color: var(--cc-banner);
+        color: var(--cc-banner-text);
       }
     }
 
