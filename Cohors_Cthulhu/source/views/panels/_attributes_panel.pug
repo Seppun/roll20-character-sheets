@@ -1,0 +1,152 @@
+//- views/panels/_attributes_panel.pug
+//- Attributes table (rating + bonus damage + roll button per attribute).
+//- ccRatingAffects below reaches into attribute names whose own
+//- calculations live in other panel files (Vitals, Skills) - that's fine
+//- with no cross-file coupling, since 'affects' is resolved purely by
+//- attribute name against the compiled cascades object, not a JS
+//- reference (see the comment at the top of views/panels/_vitals_panel.pug).
+- const ccAttributes = ['agility', 'brawn', 'coordination', 'gravitas', 'insight', 'reason', 'will']
+- const ccBonusDamageAttributes = ['brawn', 'insight', 'will']
+-
+  const ccRatingAffects = {
+    brawn: ['brawn_bonus_damage', 'base_armour', 'total_armor', 'stress_max_base', 'stress_max', 'stress_max_marker', 'fatigue_max_marker'],
+    will: ['will_bonus_damage', 'courage', 'stress_max_base', 'stress_max', 'stress_max_marker', 'fatigue_max_marker', 'power_rating'],
+    insight: ['insight_bonus_damage', 'power_rating'],
+    reason: ['power_rating'],
+  }
+.cc-panel.cc-attributes
+  .cc-banner Attributes
+  table.cc-table.cc-attributes-table
+    thead
+      tr
+        th
+        each attr in ccAttributes
+          th
+            +action({
+              name: `${attr} roll`,
+              class: 'cc-attribute-roll roller',
+              trigger: {triggeredFuncs: ['initiateAttributeRoll']}
+            })
+              = attr
+    tbody
+      tr
+        th Rating
+        each attr in ccAttributes
+          td
+            +number({
+              name: `${attr} rating`,
+              trigger: ccRatingAffects[attr] ? {affects: ccRatingAffects[attr]} : undefined
+            }).cc-attribute-rating
+      tr
+        th Bonus Damage
+        each attr in ccAttributes
+          td
+            if ccBonusDamageAttributes.includes(attr)
+              +number({
+                name: `${attr} bonus damage`,
+                readonly: true,
+                trigger: {calculation: 'calcAttributeBonusDamage'}
+              }).cc-attribute-bonus-damage
+            else
+              span.cc-attribute-bonus-damage.cc-disabled
+
++scss.
+  .cc-character {
+    .cc-attributes-table {
+      th,
+      td {
+        text-align: center;
+        vertical-align: middle;
+      }
+
+      th:first-child {
+        text-align: left;
+      }
+
+      // Made to read as an actual button (a light chip against the header's
+      // --cc-banner background, inverting on hover) rather than plain
+      // uppercase header text with no click affordance - and the roller
+      // die icon (dicefontd20's 'T' glyph, see k-scaffold's roller mixin)
+      // enlarged well past the surrounding text, since at the old 0.8em/
+      // 0.7 opacity of an already-small 0.7rem header it rendered as
+      // little more than a faint dot.
+      .cc-attribute-roll {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        background: rgba(255, 255, 255, 0.15);
+        border: 1px solid var(--cc-banner-text);
+        border-radius: 4px;
+        padding: 0.15rem 0.5rem;
+        color: inherit;
+        font: inherit;
+        text-transform: inherit;
+        letter-spacing: inherit;
+        cursor: pointer;
+
+        &:hover {
+          background: var(--cc-banner-text);
+          color: var(--cc-banner);
+        }
+
+        // k-scaffold's roller mixin sets content:'T' by default - '0' is
+        // the cleaner-looking d20 glyph in Roll20's own dicefontd20 icon
+        // font (see https://wiki.roll20.net/CSS_Wizardry#Icon_Fonts),
+        // overridden here rather than in the vendored k-scaffold library.
+        &:before {
+          content: '0';
+          font-size: 1.5em;
+          opacity: 1;
+        }
+      }
+
+      .cc-attribute-rating,
+      .cc-attribute-bonus-damage {
+        width: 3rem;
+        text-align: center;
+        background: transparent;
+        border: 1px solid var(--cc-rule);
+        color: var(--cc-ink);
+        border-radius: 2px;
+      }
+
+      // Rating is always player-entered; Bonus Damage is readonly:true
+      // (calcAttributeBonusDamage) and stays at the plain transparent
+      // look above - same distinction as .cc-field's own :read-write rule.
+      .cc-attribute-rating {
+        background: var(--cc-editable-fill);
+      }
+
+      .cc-attribute-bonus-damage.cc-disabled {
+        display: inline-block;
+        width: 3rem;
+        height: 1.6rem;
+        border: 1px dashed var(--cc-parchment-dark);
+      }
+    }
+  }
+
++module.
+  const calcAttributeBonusDamage = ({trigger, attributes}) => {
+    const attrName = trigger.name.replace(/_bonus_damage$/, '');
+    return ccAttributeBonus(attributes[`${attrName}_rating`]);
+  };
+  k.registerFuncs({calcAttributeBonusDamage});
+
+  // Attribute-only roll (no skill): target number is just the attribute's
+  // own rating, crit only on a natural 1 (no focus applies). Shares
+  // runCcRoll/ccNormalizeName/ccCapitalize with Skills' own roll
+  // initiators (views/panels/_skills_panel.pug) - see
+  // views/_global_sheetworker.pug.
+  const initiateAttributeRoll = async ({trigger, attributes}) => {
+    const attr = ccNormalizeName(trigger.name).replace(/_roll$/, '');
+    const rating = Number(attributes[`${attr}_rating`]) || 0;
+    await runCcRoll({
+      skillLabel: ccCapitalize(attr),
+      focusLabel: '',
+      attributeExpr: String(rating),
+      skillRanks: 0,
+      critMax: 1,
+    });
+  };
+  k.registerFuncs({initiateAttributeRoll});

@@ -1,0 +1,404 @@
+//- views/panels/_weapons_panel.pug
+//- Weapons repeating section. Weapon profiles from the rulebook's
+//- Chapter 7 (Melee & Ranged Weapon Profiles tables). Declared at the top
+//- of this file (pug compile-time scope) so the runtime auto-fill lookup
+//- table (JSON-embedded into +module. below) is generated from this
+//- object rather than hand-typed separately. The Name dropdown's
+//- +option() calls below are written out individually rather than
+//- generated from these same keys via an `each` loop - k-scaffold's
+//- +select/+option mixins defer rendering each option's block() until
+//- after the whole containing block has run, and Pug's `block` reference
+//- isn't captured per-iteration, so every option inside a loop ends up
+//- showing the LAST iteration's text (confirmed with an isolated repro).
+//- Each +option() value below must still match a key here exactly, or
+//- that weapon's row just won't auto-fill (falls back to a no-op, not a
+//- crash - see ccApplyWeaponPreset).
+//- Axe and Javelin appear in both tables with slightly different stats
+//- (Reach vs Range, different Focus) per RAW, so each profile is listed
+//- separately with a disambiguating suffix. Field keys match the weapon
+//- repeating section's own attribute suffixes exactly (reach_range,
+//- damage_effects) so the auto-fill function can set them directly
+//- without a separate name-mapping table.
+-
+  const ccMeleeWeapons = {
+    'Axe (Melee)': {focus: 'Melee Weapons', reach_range: '2', damage_effects: '3, Vicious', size: 'Minor', qualities: 'Special'},
+    'Club': {focus: 'Melee Weapons', reach_range: '2', damage_effects: '2', size: 'Minor', qualities: ''},
+    'Cudgel': {focus: 'Melee Weapons', reach_range: '2', damage_effects: '3, Stun', size: 'Major', qualities: ''},
+    'Dagger': {focus: 'Melee Weapons', reach_range: '1', damage_effects: '2, Piercing 1', size: 'Minor', qualities: 'Hidden, Subtle'},
+    'Dolabra': {focus: 'Melee Weapons', reach_range: '1', damage_effects: '3, Piercing 1', size: 'Minor', qualities: ''},
+    'Javelin (Melee)': {focus: 'Melee Weapons', reach_range: '2', damage_effects: '3, Piercing 1', size: 'Minor', qualities: 'Special'},
+    'Spear': {focus: 'Melee Weapons', reach_range: '3', damage_effects: '4, Piercing 1', size: 'Major', qualities: ''},
+    'Staff': {focus: 'Melee Weapons', reach_range: '3', damage_effects: '2', size: 'Major', qualities: 'Special'},
+    'Sword': {focus: 'Melee Weapons', reach_range: '2', damage_effects: '4', size: 'Major', qualities: 'Parrying'},
+    'Sword, Falx': {focus: 'Melee Weapons', reach_range: '2', damage_effects: '4, Vicious', size: 'Major', qualities: ''},
+    'Sword, Gladius': {focus: 'Melee Weapons', reach_range: '2', damage_effects: '4, Piercing 1', size: 'Major', qualities: 'Parrying'},
+    'Sword, Long': {focus: 'Melee Weapons', reach_range: '2', damage_effects: '5', size: 'Major', qualities: 'Two-Handed'},
+    'Sword, Long, Spatha': {focus: 'Melee Weapons', reach_range: '2', damage_effects: '5, Piercing 1', size: 'Major', qualities: 'Two-Handed'},
+    'Unarmed Strike': {focus: 'Unarmed', reach_range: '0', damage_effects: '2', size: '', qualities: 'Subtle'},
+    'War Axe': {focus: 'Melee Weapons', reach_range: '2', damage_effects: '4, Vicious', size: 'Major', qualities: 'Two-Handed'},
+    'Small Shield': {focus: 'Melee Weapons', reach_range: '1', damage_effects: '2, Stun', size: 'Minor', qualities: 'Shield 2'},
+    'Large Shield': {focus: 'Melee Weapons', reach_range: '1', damage_effects: '3, Stun', size: 'Major', qualities: 'Shield 3'},
+  };
+  const ccRangedWeapons = {
+    'Arcuballista': {focus: 'Archery', reach_range: 'Medium', damage_effects: '4, Piercing 1', size: 'Major', qualities: 'Accurate, Reload'},
+    'Axe (Thrown)': {focus: 'Thrown Weapons', reach_range: 'Close', damage_effects: '3, Vicious', size: 'Minor', qualities: 'Special'},
+    'Bow': {focus: 'Archery', reach_range: 'Medium', damage_effects: '3, Piercing 1', size: 'Major', qualities: 'Subtle'},
+    'Bow, Recurve': {focus: 'Archery', reach_range: 'Long', damage_effects: '4, Piercing 1', size: 'Major', qualities: 'Subtle'},
+    'Javelin (Thrown)': {focus: 'Thrown Weapons', reach_range: 'Medium', damage_effects: '3, Piercing 1', size: 'Minor', qualities: 'Special'},
+    'Pilum': {focus: 'Thrown Weapons', reach_range: 'Close', damage_effects: '4, Piercing 1', size: 'Minor', qualities: 'Special'},
+    'Plumbata': {focus: 'Thrown Weapons', reach_range: 'Close', damage_effects: '2, Piercing 1', size: 'Minor', qualities: ''},
+    'Sling': {focus: 'Thrown Weapons', reach_range: 'Long', damage_effects: '3, Stun', size: 'Minor', qualities: 'Inaccurate, Subtle, Special'},
+  };
+  const ccWeaponProfiles = Object.assign({}, ccMeleeWeapons, ccRangedWeapons);
+
+.cc-panel.cc-weapons
+  .cc-banner Weapons
+  .cc-rep-table.cc-rep-weapons
+    .cc-rep-header
+      span
+      span Name
+      span Focus
+      span Reach or Range
+      span Damage &amp; Effects
+      span Size
+      span Qualities
+    +fieldset({name: 'weapon'})
+      //- Triggers a Fighting roll using this row's Focus, plus a
+      //- damage roll from its Damage & Effects, together in a single
+      //- message (see initiateWeaponRoll).
+      +action({
+        name: 'weapon roll',
+        class: 'cc-weapon-roll roller',
+        trigger: {triggeredFuncs: ['initiateWeaponRoll']}
+      })
+      //- Options are written out individually rather than generated
+      //- from ccWeaponProfiles via an `each` loop - see the comment
+      //- above that object for why (a k-scaffold +select/+option
+      //- mixin bug breaks per-iteration option text in a loop).
+      +select({
+        name: 'name',
+        trigger: {triggeredFuncs: ['ccApplyWeaponPreset']}
+      })
+        +option({value: ''})
+          | Custom / Other
+        +option({value: 'Axe (Melee)'})
+          | Axe (Melee)
+        +option({value: 'Club'})
+          | Club
+        +option({value: 'Cudgel'})
+          | Cudgel
+        +option({value: 'Dagger'})
+          | Dagger
+        +option({value: 'Dolabra'})
+          | Dolabra
+        +option({value: 'Javelin (Melee)'})
+          | Javelin (Melee)
+        +option({value: 'Spear'})
+          | Spear
+        +option({value: 'Staff'})
+          | Staff
+        +option({value: 'Sword'})
+          | Sword
+        +option({value: 'Sword, Falx'})
+          | Sword, Falx
+        +option({value: 'Sword, Gladius'})
+          | Sword, Gladius
+        +option({value: 'Sword, Long'})
+          | Sword, Long
+        +option({value: 'Sword, Long, Spatha'})
+          | Sword, Long, Spatha
+        +option({value: 'Unarmed Strike'})
+          | Unarmed Strike
+        +option({value: 'War Axe'})
+          | War Axe
+        +option({value: 'Small Shield'})
+          | Small Shield
+        +option({value: 'Large Shield'})
+          | Large Shield
+        +option({value: 'Arcuballista'})
+          | Arcuballista
+        +option({value: 'Axe (Thrown)'})
+          | Axe (Thrown)
+        +option({value: 'Bow'})
+          | Bow
+        +option({value: 'Bow, Recurve'})
+          | Bow, Recurve
+        +option({value: 'Javelin (Thrown)'})
+          | Javelin (Thrown)
+        +option({value: 'Pilum'})
+          | Pilum
+        +option({value: 'Plumbata'})
+          | Plumbata
+        +option({value: 'Sling'})
+          | Sling
+      +text({name: 'focus'})
+      +text({name: 'reach range'})
+      +text({name: 'damage effects'})
+      +text({name: 'size'})
+      +text({name: 'qualities'})
+
++scss.
+  .cc-character {
+    .cc-rep-weapons {
+      .cc-rep-header,
+      fieldset,
+      .repcontainer .repitem {
+        grid-template-columns: 1.6rem 1fr 1fr 1fr 2fr 0.6fr 1.4fr;
+        align-items: center;
+      }
+
+      // Same carved-stone-block look as .cc-focus-roll (see --cc-stone-*
+      // in scss/_variables.scss and views/panels/_skills_panel.pug's own
+      // comment there) - a small square chip rather than a wider pill,
+      // since this column is only 1.6rem wide and carries no text, just
+      // the die icon itself. Uses the square variant of the pitted-pore
+      // fleck pattern (fewer, slightly bigger dots than .cc-focus-roll's
+      // pill, since the chip itself is much smaller).
+      .cc-weapon-roll {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 1.4rem;
+        height: 1.4rem;
+        background-image:
+          radial-gradient(circle at 61% 17%, rgba(74, 53, 30, 0.6) 0%, transparent 6%),
+          radial-gradient(circle at 27% 68%, rgba(92, 74, 48, 0.5) 0%, transparent 4%),
+          radial-gradient(circle at 83% 19%, rgba(92, 74, 48, 0.5) 0%, transparent 3%),
+          radial-gradient(circle at 11% 29%, rgba(92, 74, 48, 0.5) 0%, transparent 3%),
+          radial-gradient(circle at 7% 25%, rgba(109, 80, 52, 0.55) 0%, transparent 2%),
+          radial-gradient(circle at 54% 27%, rgba(109, 80, 52, 0.55) 0%, transparent 2%),
+          radial-gradient(circle at 78% 9%, rgba(109, 80, 52, 0.55) 0%, transparent 2%),
+          radial-gradient(circle at 68% 37%, rgba(109, 80, 52, 0.55) 0%, transparent 1%),
+          linear-gradient(145deg, var(--cc-stone-light) 0%, var(--cc-stone-dark) 100%);
+        background-repeat: no-repeat;
+        background-size: 100% 100%;
+        border: 1px solid var(--cc-stone-bezel);
+        border-radius: 4px;
+        box-shadow:
+          inset 0 1px 0 rgba(255, 255, 255, 0.45),
+          0 1px 1px rgba(0, 0, 0, 0.2);
+        color: var(--cc-ink);
+        font-size: 1.1rem;
+        cursor: pointer;
+        justify-self: center;
+
+        &:before {
+          content: '0';
+          opacity: 1;
+        }
+
+        // Flat maroon fill (same --cc-banner/--cc-banner-text pairing used
+        // on .cc-attribute-roll's hover) rather than the stone texture.
+        &:hover {
+          background-image: none;
+          background-color: var(--cc-banner);
+          border-color: var(--cc-banner);
+          color: var(--cc-banner-text);
+        }
+      }
+    }
+  }
+
++module.
+  // Embedded from the ccWeaponProfiles object declared at the top of this
+  // file (pug compile-time) - the Name dropdown's +option() values above
+  // must be kept matching this object's keys by hand (see the comment
+  // above ccWeaponProfiles for why they can't just be generated from it).
+  const ccWeaponProfiles = !{JSON.stringify(ccWeaponProfiles)};
+
+  // Selecting a weapon from the Name dropdown fills in its stock Focus/
+  // Reach or Range/Damage & Effects/Size/Qualities for that same repeating
+  // row - every field stays freely editable afterward (house-ruled
+  // weapons, printed duplicates with different qualities, etc.), this is
+  // just a convenience preset. Picking the blank "Custom / Other" option
+  // leaves whatever is already in those fields untouched.
+  const ccApplyWeaponPreset = ({trigger, attributes}) => {
+    const profile = ccWeaponProfiles[attributes[trigger.name]];
+    if (!profile) { return; }
+    const [section, rowID] = k.parseRepeatName(trigger.name);
+    Object.keys(profile).forEach((field) => {
+      attributes[`${section}_${rowID}_${field}`] = profile[field];
+    });
+  };
+  k.registerFuncs({ccApplyWeaponPreset});
+
+  // Weapon "Damage & Effects" fields are stored as free text like
+  // "4, Piercing 1" or "3, Vicious" (see ccWeaponProfiles above) - first
+  // comma-separated token is the weapon's base Damage rating (in Challenge
+  // Dice), everything after that is its list of Damage Effects (Piercing N,
+  // Vicious, Stun, etc, per the rulebook's Chapter 7).
+  const ccParseDamageEffects = (text) => {
+    const parts = String(text || '').split(',').map((s) => s.trim()).filter(Boolean);
+    return {
+      baseRating: Number(parts[0]) || 0,
+      effects: parts.slice(1),
+    };
+  };
+
+  // Cohors Cthulhu damage is rolled with special 6-sided Challenge Dice.
+  // This sheet has no access to physical Challenge Dice, so damage is
+  // rolled as plain d6s and converted face-by-face using the rulebook's
+  // own "If you don't have Challenge Dice" fallback table: 1->1 pip (a
+  // dagger face), 2->2 pips (a crossed-daggers face), 3/4->blank, 5/6->1
+  // pip plus an Effect (the Cthulhu-face symbol). Symbols here mirror
+  // that table's own iconography (dagger/crossed daggers/dash/Cthulhu
+  // face) rather than a generic pip count, so the roll template reads the
+  // same way the physical dice would.
+  //
+  // The Effect face was originally the octopus emoji (an astral-plane
+  // character, outside the Basic Multilingual Plane), which Roll20's
+  // savesheetsettings endpoint rejected with a 500 the first time this
+  // HTML was pasted into a fresh game - a known failure mode on Roll20's
+  // backend for any 4-byte-UTF-8 character in custom sheet code. Skull
+  // and crossbones reads the same way (a distinct "something happened"
+  // face) and is a plain BMP character, so it saves without issue.
+  const ccChallengeDieFromD6 = (d6) => {
+    switch (Number(d6)) {
+      case 1: return {pips: 1, effect: false, symbol: '†'};
+      case 2: return {pips: 2, effect: false, symbol: '‡'};
+      case 5: return {pips: 1, effect: true, symbol: '☠'};
+      case 6: return {pips: 1, effect: true, symbol: '☠'};
+      default: return {pips: 0, effect: false, symbol: '–'};
+    }
+  };
+
+  // Weapon roll: attack and damage rolled together in a single message,
+  // since a Cohors Cthulhu attack is an opposed test - there's no static
+  // Difficulty to pass/fail against (the GM's opposing roll decides that),
+  // so damage is rolled unconditionally alongside the attack rather than
+  // as a separate, gated follow-up roll. This also sidesteps having two
+  // separate roll templates in play, since the second one, despite being
+  // built the same way as the proven ccskill template, was showing up in
+  // chat unstyled.
+  //
+  // Unlike a generic Skill/Focus roll, an attack roll always has
+  // Difficulty 1 (no query) and doesn't ask which Attribute to pair -
+  // melee/unarmed weapons always use Agility, ranged/thrown weapons always
+  // use Coordination (Agility + Fighting / Coordination + Fighting, per
+  // RAW). Known-focus status is still checked explicitly (same as Skills'
+  // initiateFocusRoll) since clicking a weapon's roll button isn't itself
+  // a declaration that its Focus is known - crit range only opens up to
+  // Fighting's ranks when that specific focus checkbox is checked, else it
+  // stays a natural-1-only crit like a plain Skill roll.
+  const initiateWeaponRoll = async ({trigger, attributes}) => {
+    const [section, rowID] = k.parseRepeatName(trigger.name);
+    const prefix = `${section}_${rowID}_`;
+    const weaponName = attributes[`${prefix}name`] || 'Weapon';
+    const focus = attributes[`${prefix}focus`] || '';
+    const damageEffects = attributes[`${prefix}damage_effects`] || '';
+
+    const fightingRanks = Number(attributes.fighting_ranks) || 0;
+    const focusSlug = focus.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
+    const knownFocus = Boolean(focusSlug && attributes[`fighting_focus_${focusSlug}_known`]);
+    const critMax = knownFocus ? fightingRanks : 1;
+
+    const isRanged = focus.toLowerCase() === 'archery' || focus.toLowerCase() === 'thrown weapons';
+    const attributeRating = Number(attributes[isRanged ? 'coordination_rating' : 'agility_rating']) || 0;
+    const bonusDamage = Number(attributes[isRanged ? 'insight_bonus_damage' : 'brawn_bonus_damage']) || 0;
+
+    const {baseRating, effects} = ccParseDamageEffects(damageEffects);
+    const diceCount = Math.max(1, baseRating + bonusDamage);
+
+    console.log('[CC] Weapon roll:', {
+      weaponName, focus, isRanged, attributeRating, fightingRanks, knownFocus, critMax, diceCount,
+    });
+
+    const complicationQuery = '?{Complication range (1-5)|1}';
+    const bonusDiceQuery = '?{Additional d20s bought (0-3)|0}';
+
+    const rollString = '&{template:ccskill} ' +
+      `{{character_name=@{character_name}}} ` +
+      `{{skill=${weaponName}}} ` +
+      (focus ? `{{focus=${focus}}} ` : '') +
+      `{{attribute_choice=[[0+${attributeRating}]]}} ` +
+      `{{difficulty=1}} ` +
+      `{{complication_range=[[0+${complicationQuery}]]}} ` +
+      `{{roll1=[[(2+${bonusDiceQuery})d20]]}} ` +
+      `{{target_number=[[0]]}} ` +
+      `{{successes=[[0]]}} ` +
+      `{{dice_text=[[0]]}} ` +
+      `{{outcome=[[0]]}} ` +
+      `{{complications=[[0]]}} ` +
+      `{{bonus_momentum=[[0]]}} ` +
+      `{{momentum_spent=[[0]]}} ` +
+      `{{is_weapon=1}} ` +
+      `{{damage_dice=[[${diceCount}d6]]}} ` +
+      `{{total_damage=[[0]]}} ` +
+      `{{effect_count=[[0]]}} ` +
+      `{{damage_dice_text=[[0]]}} ` +
+      `{{effects_summary=[[0]]}}`;
+
+    const roll = await startRoll(rollString);
+
+    try {
+      const complicationRange = Number(roll.results.complication_range.result) || 1;
+
+      const roll1 = roll.results.roll1;
+      const dice = Array.isArray(roll1.dice) ?
+        roll1.dice :
+        (roll1.rolls && roll1.rolls[0] && roll1.rolls[0].results || []).map((r) => r.v);
+
+      console.log(`[CC] ${weaponName} attack roll - d20s:`, dice);
+
+      const targetNumber = attributeRating + fightingRanks;
+      const complicationThreshold = 21 - complicationRange;
+      const successCount = dice.filter((d) => d <= targetNumber).length +
+        dice.filter((d) => d <= critMax).length;
+      const complicationCount = dice.filter((d) => d >= complicationThreshold).length;
+      const passed = successCount >= 1;
+
+      const damageDice = roll.results.damage_dice;
+      const rawDamageDice = Array.isArray(damageDice.dice) ?
+        damageDice.dice :
+        (damageDice.rolls && damageDice.rolls[0] && damageDice.rolls[0].results || []).map((r) => r.v);
+
+      console.log(`[CC] ${weaponName} damage roll - raw d6s:`, rawDamageDice);
+
+      const converted = rawDamageDice.map(ccChallengeDieFromD6);
+      console.log(`[CC] ${weaponName} Challenge Dice faces:`, converted);
+
+      const isVicious = effects.some((e) => /vicious/i.test(e));
+      const effectCount = converted.filter((c) => c.effect).length;
+      const totalDamage = converted.reduce((sum, c) => sum + c.pips, 0) +
+        (isVicious ? effectCount : 0);
+      const effectsSummary = effectCount > 0 ?
+        `${effectCount}x Effect${effects.length ? ` - ${effects.join(', ')}` : ''}` :
+        'No Effects triggered';
+
+      console.log(`[CC] ${weaponName} result:`, {
+        targetNumber, successCount, complicationCount, passed, totalDamage, effectCount,
+      });
+
+      const weaponBonusMomentum = passed ? Math.max(0, successCount - 1) : 0;
+      const weaponBonusDiceBought = Math.max(0, dice.length - 2);
+      await ccSendMomentumSignal(weaponBonusMomentum - weaponBonusDiceBought);
+      await ccSendThreatSignal(complicationCount);
+
+      finishRoll(roll.rollId, {
+        target_number: targetNumber,
+        successes: successCount,
+        dice_text: dice.join(', '),
+        outcome: passed ? 1 : 0,
+        bonus_momentum: weaponBonusMomentum,
+        complications: complicationCount,
+        momentum_spent: weaponBonusDiceBought,
+        total_damage: totalDamage,
+        effect_count: effectCount,
+        damage_dice_text: converted.map((c) => c.symbol).join(' '),
+        effects_summary: effectsSummary,
+      });
+    } catch (err) {
+      finishRoll(roll.rollId, {
+        target_number: '?',
+        successes: '?',
+        dice_text: `error: ${err.message}`,
+        outcome: 0,
+        complications: 0,
+        total_damage: '?',
+        effect_count: '?',
+        damage_dice_text: `error: ${err.message}`,
+        effects_summary: '',
+      });
+    }
+  };
+  k.registerFuncs({initiateWeaponRoll});

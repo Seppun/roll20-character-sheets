@@ -1886,173 +1886,26 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
   k.version = "0.1.0";
   
   
-  // Embedded from the ccWeaponProfiles object declared at the top of this
-  // file (pug compile-time) - the Name dropdown's +option() values below
-  // must be kept matching this object's keys by hand (see the comment
-  // above ccWeaponProfiles for why they can't just be generated from it).
-  const ccWeaponProfiles = {"Axe (Melee)":{"focus":"Melee Weapons","reach_range":"2","damage_effects":"3, Vicious","size":"Minor","qualities":"Special"},"Club":{"focus":"Melee Weapons","reach_range":"2","damage_effects":"2","size":"Minor","qualities":""},"Cudgel":{"focus":"Melee Weapons","reach_range":"2","damage_effects":"3, Stun","size":"Major","qualities":""},"Dagger":{"focus":"Melee Weapons","reach_range":"1","damage_effects":"2, Piercing 1","size":"Minor","qualities":"Hidden, Subtle"},"Dolabra":{"focus":"Melee Weapons","reach_range":"1","damage_effects":"3, Piercing 1","size":"Minor","qualities":""},"Javelin (Melee)":{"focus":"Melee Weapons","reach_range":"2","damage_effects":"3, Piercing 1","size":"Minor","qualities":"Special"},"Spear":{"focus":"Melee Weapons","reach_range":"3","damage_effects":"4, Piercing 1","size":"Major","qualities":""},"Staff":{"focus":"Melee Weapons","reach_range":"3","damage_effects":"2","size":"Major","qualities":"Special"},"Sword":{"focus":"Melee Weapons","reach_range":"2","damage_effects":"4","size":"Major","qualities":"Parrying"},"Sword, Falx":{"focus":"Melee Weapons","reach_range":"2","damage_effects":"4, Vicious","size":"Major","qualities":""},"Sword, Gladius":{"focus":"Melee Weapons","reach_range":"2","damage_effects":"4, Piercing 1","size":"Major","qualities":"Parrying"},"Sword, Long":{"focus":"Melee Weapons","reach_range":"2","damage_effects":"5","size":"Major","qualities":"Two-Handed"},"Sword, Long, Spatha":{"focus":"Melee Weapons","reach_range":"2","damage_effects":"5, Piercing 1","size":"Major","qualities":"Two-Handed"},"Unarmed Strike":{"focus":"Unarmed","reach_range":"0","damage_effects":"2","size":"","qualities":"Subtle"},"War Axe":{"focus":"Melee Weapons","reach_range":"2","damage_effects":"4, Vicious","size":"Major","qualities":"Two-Handed"},"Small Shield":{"focus":"Melee Weapons","reach_range":"1","damage_effects":"2, Stun","size":"Minor","qualities":"Shield 2"},"Large Shield":{"focus":"Melee Weapons","reach_range":"1","damage_effects":"3, Stun","size":"Major","qualities":"Shield 3"},"Arcuballista":{"focus":"Archery","reach_range":"Medium","damage_effects":"4, Piercing 1","size":"Major","qualities":"Accurate, Reload"},"Axe (Thrown)":{"focus":"Thrown Weapons","reach_range":"Close","damage_effects":"3, Vicious","size":"Minor","qualities":"Special"},"Bow":{"focus":"Archery","reach_range":"Medium","damage_effects":"3, Piercing 1","size":"Major","qualities":"Subtle"},"Bow, Recurve":{"focus":"Archery","reach_range":"Long","damage_effects":"4, Piercing 1","size":"Major","qualities":"Subtle"},"Javelin (Thrown)":{"focus":"Thrown Weapons","reach_range":"Medium","damage_effects":"3, Piercing 1","size":"Minor","qualities":"Special"},"Pilum":{"focus":"Thrown Weapons","reach_range":"Close","damage_effects":"4, Piercing 1","size":"Minor","qualities":"Special"},"Plumbata":{"focus":"Thrown Weapons","reach_range":"Close","damage_effects":"2, Piercing 1","size":"Minor","qualities":""},"Sling":{"focus":"Thrown Weapons","reach_range":"Long","damage_effects":"3, Stun","size":"Minor","qualities":"Inaccurate, Subtle, Special"}};
-  
-  // Selecting a weapon from the Name dropdown fills in its stock Focus/
-  // Reach or Range/Damage & Effects/Size/Qualities for that same repeating
-  // row - every field stays freely editable afterward (house-ruled
-  // weapons, printed duplicates with different qualities, etc.), this is
-  // just a convenience preset. Picking the blank "Custom / Other" option
-  // leaves whatever is already in those fields untouched.
-  const ccApplyWeaponPreset = ({trigger, attributes}) => {
-    const profile = ccWeaponProfiles[attributes[trigger.name]];
-    if (!profile) { return; }
-    const [section, rowID] = k.parseRepeatName(trigger.name);
-    Object.keys(profile).forEach((field) => {
-      attributes[`${section}_${rowID}_${field}`] = profile[field];
-    });
-  };
-  k.registerFuncs({ccApplyWeaponPreset});
-  
-  // Same pattern as ccApplyWeaponPreset/ccWeaponProfiles above, for the
-  // Armor table's Name dropdown. Setting resistance here still triggers
-  // its own {affects: ['total_armor']} cascade normally (the attribute
-  // proxy re-checks a field's own cascade whenever it's set, regardless
-  // of what set it), so Total Armor stays correct without extra wiring.
-  const ccArmorProfiles = {"Chainmail / Lorica Hamata":{"resistance":"2","qualities":"Uncomfortable"},"Leather Armor":{"resistance":"1","qualities":""},"Lorica Segmentata":{"resistance":"3","qualities":"Uncomfortable"},"Lorica Squamata":{"resistance":"3","qualities":"Heavy, Uncomfortable"}};
-  const ccApplyArmorPreset = ({trigger, attributes}) => {
-    const profile = ccArmorProfiles[attributes[trigger.name]];
-    if (!profile) { return; }
-    const [section, rowID] = k.parseRepeatName(trigger.name);
-    Object.keys(profile).forEach((field) => {
-      attributes[`${section}_${rowID}_${field}`] = profile[field];
-    });
-  };
-  k.registerFuncs({ccApplyArmorPreset});
-  
-  // Same pattern again for the Talents table, for both the Name field's
-  // own trigger and the row's explicit apply button (see the comments on
-  // both in the Talents table markup above for why there are two) - reads
-  // the row's Name value via the row prefix rather than attributes[trigger.
-  // name] directly, since trigger.name is a different attribute depending
-  // on which of those two fired it. A value that doesn't match any known
-  // talent is a normal, expected case (not an error) for the free-text
-  // Name field - it just leaves Keywords/Requirements/Description
-  // untouched, same as picking "Custom / Other" does for weapons/armor.
-  const ccTalentProfiles = {"The Gods Are with You":{"keywords":"Mystic, Persuasion, Spellcaster","requirements":"Mystic archetype, no other talent with the Spellcaster keyword","description":"You are a spellcaster (see Magic). As a minor action, make a Gravitas + Persuasion test, difficulty 2. On a pass, you and all allies in your zone gain +2 Morale resistance until the end of your next turn."},"Gods Guide You":{"keywords":"Mystic, Academia, Spellcaster","requirements":"Mystic archetype, no other talent with the Spellcaster keyword","description":"You are a spellcaster (see Magic). Once per round, when an ally makes a melee, ranged, or magic attack, or a Reason + Academia test, you may generate 2 Threat to assist them as a reaction."},"Pain Is Nothing":{"keywords":"Mystic, Medicine, Spellcaster","requirements":"Mystic archetype, no other talent with the Spellcaster keyword","description":"You are a spellcaster (see Magic). At the start of any of your turns, you may generate 3 Threat to remove stress equal to your power rating, or to ignore one injury until the end of the scene."},"Aedificator":{"keywords":"Sage, Engineering","requirements":"Sage archetype","description":"When an Engineering-based skill test is part of an extended test with resistance, ignore 1 resistance for each effect rolled."},"The Best Doctor Is Also a Philosopher":{"keywords":"Sage, Medicine","requirements":"Sage archetype","description":"You are fluent in Greek. If you already speak Greek, select one other additional language (fluent). Medicine-based skill test difficulty may be reduced by 1 or 2 but this increases the skill test's complication range by the same amount."},"Deep Expertise":{"keywords":"Sage, Academia","requirements":"Sage archetype","description":"Gain one additional focus for every skill in which you have 3 or more ranks. Afterward, whenever another skill reaches 3 ranks, immediately gain a focus for it too."},"Nero Nihil Verius":{"keywords":"Sage, Observation","requirements":"Sage archetype","description":"Reduce the difficulty of skill tests made to detect danger or hidden enemies by 1."},"Backed by Authority":{"keywords":"Schemer, Persuasion","requirements":"Schemer archetype","description":"You may re-roll 1d20 on Persuasion-based skill tests (must keep the new result). Treat the Restriction rating of all items as 1 lower, to a minimum of 1."},"Et Tu?":{"keywords":"Schemer, Fighting","requirements":"Schemer archetype","description":"If you've passed a Persuasion test to influence or deceive an enemy this scene, a successful surprise attack against them later in the scene lets you roll one bonus die per effect already rolled on the attack; effects from those bonus dice don't chain further."},"Play the Part":{"keywords":"Schemer, Academia","requirements":"Schemer archetype","description":"You may use Academia in place of Stealth when using a disguise."},"Social Network":{"keywords":"Schemer, Observation","requirements":"Schemer archetype","description":"In any location where you've had downtime, you have at least one contact with a fair relationship. The first bonus d20 you buy on a non-combat skill test made during downtime costs no Momentum."},"Cunning Fighter":{"keywords":"Scoundrel, Athletics","requirements":"Scoundrel archetype","description":"When an enemy's melee attack against you deals no stress, they lose Guard. Your next successful attack against them deals bonus damage equal to your Athletics skill."},"Hidden Blade":{"keywords":"Scoundrel, Fighting","requirements":"Scoundrel archetype","description":"When making a melee attack, you may generate 1-3 Threat. On a successful hit, add +1 damage per Threat generated, or apply the Intense or Vicious damage effect once per Threat generated."},"Oculus Aurum":{"keywords":"Scoundrel, Observation","requirements":"Scoundrel archetype","description":"As a free action, generate 1 Threat to identify the most valuable object in your zone. Generate 1 more Threat to learn its approximate value and Restriction rating."},"Unremarkable":{"keywords":"Scoundrel, Stealth","requirements":"Scoundrel archetype","description":"While blending in, tests made to notice you have their difficulty increased by 1."},"Eye for Weakness":{"keywords":"Scout, Observation","requirements":"Scout archetype","description":"After spending Momentum to Obtain Information about a creature, your attacks against it gain the Piercing 1 effect (or +1 Piercing if it already has that effect) until the end of the scene."},"Strike from Hiding":{"keywords":"Scout, Fighting","requirements":"Scout archetype","description":"A successful surprise attack lets you roll one bonus die per effect already rolled on the attack; effects from those bonus dice don't chain further."},"Survivalist":{"keywords":"Scout, Survival","requirements":"Scout archetype","description":"Extended tests to forage, hunt, build shelter, or gather supplies in the wilderness gain the Vicious damage effect."},"Woodland Stride":{"keywords":"Scout, Athletics","requirements":"Scout archetype","description":"Reduce the difficulty of tests to move through difficult or hazardous terrain by 1 (minimum 0). At 0, that terrain no longer impedes your movement at all."},"Brute":{"keywords":"Soldier, Athletics","requirements":"Soldier archetype","description":"When making a melee attack, you may re-roll any number of the challenge dice used to determine stress and damage effects."},"Flashing Steel":{"keywords":"Soldier, Fighting","requirements":"Soldier archetype","description":"After an Attack major action, make a second attack as a minor action against a different target within Reach. Against a mob, instead double the stress your attack deals."},"Hold Fast":{"keywords":"Soldier, Resilience","requirements":"Soldier archetype","description":"When you or an ally in your zone is targeted by a melee attack, generate 1 Threat to increase the attacker's difficulty by 1."},"Shield Wall":{"keywords":"Soldier, Tactics","requirements":"Soldier archetype","description":"As a minor action, lock shields with an allied, shield-equipped character within Reach. While locked together, each of you gains +2 Cover resistance from your shield, as long as you still have Guard."},"Advisor":{"keywords":"<Skill>","requirements":"","description":"Choose a skill. When you assist an ally using that skill, they may re-roll one d20 in their pool."},"Bold":{"keywords":"<Skill>","requirements":"","description":"Choose a skill. When you buy bonus d20s by generating Threat on a test with that skill, you may re-roll one d20 in the pool."},"Prodigialis Fortuna":{"keywords":"Fortune","requirements":"","description":"Whenever you spend a Fortune point, roll one die. An effect result immediately refunds the point; a blank instead generates 3 Threat."},"Skin of Your Teeth":{"keywords":"Fortune","requirements":"","description":"Once per scene, spend a Fortune point when dealt an injury to avoid suffering it."},"Cautious":{"keywords":"<Skill>","requirements":"","description":"Choose a skill. When you buy bonus d20s by spending Momentum on a test with that skill, you may re-roll one d20 in the pool."},"Applied Knowledge":{"keywords":"Academia","requirements":"","description":"Once per scene, substitute Academia for another skill on a test, treating yourself as having a focus for it."},"Collaboration":{"keywords":"Academia","requirements":"","description":"Passing an Academia-based skill test grants +1 bonus Momentum, which cannot be saved."},"Magister's Favorite":{"keywords":"<Skill>","requirements":"Advanced","description":"Choose a skill in which you have 3+ ranks. When a communicating ally makes a test with that skill, spend 2 Momentum to let them use your ranks (and a relevant focus) instead of their own."},"Cool Under Pressure":{"keywords":"<Skill>, Fortune","requirements":"","description":"Choose a skill. Spend a Fortune point to automatically pass a test with that skill, though it generates no Momentum."},"Platonist":{"keywords":"Academia","requirements":"","description":"Gain Courage resistance equal to your Academia ranks. Does not stack with other talents that grant bonus Courage resistance."},"Savant":{"keywords":"Academia","requirements":"","description":"Choose two skills that your archetype granted bonus ranks in. For each, either increase its ranks by 1 or gain a focus for it."},"Ludi Champion":{"keywords":"Athletics","requirements":"","description":"Ignore the first complication rolled on Athletics-based tests to run, ride, or swim."},"Marathon Runner":{"keywords":"Athletics","requirements":"","description":"You may take the Rush major action even after already taking the Movement minor action this turn."},"Quality Crafting":{"keywords":"Engineering","requirements":"","description":"Objects you build have their maximum stress increased by 2 and can sustain 1 additional injury."},"The Tool for the Job":{"keywords":"Engineering","requirements":"","description":"Damage rolled on Engineering-based tests that are part of an extended test gains the Piercing 1 effect."},"Sculpted from Marble":{"keywords":"Athletics","requirements":"","description":"You may re-roll any number of dice on Athletics-based tests to lift, run, throw, or swim."},"Aggressive":{"keywords":"Fighting","requirements":"","description":"On a melee attack, the first bonus d20 you buy costs no Momentum; doing so reduces the difficulty of attacks against you by 1 until the start of your next turn. Incompatible with the Defensive talent."},"Field Repair":{"keywords":"Crafting","requirements":"","description":"On an Insight + Crafting test to repair an item in the field, generate 2 Threat to reduce the difficulty by 1 (minimum 1). The repaired item gains the Field Repairs truth."},"Scavenger":{"keywords":"Crafting","requirements":"","description":"Spend half an hour scrounging and pass an Insight + Crafting test (difficulty 1) to replenish a crafting kit's resources."},"Demolitionist":{"keywords":"Engineering","requirements":"","description":"When attacking an object, structure, or stationary vehicle, use Engineering in place of Fighting, and Reason in place of Brawn or Insight for bonus damage. Spend 2 Momentum to convert a number of rolled blanks (up to your Engineering ranks) into effects."},"Defensive":{"keywords":"Fighting","requirements":"","description":"Choose melee or ranged attacks. Attacks of that type made against you have their difficulty increased by 1. May be taken twice, once per type. Incompatible with the Aggressive talent."},"Skirmisher":{"keywords":"Fighting","requirements":"","description":"Once per round, when an enemy's melee or ranged attack against you misses, generate 2 Threat to move anywhere within Medium range as a free action and gain +2 Cover resistance against melee and ranged attacks until the start of your next turn."},"Steady Aim":{"keywords":"Fighting","requirements":"","description":"The Aim minor action with a ranged weapon lets you re-roll 2d20 on that turn's attack, instead of 1."},"Anatomist":{"keywords":"Medicine","requirements":"","description":"Against a human, or an animal or creature you've previously dissected, use Medicine in place of Fighting for attacks, and add the Vicious damage effect."},"Imposing Presence":{"keywords":"Persuasion","requirements":"","description":"Make a mental attack with a melee weapon using Gravitas + Persuasion, without needing the Fearsome X rule. It deals mental damage equal to the weapon's rating plus your Will-based bonus damage, with your choice of Piercing 1 or Stun."},"Combat Medicus":{"keywords":"Medicine","requirements":"","description":"On the Stabilize major action, re-roll 1d20 of your Coordination + Medicine test. If it passes, also remove one condition from the target."},"Keen Eyed":{"keywords":"Observation","requirements":"","description":"Reduce by 1 the extra difficulty Perception-based tests suffer beyond Close range. Additionally, your ranged weapons' effective range extends one zone further without the usual difficulty increase."},"Predator's Senses":{"keywords":"Observation","requirements":"","description":"While conscious, you cannot be the target of a surprise attack. The GM must spend 1 additional Threat to have NPCs act first in a combat encounter."},"Suspicious":{"keywords":"Observation","requirements":"","description":"Before your first turn in combat, hostile physical or mental attacks against you have their difficulty increased by 1."},"Lingua Argentea":{"keywords":"Persuasion","requirements":"","description":"Reduce the difficulty of Persuasion-based tests to sway someone's opinion or to haggle by 1."},"Iron Hide":{"keywords":"Resilience","requirements":"","description":"Your first injury doesn't count toward increasing your complication range. You are defeated after 4 injuries instead of 3 (GM determines whether you're dying or irrational)."},"Mithradatic":{"keywords":"Resilience","requirements":"","description":"Reduce the difficulty of Resilience-based tests to resist poisons, toxins, or drugs by 1; at 0, no test is needed at all."},"Second Wind":{"keywords":"Resilience","requirements":"","description":"When you take the Catch Breath major action, roll a number of dice equal to your Resilience ranks; each effect result removes 1 additional point of stress."},"Fade Away":{"keywords":"Stealth","requirements":"","description":"Once per scene, as a minor action, generate 2 Threat to become immune to being targeted (except by Area attacks) until the start of your next turn. Free if you're already in heavy cover."},"Low Profile":{"keywords":"Stealth","requirements":"","description":"Any Cover resistance you gain is increased by 1."},"Bestiarius":{"keywords":"Survival","requirements":"","description":"Gain a non-sapient companion creature (a Companion Creature profile of your choice), treated as an allied NPC under your command; it looks after itself while you forage. If it's slain, gain a nonrefreshing Fortune point, and either retrain this talent for a new companion or replace it with a different talent."},"Coordinator":{"keywords":"Tactics","requirements":"","description":"Whenever you take part in an assisted skill test, whether leading or assisting, each participating player may re-roll one d20 (keeping the new result)."},"Inconspicuous":{"keywords":"Tactics","requirements":"","description":"Reduce any Threat generated by your weapons or equipment by 1 (a relic or profane item's bonus Threat cannot be reduced below 1 this way)."},"Untraceable":{"keywords":"Survival","requirements":"","description":"While traveling alone or leading a group, increase the difficulty of tests to track your movements by half your Survival ranks (rounded down)."},"Rallying Cry":{"keywords":"Tactics","requirements":"","description":"Roll a number of dice equal to your Tactics ranks. Rather than dealing stress, each stress result removes 1 stress (2 per effect result) from you or an ally within Close range, apportioned as you choose."},"Bizarre Insight":{"keywords":"Weird","requirements":"","description":"Once per scene, generate 1 Threat to Obtain Information without needing to pass a skill test."},"Foreboding Survival":{"keywords":"Weird","requirements":"","description":"Once per session, when dealt an injury, generate 3 Threat to avoid it. The GM may offer the same trade to avoid other misfortunes."},"Mystical Power":{"keywords":"Weird","requirements":"","description":"Requires being a spellcaster. Gain an additional personal truth reflecting the toll of forbidden knowledge (such as Glimpsed What Mortals Should Not Know). When casting a spell, you may increase your power rating by 2; if you do, each ally within Close range suffers 1 mental stress per effect rolled on the spell's cost."},"Numb to the Horrors":{"keywords":"Weird","requirements":"","description":"Gain +6 Courage resistance (no other source of Courage resistance may be added). Re-roll 1d20 on tests to determine whether you gain a mental scar. However, your detached manner increases the complication range of your Persuasion-based tests by 1."},"Occult Dabbler":{"keywords":"Spellcaster, Weird","requirements":"","description":"You become a dabbling spellcaster (see Magic)."},"Spectral Hunter":{"keywords":"Lupercus, Spellcaster","requirements":"Mystic archetype, no other talent with the Spellcaster keyword","description":"You are a spellcaster (see Magic). When you take stress from a battlefield spell's cost, immediately move anywhere within Medium range. May replace another talent with the Spellcaster keyword (only one such talent may be held at a time)."},"Hasty Ritual":{"keywords":"Lupercus","requirements":"Spectral Hunter talent","description":"Choose a spell you know. Once per scene, cast it without the Prepare minor action, though it's cast as a flawed spell."},"Instinctive Magic":{"keywords":"Lupercus, Resilience","requirements":"Hasty Ritual talent","description":"Once per scene, cast a battlefield spell using Resilience (the Fortitude focus applies) instead of its normal skill, and reduce its cost by 2 (minimum 1)."},"Jaws of the Wolf":{"keywords":"Lupercus","requirements":"Hasty Ritual talent","description":"Successfully casting an attack spell grants +1 bonus Momentum, usable only to add +1 to the spell's damage."},"Lupercalia":{"keywords":"Lupercus","requirements":"Jaws of the Wolf talent","description":"Passing one of a ritual's component tests lets you ignore up to 2 resistance per effect rolled."},"Wolf Howl":{"keywords":"Lupercus, Persuasion, Survival","requirements":"Jaws of the Wolf talent","description":"Make a mental attack (no Fearsome X needed) against an aware target within Medium range using Will + Persuasion or Will + Survival, difficulty 1. On a pass, deal mental damage equal to your power rating + 2."},"Quiet Wisdom":{"keywords":"Staff Bearer, Persuasion, Spellcaster","requirements":"Mystic archetype","description":"You are a spellcaster (see Magic). Re-roll 1d20 on Persuasion-based tests (keeping the new result). May replace another talent with the Spellcaster keyword (only one such talent may be held at a time)."},"Know the Signs":{"keywords":"Staff Bearer, Observation, Spellcaster","requirements":"Mystic archetype","description":"You are a spellcaster (see Magic). Near a person or object touched by supernatural power within the last six hours, make an Insight + Observation test with difficulty equal to the hours elapsed. On a pass, you sense the taint; spend 2 Momentum to identify the specific power used. May replace another talent with the Spellcaster keyword (only one such talent may be held at a time)."},"Do We Fear This?":{"keywords":"Staff Bearer, Persuasion","requirements":"Force of Presence talent or Protective Superstitions talent","description":"As a minor action, spend 1 Fortune point to grant each ally within Close range Morale resistance equal to your Persuasion ranks, lasting until the end of the scene."},"Force of Presence":{"keywords":"Staff Bearer, Weird","requirements":"Quiet Wisdom talent","description":"Your bonus damage on mental-damage attacks increases by 1."},"Runecasting":{"keywords":"Staff Bearer, Observation","requirements":"Quiet Wisdom talent or Know the Signs talent","description":"Once every 24 hours, make an Insight + Observation test at a difficulty of your choice (1-5). On a pass, roll that many d20s and record each result. Until the next morning, whenever you or anyone within line of sight makes a skill test, you may substitute one or more of the rolled dice with a recorded result (each recorded result can replace only one die, and you need not use them all)."},"Protective Superstitions":{"keywords":"Staff Bearer, Observation","requirements":"Know the Signs talent","description":"When resisting a spell, gain +1 bonus Momentum per rank in Observation."},"Fabricator":{"keywords":"Engineer, Crafting, Engineering","requirements":"Sage archetype","description":"Re-roll 1d20 on Crafting- or Engineering-based tests (keeping the new result)."},"Dedication":{"keywords":"Engineer, Momentum","requirements":"Fabricator talent","description":"At the start of a scene, if the group's Momentum pool is empty, roll 1d20. If the result is at or below your Will rating, add 1 Momentum to the pool."},"In the Nick of Time":{"keywords":"Engineer, Academia, Engineering","requirements":"Intense Study talent, 3+ ranks in Academia or Engineering","description":"Passing an Academia- or Engineering-based test that's part of an extended test grants the Vicious damage effect on it."},"Incisive Scrutiny":{"keywords":"Engineer","requirements":"Fabricator talent","description":"Passing an Insight- or Reason-based test grants +1 bonus Momentum, usable only for the Obtain Information option."},"Intense Scrutiny":{"keywords":"Engineer","requirements":"(Incisive Scrutiny talent or Intense Study talent) and 3+ ranks in Academia or Engineering","description":"Reason- or Will-based tests that are part of an extended test gain the Piercing 2 damage effect."},"Intense Study":{"keywords":"Engineer","requirements":"Dedication talent or Intense Scrutiny talent","description":"Twice per session, before a skill test, choose a focus you don't have and use it for that test; you retain it for the rest of the session."},"Physician":{"keywords":"Medicus, Medicine","requirements":"Sage archetype, 1+ ranks in Medicine","description":"Re-roll 1d20 on Medicine-based tests (keeping the new result)."},"Emergency Doctor":{"keywords":"Medicus, Medicine","requirements":"Physician talent","description":"Reduce the difficulty of the Stabilize major action by 1 (minimum 0)."},"Fast Aid":{"keywords":"Medicus, Medicine","requirements":"Physician talent","description":"On a Medicine-based test, you may accept one additional complication in exchange for one automatic success."},"Field Medicine":{"keywords":"Medicus, Medicine","requirements":"Physician talent","description":"Ignore any difficulty increase on Medicine-based tests caused by lacking proper tools or equipment."},"First Response":{"keywords":"Medicus, Medicine","requirements":"Fast Aid talent, 3+ ranks in Medicine","description":"In combat, the Stabilize major action can also target characters who aren't dying. On a pass, choose one: remove stress equal to your Medicine ranks (plus 1 more per Momentum spent); remove a condition; or remove an ongoing damage effect such as Persistent."},"Triage":{"keywords":"Medicus, Medicine","requirements":"Emergency Doctor talent or First Response talent, 3+ ranks in Medicine","description":"Make a Reason + Medicine test to diagnose a patient's injuries, illness, or its severity; on a pass, gain +1 bonus Momentum usable only for Obtain Information. When you pass a Reason + Medicine test to remove a scar, spend Momentum to remove the same scar from one additional patient per point spent."},"Sharp Senses":{"keywords":"Frumentarius, Observation","requirements":"Schemer archetype","description":"Re-roll 1d20 on Observation-based tests (keeping the new result)."},"Do or Die":{"keywords":"Frumentarius, Morale","requirements":"Sharp Senses talent","description":"Generate 1 Threat to gain +2 Morale resistance until the end of the scene."},"Interrogation":{"keywords":"Frumentarius","requirements":"Know Thy Enemy talent","description":"Passing a test to coerce information during a social conflict grants +1 bonus Momentum, usable only for Obtain Information."},"Know Thy Enemy":{"keywords":"Frumentarius","requirements":"Sharp Senses talent","description":"The first bonus d20 you buy on an Insight-based test to detect lies or hidden truths costs no Momentum."},"Perfect Facade":{"keywords":"Frumentarius, Stealth","requirements":"Sharp Senses talent","description":"Passing a Stealth-based test to create or use a disguise grants bonus Momentum equal to your Stealth ranks, to a maximum of +3."},"Thorough Search":{"keywords":"Frumentarius","requirements":"Interrogation talent","description":"Passing a test to search for evidence grants +1 bonus Momentum, usable only for Obtain Information. If you assist such a search and the leader passes, they receive this bonus instead."},"Charismatic":{"keywords":"Magistrate, Persuasion","requirements":"Schemer archetype","description":"Re-roll 1d20 on Persuasion-based tests (keeping the new result)."},"Commanding Presence":{"keywords":"Magistrate, Persuasion, Tactics","requirements":"Charismatic talent","description":"The first bonus d20 you buy on Persuasion- or Tactics-based tests costs no Momentum."},"Honestas":{"keywords":"Magistrate","requirements":"Charismatic talent","description":"Reduce by 1 (minimum 0) the difficulty of tests to resist being coerced into breaking a promise or acting dishonorably."},"Lictors":{"keywords":"Magistrate, Tactics","requirements":"Commanding Presence talent","description":"Designate allies in your zone, up to your Tactics rank, as lictors. For the rest of the scene, when you're targeted by an attack, a lictor may take your place as the target, gaining Courage resistance equal to your Tactics ranks against it."},"Rhetoric":{"keywords":"Magistrate","requirements":"Charismatic talent","description":"When buying bonus d20s on a test to address a crowd, you may re-roll one of them."},"Stoic":{"keywords":"Magistrate","requirements":"Honestas talent","description":"Reduce by 2 (minimum 0) the difficulty of tests to resist coercion, mental intrusion, pain, or other mental attacks."},"Hasty Retreat":{"keywords":"Robber","requirements":"Scoundrel archetype","description":"When buying bonus d20s on a test to evade pursuit, you may re-roll one of them."},"Inconspicuous (Robber)":{"keywords":"Robber, Stealth","requirements":"Scoundrel archetype","description":"If non-enemies are within Close range, make an Insight + Stealth test to hide or avoid notice even while visible to an enemy (the GM may raise the difficulty if you stand out)."},"Alter Ego":{"keywords":"Robber","requirements":"Inconspicuous talent","description":"On entering a scene, you may adopt a persona, gaining a new truth that represents it until you're discovered or drop the disguise. While out of sight, spend a major action and generate 2 Threat to quick-change into a new disguise."},"Nimble":{"keywords":"Robber, Movement","requirements":"Hasty Retreat talent","description":"Reduce by 2 the difficulty of tests to move through difficult terrain or obstacles (such as during a pursuit or skirmish); at 0, you move through it freely."},"Ransack":{"keywords":"Robber, Observation","requirements":"Scotopia talent","description":"On an Observation-based test to search an area, generate 2 Threat to reduce the difficulty by 1 and halve the time the search takes."},"Scotopia (Robber)":{"keywords":"Robber","requirements":"Alter Ego talent or Nimble talent","description":"Ignore skill test penalties from poor illumination or low light (not total darkness)."},"Subtle Step":{"keywords":"Sicarius, Stealth","requirements":"Scoundrel archetype","description":"The first bonus d20 you buy on a Stealth-based test to sneak or pass unseen costs no Momentum."},"Assassin":{"keywords":"Sicarius","requirements":"Death Dealer talent or Silent Strike talent","description":"When attacking with a melee weapon that has the Hidden quality, spend 2 Momentum to treat every blank rolled in the attack's pool as an effect instead."},"Backstabber":{"keywords":"Sicarius","requirements":"Guard Break talent or Subtle Step talent","description":"Attacks against a target without Guard gain the Intense damage effect, if they don't already have it."},"Death Dealer":{"keywords":"Sicarius, Stealth","requirements":"Guard Break talent or Silent Strike talent","description":"While wielding a weapon with the Hidden quality, use Stealth in place of Fighting to attack with it, and increase its damage by 1."},"Guard Break":{"keywords":"Sicarius","requirements":"Backstabber talent or Subtle Step talent","description":"When attacking an opponent with greater Reach than yours, treat their Reach as 1 point lower."},"Silent Strike":{"keywords":"Sicarius","requirements":"Backstabber talent or Death Dealer talent","description":"Attacks with a melee weapon that has Reach 1 gain the Subtle quality."},"Tracker":{"keywords":"Hunter","requirements":"Scout archetype","description":"The first bonus d20 you buy on a test to discover or follow tracks costs no Momentum."},"Constantly Watching":{"keywords":"Hunter","requirements":"Tracker talent","description":"Reduce by 1 (minimum 0) the difficulty of tests to detect danger or hidden enemies."},"Dead Eye":{"keywords":"Hunter","requirements":"Expert Aim talent","description":"Ranged weapon attacks deal +1 damage."},"Expert Aim":{"keywords":"Hunter","requirements":"Tracker talent","description":"The Aim minor action lets you, instead of re-rolling a d20, designate one d20 in your pool before rolling and treat it as having rolled a 1."},"Scotopia (Hunter)":{"keywords":"Hunter","requirements":"Constantly Watching talent","description":"Ignore skill test penalties from poor illumination or low light (not total darkness)."},"Self Sufficient":{"keywords":"Hunter, Survival","requirements":"Tracker talent","description":"Re-roll 1d20 on Survival-based tests (keeping the new result)."},"Pack Tactics":{"keywords":"Veles","requirements":"Scout archetype","description":"When you assist an ally in combat and their test passes, they gain +1 bonus Momentum."},"Acrobatic Dodge":{"keywords":"Veles, Athletics","requirements":"Swift Victory talent","description":"Oppose an enemy's melee attack with Agility + Athletics instead of Agility + Fighting. Winning deals no damage but lets you move to anywhere within Close range (or Medium range, for 1 Momentum)."},"Assail":{"keywords":"Veles, Fighting","requirements":"Pack Tactics talent","description":"When making a ranged attack with a Thrown Weapons-focus weapon, spend 2 Momentum to take a second major action this turn."},"Fortune Favors the Bold":{"keywords":"Veles, Fortune","requirements":"Rejuvenation talent","description":"When spending Fortune to re-roll a failed test, you may first increase its difficulty by 1; if the re-roll then passes, regain the spent Fortune point."},"Rejuvenation":{"keywords":"Veles, Resilience","requirements":"Pack Tactics talent","description":"Reduce the difficulty of the Catch Breath major action by 1 (minimum 0), and each Momentum spent on it to remove stress removes 2 instead of 1."},"Swift Victory":{"keywords":"Veles","requirements":"Pack Tactics talent","description":"On an Athletics-based test for a Rush action or to cross difficult terrain, accept one additional complication for one automatic success. At the start of any conflict, generate 1 Threat to act first, regardless of who'd normally go first."},"Head Taker":{"keywords":"Berserker, Fighting","requirements":"Soldier archetype","description":"Choose a visible Toughened or Nemesis NPC. Your melee attacks against them gain +1, until they die, the scene ends, or they deal you stress. Defeating them grants a nonrefreshing Fortune point, lost at the end of the scene."},"War Cry":{"keywords":"Berserker","requirements":"Head Taker talent","description":"When your Head Taker target attacks you in melee, as a reaction, before the dice are rolled, designate one d20 in their pool to automatically count as a 20; the attack's complication range also increases by 1."},"Hack and Slash":{"keywords":"Berserker, Fighting","requirements":"Head Taker talent","description":"The first bonus d20 you buy on a melee attack against a creature you've already hit this scene costs no Momentum."},"Brutal Fighter":{"keywords":"Berserker","requirements":"Hack and Slash talent","description":"All weapons you wield gain the Vicious damage effect; a weapon that already has Vicious instead deals +2 damage."},"Bloody Handed":{"keywords":"Berserker, Fighting","requirements":"Brutal Fighter talent","description":"On a melee attack, add the Area effect, striking one additional GM-chosen target within Close range per effect rolled, and add 1 Threat per effect rolled. The GM may spend that Threat (2 per target) to have the attack strike unintended targets instead."},"Onslaught":{"keywords":"Berserker, Movement","requirements":"Head Taker talent","description":"After a melee attack of yours deals stress, move anywhere within Medium range as a free action."},"Berserker Rush":{"keywords":"Berserker, Fighting","requirements":"Onslaught talent","description":"After using the Rush major action, spend 2 Momentum to make a melee attack at the end of your movement; if it deals damage, add +1."},"Legionary Training":{"keywords":"Legionary, Fighting","requirements":"Soldier archetype","description":"Re-roll 1d20 on Fighting-based tests made with a spear, gladius, or pilum (keeping the new result)."},"Legionary Veteran":{"keywords":"Legionary","requirements":"Legionary Training talent","description":"Gain +2 Courage resistance."},"Precision Strikes":{"keywords":"Legionary","requirements":"Legionary Training talent","description":"Weapons you wield gain the Piercing 1 damage effect; a weapon that already has Piercing instead gets +1 to it."},"Strike as One":{"keywords":"Legionary, Tactics","requirements":"Precision Strikes talent","description":"As a minor action before attacking, spend Momentum (up to your Tactics rank) to order one ally to strike per point spent. When you then make your attack, each ordered ally may use their Reaction to make a melee or ranged attack."},"Scutarius":{"keywords":"Legionary","requirements":"Legionary Training talent","description":"As a major action, lock shields with a shield-equipped ally in your zone. While locked, you each gain bonus Cover resistance equal to the other's shield's Shield X rating."},"Brace for Impact":{"keywords":"Legionary, Fighting","requirements":"Scutarius talent","description":"When targeted by a melee attack, before its dice are rolled, brace in formation with a shield-equipped ally in your zone (you must also have a shield); you each gain +1 Cover resistance. Winning the opposed Agility + Fighting test lets you deal damage and force the attacker back to a point within Close range."},"Formation Tactics":{"keywords":"Legionary","requirements":"Brace for Impact talent","description":"As a major action, form up with an ally in your zone who's also equipped with a shield and a gladius or similar sword. While in formation, you may regain Guard as a free action even with an enemy within Reach, and any enemy who successfully attacks either of you takes 2 physical damage."},"Purse Strings":{"keywords":"Servant","requirements":"Servant caste","description":"Once per adventure, purchase an item with Restriction 3 or lower using your employer's wealth or requisition points instead of your own. You must return the item after the adventure ends."},"Envy and Attention":{"keywords":"Noble","requirements":"Noble caste","description":"The first bonus d20 you buy on Gravitas-based tests to sway or influence others costs no Momentum, but the GM starts each adventure with 2 additional Threat. This talent can't be retrained unless you lose your Noble caste status."},"Alea Iacta Est (The Die Is Cast)":{"keywords":"Roman Citizen","requirements":"Roman Citizen culture","description":"Once per scene, when an NPC suffers a complication, raise the GM's Threat cost to cancel it to 4."},"All Roads Lead to Rome":{"keywords":"Roman Citizen","requirements":"Roman Citizen culture","description":"Reduce by 1 (minimum 0) the difficulty of tests to learn about, or act appropriately within, an unfamiliar culture."},"Unyielding":{"keywords":"Germanic Tribe","requirements":"Germanic Tribe culture","description":"Increase your maximum stress by 3."},"Woodwise":{"keywords":"Germanic Tribe","requirements":"Germanic Tribe culture","description":"In the woodlands of Germania, reduce by 1 (minimum 0) the difficulty of tests to find food or shelter, navigate, or travel through the forest."},"Balancing the Scales":{"keywords":"Ægyptus","requirements":"Ægyptus culture","description":"On a test to haggle over price, generate 2 Threat to reduce the difficulty by 1 (minimum 1)."},"Writ in Stone":{"keywords":"Ægyptus, Academia","requirements":"Ægyptus culture","description":"Re-roll every die that fails to generate a success on Academia-based tests to recall history or lore."},"Night Raiders":{"keywords":"Briton","requirements":"Briton culture","description":"Ignore location truths that penalize skill tests due to poor illumination or low light (not total darkness)."},"Warrior Born":{"keywords":"Briton","requirements":"Briton culture","description":"Begin the game with +2 Courage resistance."},"Noble Line":{"keywords":"Gaul","requirements":"Gaul culture","description":"Re-roll 1d20 on tests to gain support or aid from a non-Roman (keeping the new result)."},"Undergoing All Dangers":{"keywords":"Gaul","requirements":"Gaul culture","description":"Begin the game with +1 Courage resistance."},"Cosmopolitan":{"keywords":"Greek","requirements":"Greek culture","description":"You can communicate clearly with someone who doesn't share a language with you, through pidgin and gesture, as long as the information isn't too complex."},"Practiced Listener":{"keywords":"Greek","requirements":"Greek culture","description":"Re-roll one die that fails to generate a success on an Insight-based test to judge a speaker's honesty."},"Do as the Romans Do":{"keywords":"Other Culture / Foederati","requirements":"Other Culture / Foederati culture","description":"Choose and gain one culture talent available to Roman citizens."},"Hidden Potential":{"keywords":"Other Culture / Foederati","requirements":"Other Culture / Foederati culture","description":"Once per scene, generate 2 Threat to treat a skill you have no ranks in as having 2 ranks (plus a relevant focus) for the rest of the scene."},"World Weary":{"keywords":"Other Culture / Foederati","requirements":"Other Culture / Foederati culture","description":"Add one automatic success to Will-based tests."}};
-  const ccApplyTalentPreset = ({trigger, attributes}) => {
-    const [section, rowID] = k.parseRepeatName(trigger.name);
-    const prefix = `${section}_${rowID}_`;
-    const profile = ccTalentProfiles[attributes[`${prefix}name`]];
-    if (!profile) { return; }
-    Object.keys(profile).forEach((field) => {
-      attributes[`${prefix}${field}`] = profile[field];
-    });
-  };
-  k.registerFuncs({ccApplyTalentPreset});
-  
-  // Shared lookup table used by Bonus Damage, Base Armour, Courage, and
-  // (in views/_spells.pug) spellcasting Power Rating. Rulebook table:
+  // Shared lookup table used by Attributes' Bonus Damage, Vitals' Base
+  // Armour/Courage/Total Armor, and (in views/_spells.pug) spellcasting
+  // Power Rating - four different panel/tab files. Rulebook table:
   // rating <=8 -> 0, 9 -> +1, 10-11 -> +2, 12-13 -> +3, 14-15 -> +4, 16+ -> +5.
   const ccAttributeBonus = (rating) => {
     const r = Number(rating) || 0;
     return r <= 8 ? 0 : Math.min(5, Math.ceil((r - 7) / 2));
   };
   
-  const calcAttributeBonusDamage = ({trigger, attributes}) => {
-    const attrName = trigger.name.replace(/_bonus_damage$/, '');
-    return ccAttributeBonus(attributes[`${attrName}_rating`]);
-  };
-  k.registerFuncs({calcAttributeBonusDamage});
-  
-  const calcBaseArmour = ({attributes}) => ccAttributeBonus(attributes.brawn_rating);
-  k.registerFuncs({calcBaseArmour});
-  
-  const calcCourage = ({attributes}) => ccAttributeBonus(attributes.will_rating);
-  k.registerFuncs({calcCourage});
-  
-  const calcTotalArmor = ({attributes}) => {
-    const base = ccAttributeBonus(attributes.brawn_rating);
-    const armorRows = attributes.repeating_armor || [];
-    const armorSum = armorRows.reduce((sum, row) => sum + (Number(row.resistance) || 0), 0);
-    return base + armorSum;
-  };
-  k.registerFuncs({calcTotalArmor});
-  
-  // "Add your: Brawn + Resilience, or Will + Resilience (whichever is higher)."
-  // Plus +3 from the Unyielding talent ("You increase your maximum stress
-  // by +3") if the character has taken it - checked by name since talents
-  // are free text (a datalist, not a fixed dropdown - see the pug comment
-  // above the Name field), so this matches case/whitespace-insensitively
-  // the same way ccApplyTalentPreset's own lookup effectively does via the
-  // datalist's exact suggested spelling. This is the character's raw/
-  // un-reduced Max Stress - shared by calcStressMax below (which further
-  // reduces it for Fatigue) and calcStressMaxBase's own "Max" field/
-  // .cc-fatigue-max-marker, which both need the UN-reduced number (Fatigue
-  // capping its own, already-Fatigue-reduced cap would be self-referential).
-  const ccStressMaxBase = (attributes) => {
-    const resilience = Number(attributes.resilience_ranks) || 0;
-    const brawn = Number(attributes.brawn_rating) || 0;
-    const will = Number(attributes.will_rating) || 0;
-    const talents = attributes.repeating_talent || [];
-    const hasUnyielding = talents.some((row) => String(row.name || '').trim().toLowerCase() === 'unyielding');
-    return Math.max(brawn, will) + resilience + (hasUnyielding ? 3 : 0);
-  };
-  
-  const calcStressMaxBase = ({attributes}) => ccStressMaxBase(attributes);
-  k.registerFuncs({calcStressMaxBase});
-  
-  // Fatigue (page 41): each point temporarily reduces Max Stress by 1,
-  // floored at 0 - RAW says reaching 0 this way means Defeated, which this
-  // sheet has no separate tracked state to flag, so it's left as a
-  // Current Max of 0 for the player/GM to notice and resolve narratively.
-  // "Ignore Fatigue" suppresses this reduction without discarding the
-  // tracked fatigue value, since the fatigue itself hasn't been removed,
-  // just pushed through for now (see the pug comment above the Fatigue
-  // tracker).
-  const calcStressMax = ({attributes}) => {
-    const fatigue = attributes.fatigue_ignored ? 0 : (Number(attributes.fatigue) || 0);
-    return Math.max(0, ccStressMaxBase(attributes) - fatigue);
-  };
-  k.registerFuncs({calcStressMax});
-  
-  // Backs every box in the Stress/Fortune/Fatigue trackers (see the pug
-  // comment above .cc-stress-track for the full rationale) - each box is
-  // an action button rather than a radio specifically so this runs on
-  // every click, including a re-click of the currently topmost box, which
-  // a native radio can't ever report at all (clicking an already-checked
-  // radio is a silent no-op, no event fires). Clicking a box jumps the
-  // track straight to that box's value, the same "fill up to / clear down
-  // to" behavior a radio group gives for free - except clicking box 1
-  // while it's the ONLY box filled clears the whole track to 0 instead of
-  // re-selecting 1, since that's the one value a real radio group could
-  // never leave once reached. That one case replaces the old separate
-  // Clear button entirely. Writes straight to `attributes`, the same
-  // write-via-attributes pattern ccApplyTalentPreset uses to drive a
-  // field's displayed value from a sheet worker. Action-button
-  // trigger.name arrives dash-separated with no act_ prefix (e.g.
-  // 'stress-box-5'), not the space-separated name the action was declared
-  // with - see ccNormalizeName's own comment further below for the same
-  // quirk.
-  const ccTrackBoxClick = ({trigger, attributes}) => {
-    const match = /^(stress|fortune|fatigue)-box-(\d+)$/.exec(trigger.name);
-    if (!match) { return; }
-    const [, track, posStr] = match;
-    const position = Number(posStr);
-    const current = Number(attributes[track]) || 0;
-    attributes[track] = (position === 1 && current === 1) ? 0 : position;
-  };
-  k.registerFuncs({ccTrackBoxClick});
-  
-  const calcXpAvailable = ({attributes}) => {
-    return (Number(attributes.xp_earned) || 0) - (Number(attributes.xp_spent) || 0);
-  };
-  k.registerFuncs({calcXpAvailable});
-  
   const ccCapitalize = (s) => s.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
   
-  const ccAttributeQuery = '?{Attribute' +
-    '|Agility,@{agility_rating}' +
-    '|Brawn,@{brawn_rating}' +
-    '|Coordination,@{coordination_rating}' +
-    '|Gravitas,@{gravitas_rating}' +
-    '|Insight,@{insight_rating}' +
-    '|Reason,@{reason_rating}' +
-    '|Will,@{will_rating}}';
+  // Action-button trigger.name is normalized with dashes (e.g.
+  // "academia-focus-finance-roll"), not the underscores used everywhere
+  // else on this sheet (attribute/calculation trigger names) - confirmed
+  // by inspecting the compiled sheet's own cascade data. Normalize before
+  // matching so the regexes in Attributes'/Skills' own roll initiators
+  // (written against underscore form) work. Shared between those two
+  // panel files' roll initiators - see ccNormalizeName's own comment
+  // further below for the same quirk (referring to this one).
+  const ccNormalizeName = (name) => name.replace(/-/g, '_');
   
   // Momentum in Cohors Cthulhu (as in the wider 2d20 System) is a shared
   // party resource, not a per-character stat, so it isn't tracked on this
@@ -2062,6 +1915,9 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
   // pool in sync and display it to the table. delta is net: positive for
   // Momentum a passed roll generates, negative for Momentum spent (buying
   // additional d20s, or - for spells - declaring Extra Momentum spent).
+  // Called from Attributes/Skills' shared runCcRoll below, Vitals' own
+  // Fatigue resist roll, Weapons' weapon roll, and Spells' spell roll
+  // (views/_spells.pug) - five different call sites across panels/tabs.
   //
   // Originally tried calling sendChat() directly - confirmed live in a
   // real game that sheet workers have no such function at all ("sendChat
@@ -2112,12 +1968,15 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
     }
   };
   
-  // Shared 2d20 roll core, used for Attribute-only rolls, plain Skill
-  // rolls (no focus), and Focus rolls. attributeExpr is either a literal
-  // rating (attribute-only roll, no choice to make) or the ?{Attribute}
-  // query string (skill/focus rolls, since skill-to-attribute pairing
-  // isn't fixed by RAW). critMax is the die value at/under which a die is
-  // a critical success (this skill's ranks if a focus applies, else 1).
+  // Shared 2d20 roll core, used for Attribute-only rolls (Attributes
+  // panel), plain Skill rolls (no focus), and Focus rolls (both Skills
+  // panel) - three call sites across two panel files. attributeExpr is
+  // either a literal rating (attribute-only roll, no choice to make) or
+  // the ?{Attribute} query string (skill/focus rolls, since skill-to-
+  // attribute pairing isn't fixed by RAW - see ccAttributeQuery in
+  // views/panels/_skills_panel.pug). critMax is the die value at/under
+  // which a die is a critical success (this skill's ranks if a focus
+  // applies, else 1).
   const runCcRoll = async ({skillLabel, focusLabel, attributeExpr, skillRanks, critMax}) => {
     const difficultyQuery = '?{Difficulty|1}';
     const complicationQuery = '?{Complication range (1-5)|1}';
@@ -2225,344 +2084,6 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
       return false;
     }
   };
-  
-  // Action-button trigger.name is normalized with dashes (e.g.
-  // "academia-focus-finance-roll"), not the underscores used everywhere
-  // else on this sheet (attribute/calculation trigger names) - confirmed
-  // by inspecting the compiled sheet's own cascade data. Normalize before
-  // matching so the regexes below (written against underscore form) work.
-  const ccNormalizeName = (name) => name.replace(/-/g, '_');
-  
-  // Attribute-only roll (no skill): target number is just the attribute's
-  // own rating, crit only on a natural 1 (no focus applies).
-  const initiateAttributeRoll = async ({trigger, attributes}) => {
-    const attr = ccNormalizeName(trigger.name).replace(/_roll$/, '');
-    const rating = Number(attributes[`${attr}_rating`]) || 0;
-    await runCcRoll({
-      skillLabel: ccCapitalize(attr),
-      focusLabel: '',
-      attributeExpr: String(rating),
-      skillRanks: 0,
-      critMax: 1,
-    });
-  };
-  k.registerFuncs({initiateAttributeRoll});
-  
-  // Plain Skill roll (no specific focus): crit only on a natural 1, per
-  // RAW ("if you don't have a focus that applies, each die that rolls a
-  // 1 is a critical success").
-  const initiateSkillRoll = async ({trigger, attributes}) => {
-    const skill = ccNormalizeName(trigger.name).replace(/_skill_roll$/, '');
-    const skillRanks = Number(attributes[`${skill}_ranks`]) || 0;
-    await runCcRoll({
-      skillLabel: ccCapitalize(skill),
-      focusLabel: '',
-      attributeExpr: ccAttributeQuery,
-      skillRanks,
-      critMax: 1,
-    });
-  };
-  k.registerFuncs({initiateSkillRoll});
-  
-  // Focus roll: crit on a die <= this skill's ranks, since a
-  // focus-specific roller always "has the focus" that applies.
-  const initiateFocusRoll = async ({trigger, attributes}) => {
-    const match = ccNormalizeName(trigger.name).match(/^(.+)_focus_(.+)_roll$/);
-    if (!match) { return; }
-    const [, skill, focusSlug] = match;
-    const skillRanks = Number(attributes[`${skill}_ranks`]) || 0;
-    await runCcRoll({
-      skillLabel: ccCapitalize(skill),
-      focusLabel: ccCapitalize(focusSlug),
-      attributeExpr: ccAttributeQuery,
-      skillRanks,
-      critMax: skillRanks,
-    });
-  };
-  k.registerFuncs({initiateFocusRoll});
-  
-  // Fatigue (page 41): "Brawn + Resilience, or Will + Resilience test with
-  // a difficulty of 1" to remove it, always the higher of Brawn/Will per
-  // RAW (same pairing calcStressMax already uses, so no attribute-choice
-  // query is needed here unlike the shared skill/focus rolls above).
-  // "Passing the test removes 1 point of fatigue, plus 1 more for each
-  // point of Momentum spent" - that's an input the player commits from the
-  // party's Momentum pool to boost the effect, not Momentum the roll
-  // itself generates, so it's wired the same way Extra Momentum works for
-  // spells (see initiateSpellRoll in views/_spells.pug): a query, counted
-  // as a cost against ccSendMomentumSignal, and only ever applied on a
-  // pass. This is a bespoke roll (not built on the shared runCcRoll core)
-  // because it needs that extra query plus a post-roll attributes write,
-  // neither of which runCcRoll supports - same reason initiateWeaponRoll/
-  // initiateSpellRoll each have their own rollString instead of sharing it.
-  const initiateFatigueResistRoll = async ({attributes}) => {
-    const brawnRating = Number(attributes.brawn_rating) || 0;
-    const willRating = Number(attributes.will_rating) || 0;
-    const resilienceRanks = Number(attributes.resilience_ranks) || 0;
-    const attributeRating = Math.max(brawnRating, willRating);
-  
-    const difficultyQuery = '?{Difficulty|1}';
-    const complicationQuery = '?{Complication range (1-5)|1}';
-    const bonusDiceQuery = '?{Additional d20s bought (0-3)|0}';
-    const extraMomentumQuery = '?{Momentum spent to remove extra fatigue|0}';
-  
-    const rollString = '&{template:ccskill} ' +
-      `{{character_name=@{character_name}}} ` +
-      `{{skill=Resist Fatigue}} ` +
-      `{{focus=Resilience}} ` +
-      `{{attribute_choice=[[0+${attributeRating}]]}} ` +
-      `{{difficulty=[[0+${difficultyQuery}]]}} ` +
-      `{{complication_range=[[0+${complicationQuery}]]}} ` +
-      `{{roll1=[[(2+${bonusDiceQuery})d20]]}} ` +
-      `{{extra_momentum=[[0+${extraMomentumQuery}]]}} ` +
-      `{{target_number=[[0]]}} ` +
-      `{{successes=[[0]]}} ` +
-      `{{dice_text=[[0]]}} ` +
-      `{{outcome=[[0]]}} ` +
-      `{{complications=[[0]]}} ` +
-      `{{bonus_momentum=[[0]]}} ` +
-      `{{momentum_spent=[[0]]}} ` +
-      `{{fatigue_removed=[[0]]}}`;
-  
-    const roll = await startRoll(rollString);
-  
-    try {
-      const difficulty = Number(roll.results.difficulty.result) || 1;
-      const complicationRange = Number(roll.results.complication_range.result) || 1;
-      const extraMomentum = Number(roll.results.extra_momentum.result) || 0;
-  
-      const roll1 = roll.results.roll1;
-      const dice = Array.isArray(roll1.dice) ?
-        roll1.dice :
-        (roll1.rolls && roll1.rolls[0] && roll1.rolls[0].results || []).map((r) => r.v);
-  
-      // Crit only on a natural 1 - this test has no Focus mechanic to
-      // widen that range the way a known Weapon Focus can.
-      const targetNumber = attributeRating + resilienceRanks;
-      const complicationThreshold = 21 - complicationRange;
-      const successCount = dice.filter((d) => d <= targetNumber).length +
-        dice.filter((d) => d <= 1).length;
-      const complicationCount = dice.filter((d) => d >= complicationThreshold).length;
-      const passed = successCount >= difficulty;
-      const bonusMomentum = passed ? Math.max(0, successCount - difficulty) : 0;
-      const bonusDiceBought = Math.max(0, dice.length - 2);
-  
-      // "Passing the test removes 1 point of fatigue, plus 1 more for each
-      // point of Momentum spent" - applied straight to the attribute (same
-      // write-via-attributes pattern as ccApplyTalentPreset/ccTrackBoxClick
-      // above), floored at 0 so it can't go negative.
-      const fatigueRemoved = passed ? 1 + extraMomentum : 0;
-      if (fatigueRemoved > 0) {
-        attributes.fatigue = Math.max(0, (Number(attributes.fatigue) || 0) - fatigueRemoved);
-      }
-  
-      await ccSendMomentumSignal(bonusMomentum - bonusDiceBought - extraMomentum);
-      await ccSendThreatSignal(complicationCount);
-  
-      finishRoll(roll.rollId, {
-        target_number: targetNumber,
-        successes: successCount,
-        dice_text: dice.join(', '),
-        outcome: passed ? 1 : 0,
-        bonus_momentum: bonusMomentum,
-        complications: complicationCount,
-        extra_momentum: extraMomentum,
-        momentum_spent: bonusDiceBought + extraMomentum,
-        fatigue_removed: fatigueRemoved,
-      });
-    } catch (err) {
-      finishRoll(roll.rollId, {
-        target_number: '?',
-        successes: '?',
-        dice_text: `error: ${err.message}`,
-        outcome: 0,
-        complications: 0,
-        fatigue_removed: 0,
-      });
-    }
-  };
-  k.registerFuncs({initiateFatigueResistRoll});
-  
-  // Weapon "Damage & Effects" fields are stored as free text like
-  // "4, Piercing 1" or "3, Vicious" (see ccWeaponProfiles above) - first
-  // comma-separated token is the weapon's base Damage rating (in Challenge
-  // Dice), everything after that is its list of Damage Effects (Piercing N,
-  // Vicious, Stun, etc, per the rulebook's Chapter 7).
-  const ccParseDamageEffects = (text) => {
-    const parts = String(text || '').split(',').map((s) => s.trim()).filter(Boolean);
-    return {
-      baseRating: Number(parts[0]) || 0,
-      effects: parts.slice(1),
-    };
-  };
-  
-  // Cohors Cthulhu damage is rolled with special 6-sided Challenge Dice.
-  // This sheet has no access to physical Challenge Dice, so damage is
-  // rolled as plain d6s and converted face-by-face using the rulebook's
-  // own "If you don't have Challenge Dice" fallback table: 1->1 pip (a
-  // dagger face), 2->2 pips (a crossed-daggers face), 3/4->blank, 5/6->1
-  // pip plus an Effect (the Cthulhu-face symbol). Symbols here mirror
-  // that table's own iconography (dagger/crossed daggers/dash/Cthulhu
-  // face) rather than a generic pip count, so the roll template reads the
-  // same way the physical dice would.
-  //
-  // The Effect face was originally the octopus emoji (an astral-plane
-  // character, outside the Basic Multilingual Plane), which Roll20's
-  // savesheetsettings endpoint rejected with a 500 the first time this
-  // HTML was pasted into a fresh game - a known failure mode on Roll20's
-  // backend for any 4-byte-UTF-8 character in custom sheet code. Skull
-  // and crossbones reads the same way (a distinct "something happened"
-  // face) and is a plain BMP character, so it saves without issue.
-  const ccChallengeDieFromD6 = (d6) => {
-    switch (Number(d6)) {
-      case 1: return {pips: 1, effect: false, symbol: '†'};
-      case 2: return {pips: 2, effect: false, symbol: '‡'};
-      case 5: return {pips: 1, effect: true, symbol: '☠'};
-      case 6: return {pips: 1, effect: true, symbol: '☠'};
-      default: return {pips: 0, effect: false, symbol: '–'};
-    }
-  };
-  
-  // Weapon roll: attack and damage rolled together in a single message,
-  // since a Cohors Cthulhu attack is an opposed test - there's no static
-  // Difficulty to pass/fail against (the GM's opposing roll decides that),
-  // so damage is rolled unconditionally alongside the attack rather than
-  // as a separate, gated follow-up roll. This also sidesteps having two
-  // separate roll templates in play, since the second one, despite being
-  // built the same way as the proven ccskill template, was showing up in
-  // chat unstyled.
-  //
-  // Unlike a generic Skill/Focus roll, an attack roll always has
-  // Difficulty 1 (no query) and doesn't ask which Attribute to pair -
-  // melee/unarmed weapons always use Agility, ranged/thrown weapons always
-  // use Coordination (Agility + Fighting / Coordination + Fighting, per
-  // RAW). Known-focus status is still checked explicitly (same as
-  // initiateFocusRoll) since clicking a weapon's roll button isn't itself
-  // a declaration that its Focus is known - crit range only opens up to
-  // Fighting's ranks when that specific focus checkbox is checked, else it
-  // stays a natural-1-only crit like a plain Skill roll.
-  const initiateWeaponRoll = async ({trigger, attributes}) => {
-    const [section, rowID] = k.parseRepeatName(trigger.name);
-    const prefix = `${section}_${rowID}_`;
-    const weaponName = attributes[`${prefix}name`] || 'Weapon';
-    const focus = attributes[`${prefix}focus`] || '';
-    const damageEffects = attributes[`${prefix}damage_effects`] || '';
-  
-    const fightingRanks = Number(attributes.fighting_ranks) || 0;
-    const focusSlug = focus.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
-    const knownFocus = Boolean(focusSlug && attributes[`fighting_focus_${focusSlug}_known`]);
-    const critMax = knownFocus ? fightingRanks : 1;
-  
-    const isRanged = focus.toLowerCase() === 'archery' || focus.toLowerCase() === 'thrown weapons';
-    const attributeRating = Number(attributes[isRanged ? 'coordination_rating' : 'agility_rating']) || 0;
-    const bonusDamage = Number(attributes[isRanged ? 'insight_bonus_damage' : 'brawn_bonus_damage']) || 0;
-  
-    const {baseRating, effects} = ccParseDamageEffects(damageEffects);
-    const diceCount = Math.max(1, baseRating + bonusDamage);
-  
-    console.log('[CC] Weapon roll:', {
-      weaponName, focus, isRanged, attributeRating, fightingRanks, knownFocus, critMax, diceCount,
-    });
-  
-    const complicationQuery = '?{Complication range (1-5)|1}';
-    const bonusDiceQuery = '?{Additional d20s bought (0-3)|0}';
-  
-    const rollString = '&{template:ccskill} ' +
-      `{{character_name=@{character_name}}} ` +
-      `{{skill=${weaponName}}} ` +
-      (focus ? `{{focus=${focus}}} ` : '') +
-      `{{attribute_choice=[[0+${attributeRating}]]}} ` +
-      `{{difficulty=1}} ` +
-      `{{complication_range=[[0+${complicationQuery}]]}} ` +
-      `{{roll1=[[(2+${bonusDiceQuery})d20]]}} ` +
-      `{{target_number=[[0]]}} ` +
-      `{{successes=[[0]]}} ` +
-      `{{dice_text=[[0]]}} ` +
-      `{{outcome=[[0]]}} ` +
-      `{{complications=[[0]]}} ` +
-      `{{bonus_momentum=[[0]]}} ` +
-      `{{momentum_spent=[[0]]}} ` +
-      `{{is_weapon=1}} ` +
-      `{{damage_dice=[[${diceCount}d6]]}} ` +
-      `{{total_damage=[[0]]}} ` +
-      `{{effect_count=[[0]]}} ` +
-      `{{damage_dice_text=[[0]]}} ` +
-      `{{effects_summary=[[0]]}}`;
-  
-    const roll = await startRoll(rollString);
-  
-    try {
-      const complicationRange = Number(roll.results.complication_range.result) || 1;
-  
-      const roll1 = roll.results.roll1;
-      const dice = Array.isArray(roll1.dice) ?
-        roll1.dice :
-        (roll1.rolls && roll1.rolls[0] && roll1.rolls[0].results || []).map((r) => r.v);
-  
-      console.log(`[CC] ${weaponName} attack roll - d20s:`, dice);
-  
-      const targetNumber = attributeRating + fightingRanks;
-      const complicationThreshold = 21 - complicationRange;
-      const successCount = dice.filter((d) => d <= targetNumber).length +
-        dice.filter((d) => d <= critMax).length;
-      const complicationCount = dice.filter((d) => d >= complicationThreshold).length;
-      const passed = successCount >= 1;
-  
-      const damageDice = roll.results.damage_dice;
-      const rawDamageDice = Array.isArray(damageDice.dice) ?
-        damageDice.dice :
-        (damageDice.rolls && damageDice.rolls[0] && damageDice.rolls[0].results || []).map((r) => r.v);
-  
-      console.log(`[CC] ${weaponName} damage roll - raw d6s:`, rawDamageDice);
-  
-      const converted = rawDamageDice.map(ccChallengeDieFromD6);
-      console.log(`[CC] ${weaponName} Challenge Dice faces:`, converted);
-  
-      const isVicious = effects.some((e) => /vicious/i.test(e));
-      const effectCount = converted.filter((c) => c.effect).length;
-      const totalDamage = converted.reduce((sum, c) => sum + c.pips, 0) +
-        (isVicious ? effectCount : 0);
-      const effectsSummary = effectCount > 0 ?
-        `${effectCount}x Effect${effects.length ? ` - ${effects.join(', ')}` : ''}` :
-        'No Effects triggered';
-  
-      console.log(`[CC] ${weaponName} result:`, {
-        targetNumber, successCount, complicationCount, passed, totalDamage, effectCount,
-      });
-  
-      const weaponBonusMomentum = passed ? Math.max(0, successCount - 1) : 0;
-      const weaponBonusDiceBought = Math.max(0, dice.length - 2);
-      await ccSendMomentumSignal(weaponBonusMomentum - weaponBonusDiceBought);
-      await ccSendThreatSignal(complicationCount);
-  
-      finishRoll(roll.rollId, {
-        target_number: targetNumber,
-        successes: successCount,
-        dice_text: dice.join(', '),
-        outcome: passed ? 1 : 0,
-        bonus_momentum: weaponBonusMomentum,
-        complications: complicationCount,
-        momentum_spent: weaponBonusDiceBought,
-        total_damage: totalDamage,
-        effect_count: effectCount,
-        damage_dice_text: converted.map((c) => c.symbol).join(' '),
-        effects_summary: effectsSummary,
-      });
-    } catch (err) {
-      finishRoll(roll.rollId, {
-        target_number: '?',
-        successes: '?',
-        dice_text: `error: ${err.message}`,
-        outcome: 0,
-        complications: 0,
-        total_damage: '?',
-        effect_count: '?',
-        damage_dice_text: `error: ${err.message}`,
-        effects_summary: '',
-      });
-    }
-  };
-  k.registerFuncs({initiateWeaponRoll});
   
   
   // Traditional casters use Insight, Research casters use Reason,
@@ -2834,6 +2355,517 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
     }
   };
   k.registerFuncs({initiateSpellRoll});
+  
+  
+  const calcBaseArmour = ({attributes}) => ccAttributeBonus(attributes.brawn_rating);
+  k.registerFuncs({calcBaseArmour});
+  
+  const calcCourage = ({attributes}) => ccAttributeBonus(attributes.will_rating);
+  k.registerFuncs({calcCourage});
+  
+  const calcTotalArmor = ({attributes}) => {
+    const base = ccAttributeBonus(attributes.brawn_rating);
+    const armorRows = attributes.repeating_armor || [];
+    const armorSum = armorRows.reduce((sum, row) => sum + (Number(row.resistance) || 0), 0);
+    return base + armorSum;
+  };
+  k.registerFuncs({calcTotalArmor});
+  
+  // "Add your: Brawn + Resilience, or Will + Resilience (whichever is higher)."
+  // Plus +3 from the Unyielding talent ("You increase your maximum stress
+  // by +3") if the character has taken it - checked by name since talents
+  // are free text (a datalist, not a fixed dropdown - see the pug comment
+  // above the Name field in panels/_talents_panel.pug), so this matches
+  // case/whitespace-insensitively the same way ccApplyTalentPreset's own
+  // lookup effectively does via the datalist's exact suggested spelling.
+  // This is the character's raw/un-reduced Max Stress - shared by
+  // calcStressMax below (which further reduces it for Fatigue) and
+  // calcStressMaxBase's own "Max" field/.cc-fatigue-max-marker, which both
+  // need the UN-reduced number (Fatigue capping its own, already-Fatigue-
+  // reduced cap would be self-referential).
+  const ccStressMaxBase = (attributes) => {
+    const resilience = Number(attributes.resilience_ranks) || 0;
+    const brawn = Number(attributes.brawn_rating) || 0;
+    const will = Number(attributes.will_rating) || 0;
+    const talents = attributes.repeating_talent || [];
+    const hasUnyielding = talents.some((row) => String(row.name || '').trim().toLowerCase() === 'unyielding');
+    return Math.max(brawn, will) + resilience + (hasUnyielding ? 3 : 0);
+  };
+  
+  const calcStressMaxBase = ({attributes}) => ccStressMaxBase(attributes);
+  k.registerFuncs({calcStressMaxBase});
+  
+  // Fatigue (page 41): each point temporarily reduces Max Stress by 1,
+  // floored at 0 - RAW says reaching 0 this way means Defeated, which this
+  // sheet has no separate tracked state to flag, so it's left as a
+  // Current Max of 0 for the player/GM to notice and resolve narratively.
+  // "Ignore Fatigue" suppresses this reduction without discarding the
+  // tracked fatigue value, since the fatigue itself hasn't been removed,
+  // just pushed through for now (see the pug comment above the Fatigue
+  // tracker).
+  const calcStressMax = ({attributes}) => {
+    const fatigue = attributes.fatigue_ignored ? 0 : (Number(attributes.fatigue) || 0);
+    return Math.max(0, ccStressMaxBase(attributes) - fatigue);
+  };
+  k.registerFuncs({calcStressMax});
+  
+  // Backs every box in the Stress/Fortune/Fatigue trackers (see the pug
+  // comment above .cc-stress-track for the full rationale) - each box is
+  // an action button rather than a radio specifically so this runs on
+  // every click, including a re-click of the currently topmost box, which
+  // a native radio can't ever report at all (clicking an already-checked
+  // radio is a silent no-op, no event fires). Clicking a box jumps the
+  // track straight to that box's value, the same "fill up to / clear down
+  // to" behavior a radio group gives for free - except clicking box 1
+  // while it's the ONLY box filled clears the whole track to 0 instead of
+  // re-selecting 1, since that's the one value a real radio group could
+  // never leave once reached. That one case replaces the old separate
+  // Clear button entirely. Writes straight to `attributes`, the same
+  // write-via-attributes pattern ccApplyTalentPreset (panels/
+  // _talents_panel.pug) uses to drive a field's displayed value from a
+  // sheet worker. Action-button trigger.name arrives dash-separated with
+  // no act_ prefix (e.g. 'stress-box-5'), not the space-separated name the
+  // action was declared with - see ccNormalizeName's own comment (in
+  // views/_global_sheetworker.pug) for the same quirk.
+  const ccTrackBoxClick = ({trigger, attributes}) => {
+    const match = /^(stress|fortune|fatigue)-box-(\d+)$/.exec(trigger.name);
+    if (!match) { return; }
+    const [, track, posStr] = match;
+    const position = Number(posStr);
+    const current = Number(attributes[track]) || 0;
+    attributes[track] = (position === 1 && current === 1) ? 0 : position;
+  };
+  k.registerFuncs({ccTrackBoxClick});
+  
+  // Fatigue (page 41): "Brawn + Resilience, or Will + Resilience test with
+  // a difficulty of 1" to remove it, always the higher of Brawn/Will per
+  // RAW (same pairing calcStressMax above already uses, so no attribute-
+  // choice query is needed here unlike Attributes/Skills' shared skill/
+  // focus rolls). "Passing the test removes 1 point of fatigue, plus 1
+  // more for each point of Momentum spent" - that's an input the player
+  // commits from the party's Momentum pool to boost the effect, not
+  // Momentum the roll itself generates, so it's wired the same way Extra
+  // Momentum works for spells (see initiateSpellRoll in
+  // views/_spells.pug): a query, counted as a cost against
+  // ccSendMomentumSignal, and only ever applied on a pass. This is a
+  // bespoke roll (not built on Attributes/Skills' shared runCcRoll core,
+  // see views/_global_sheetworker.pug) because it needs that extra query
+  // plus a post-roll attributes write, neither of which runCcRoll
+  // supports - same reason Weapons' initiateWeaponRoll/Spells'
+  // initiateSpellRoll each have their own rollString instead of sharing
+  // it.
+  const initiateFatigueResistRoll = async ({attributes}) => {
+    const brawnRating = Number(attributes.brawn_rating) || 0;
+    const willRating = Number(attributes.will_rating) || 0;
+    const resilienceRanks = Number(attributes.resilience_ranks) || 0;
+    const attributeRating = Math.max(brawnRating, willRating);
+  
+    const difficultyQuery = '?{Difficulty|1}';
+    const complicationQuery = '?{Complication range (1-5)|1}';
+    const bonusDiceQuery = '?{Additional d20s bought (0-3)|0}';
+    const extraMomentumQuery = '?{Momentum spent to remove extra fatigue|0}';
+  
+    const rollString = '&{template:ccskill} ' +
+      `{{character_name=@{character_name}}} ` +
+      `{{skill=Resist Fatigue}} ` +
+      `{{focus=Resilience}} ` +
+      `{{attribute_choice=[[0+${attributeRating}]]}} ` +
+      `{{difficulty=[[0+${difficultyQuery}]]}} ` +
+      `{{complication_range=[[0+${complicationQuery}]]}} ` +
+      `{{roll1=[[(2+${bonusDiceQuery})d20]]}} ` +
+      `{{extra_momentum=[[0+${extraMomentumQuery}]]}} ` +
+      `{{target_number=[[0]]}} ` +
+      `{{successes=[[0]]}} ` +
+      `{{dice_text=[[0]]}} ` +
+      `{{outcome=[[0]]}} ` +
+      `{{complications=[[0]]}} ` +
+      `{{bonus_momentum=[[0]]}} ` +
+      `{{momentum_spent=[[0]]}} ` +
+      `{{fatigue_removed=[[0]]}}`;
+  
+    const roll = await startRoll(rollString);
+  
+    try {
+      const difficulty = Number(roll.results.difficulty.result) || 1;
+      const complicationRange = Number(roll.results.complication_range.result) || 1;
+      const extraMomentum = Number(roll.results.extra_momentum.result) || 0;
+  
+      const roll1 = roll.results.roll1;
+      const dice = Array.isArray(roll1.dice) ?
+        roll1.dice :
+        (roll1.rolls && roll1.rolls[0] && roll1.rolls[0].results || []).map((r) => r.v);
+  
+      // Crit only on a natural 1 - this test has no Focus mechanic to
+      // widen that range the way a known Weapon Focus can.
+      const targetNumber = attributeRating + resilienceRanks;
+      const complicationThreshold = 21 - complicationRange;
+      const successCount = dice.filter((d) => d <= targetNumber).length +
+        dice.filter((d) => d <= 1).length;
+      const complicationCount = dice.filter((d) => d >= complicationThreshold).length;
+      const passed = successCount >= difficulty;
+      const bonusMomentum = passed ? Math.max(0, successCount - difficulty) : 0;
+      const bonusDiceBought = Math.max(0, dice.length - 2);
+  
+      // "Passing the test removes 1 point of fatigue, plus 1 more for each
+      // point of Momentum spent" - applied straight to the attribute (same
+      // write-via-attributes pattern as ccApplyTalentPreset/ccTrackBoxClick
+      // above), floored at 0 so it can't go negative.
+      const fatigueRemoved = passed ? 1 + extraMomentum : 0;
+      if (fatigueRemoved > 0) {
+        attributes.fatigue = Math.max(0, (Number(attributes.fatigue) || 0) - fatigueRemoved);
+      }
+  
+      await ccSendMomentumSignal(bonusMomentum - bonusDiceBought - extraMomentum);
+      await ccSendThreatSignal(complicationCount);
+  
+      finishRoll(roll.rollId, {
+        target_number: targetNumber,
+        successes: successCount,
+        dice_text: dice.join(', '),
+        outcome: passed ? 1 : 0,
+        bonus_momentum: bonusMomentum,
+        complications: complicationCount,
+        extra_momentum: extraMomentum,
+        momentum_spent: bonusDiceBought + extraMomentum,
+        fatigue_removed: fatigueRemoved,
+      });
+    } catch (err) {
+      finishRoll(roll.rollId, {
+        target_number: '?',
+        successes: '?',
+        dice_text: `error: ${err.message}`,
+        outcome: 0,
+        complications: 0,
+        fatigue_removed: 0,
+      });
+    }
+  };
+  k.registerFuncs({initiateFatigueResistRoll});
+  
+  
+  const calcAttributeBonusDamage = ({trigger, attributes}) => {
+    const attrName = trigger.name.replace(/_bonus_damage$/, '');
+    return ccAttributeBonus(attributes[`${attrName}_rating`]);
+  };
+  k.registerFuncs({calcAttributeBonusDamage});
+  
+  // Attribute-only roll (no skill): target number is just the attribute's
+  // own rating, crit only on a natural 1 (no focus applies). Shares
+  // runCcRoll/ccNormalizeName/ccCapitalize with Skills' own roll
+  // initiators (views/panels/_skills_panel.pug) - see
+  // views/_global_sheetworker.pug.
+  const initiateAttributeRoll = async ({trigger, attributes}) => {
+    const attr = ccNormalizeName(trigger.name).replace(/_roll$/, '');
+    const rating = Number(attributes[`${attr}_rating`]) || 0;
+    await runCcRoll({
+      skillLabel: ccCapitalize(attr),
+      focusLabel: '',
+      attributeExpr: String(rating),
+      skillRanks: 0,
+      critMax: 1,
+    });
+  };
+  k.registerFuncs({initiateAttributeRoll});
+  
+  
+  // Query string for choosing which Attribute pairs with a skill/focus
+  // roll (skill-to-attribute pairing isn't fixed by RAW) - used only by
+  // this panel's own two roll initiators below, unlike Attributes' own
+  // roll which always knows its attribute already.
+  const ccAttributeQuery = '?{Attribute' +
+    '|Agility,@{agility_rating}' +
+    '|Brawn,@{brawn_rating}' +
+    '|Coordination,@{coordination_rating}' +
+    '|Gravitas,@{gravitas_rating}' +
+    '|Insight,@{insight_rating}' +
+    '|Reason,@{reason_rating}' +
+    '|Will,@{will_rating}}';
+  
+  // Plain Skill roll (no specific focus): crit only on a natural 1, per
+  // RAW ("if you don't have a focus that applies, each die that rolls a
+  // 1 is a critical success"). Shares runCcRoll/ccNormalizeName/
+  // ccCapitalize with Attributes' own roll initiator
+  // (views/panels/_attributes_panel.pug) - see views/_global_sheetworker.pug.
+  const initiateSkillRoll = async ({trigger, attributes}) => {
+    const skill = ccNormalizeName(trigger.name).replace(/_skill_roll$/, '');
+    const skillRanks = Number(attributes[`${skill}_ranks`]) || 0;
+    await runCcRoll({
+      skillLabel: ccCapitalize(skill),
+      focusLabel: '',
+      attributeExpr: ccAttributeQuery,
+      skillRanks,
+      critMax: 1,
+    });
+  };
+  k.registerFuncs({initiateSkillRoll});
+  
+  // Focus roll: crit on a die <= this skill's ranks, since a
+  // focus-specific roller always "has the focus" that applies.
+  const initiateFocusRoll = async ({trigger, attributes}) => {
+    const match = ccNormalizeName(trigger.name).match(/^(.+)_focus_(.+)_roll$/);
+    if (!match) { return; }
+    const [, skill, focusSlug] = match;
+    const skillRanks = Number(attributes[`${skill}_ranks`]) || 0;
+    await runCcRoll({
+      skillLabel: ccCapitalize(skill),
+      focusLabel: ccCapitalize(focusSlug),
+      attributeExpr: ccAttributeQuery,
+      skillRanks,
+      critMax: skillRanks,
+    });
+  };
+  k.registerFuncs({initiateFocusRoll});
+  
+  
+  // Embedded from the ccWeaponProfiles object declared at the top of this
+  // file (pug compile-time) - the Name dropdown's +option() values above
+  // must be kept matching this object's keys by hand (see the comment
+  // above ccWeaponProfiles for why they can't just be generated from it).
+  const ccWeaponProfiles = {"Axe (Melee)":{"focus":"Melee Weapons","reach_range":"2","damage_effects":"3, Vicious","size":"Minor","qualities":"Special"},"Club":{"focus":"Melee Weapons","reach_range":"2","damage_effects":"2","size":"Minor","qualities":""},"Cudgel":{"focus":"Melee Weapons","reach_range":"2","damage_effects":"3, Stun","size":"Major","qualities":""},"Dagger":{"focus":"Melee Weapons","reach_range":"1","damage_effects":"2, Piercing 1","size":"Minor","qualities":"Hidden, Subtle"},"Dolabra":{"focus":"Melee Weapons","reach_range":"1","damage_effects":"3, Piercing 1","size":"Minor","qualities":""},"Javelin (Melee)":{"focus":"Melee Weapons","reach_range":"2","damage_effects":"3, Piercing 1","size":"Minor","qualities":"Special"},"Spear":{"focus":"Melee Weapons","reach_range":"3","damage_effects":"4, Piercing 1","size":"Major","qualities":""},"Staff":{"focus":"Melee Weapons","reach_range":"3","damage_effects":"2","size":"Major","qualities":"Special"},"Sword":{"focus":"Melee Weapons","reach_range":"2","damage_effects":"4","size":"Major","qualities":"Parrying"},"Sword, Falx":{"focus":"Melee Weapons","reach_range":"2","damage_effects":"4, Vicious","size":"Major","qualities":""},"Sword, Gladius":{"focus":"Melee Weapons","reach_range":"2","damage_effects":"4, Piercing 1","size":"Major","qualities":"Parrying"},"Sword, Long":{"focus":"Melee Weapons","reach_range":"2","damage_effects":"5","size":"Major","qualities":"Two-Handed"},"Sword, Long, Spatha":{"focus":"Melee Weapons","reach_range":"2","damage_effects":"5, Piercing 1","size":"Major","qualities":"Two-Handed"},"Unarmed Strike":{"focus":"Unarmed","reach_range":"0","damage_effects":"2","size":"","qualities":"Subtle"},"War Axe":{"focus":"Melee Weapons","reach_range":"2","damage_effects":"4, Vicious","size":"Major","qualities":"Two-Handed"},"Small Shield":{"focus":"Melee Weapons","reach_range":"1","damage_effects":"2, Stun","size":"Minor","qualities":"Shield 2"},"Large Shield":{"focus":"Melee Weapons","reach_range":"1","damage_effects":"3, Stun","size":"Major","qualities":"Shield 3"},"Arcuballista":{"focus":"Archery","reach_range":"Medium","damage_effects":"4, Piercing 1","size":"Major","qualities":"Accurate, Reload"},"Axe (Thrown)":{"focus":"Thrown Weapons","reach_range":"Close","damage_effects":"3, Vicious","size":"Minor","qualities":"Special"},"Bow":{"focus":"Archery","reach_range":"Medium","damage_effects":"3, Piercing 1","size":"Major","qualities":"Subtle"},"Bow, Recurve":{"focus":"Archery","reach_range":"Long","damage_effects":"4, Piercing 1","size":"Major","qualities":"Subtle"},"Javelin (Thrown)":{"focus":"Thrown Weapons","reach_range":"Medium","damage_effects":"3, Piercing 1","size":"Minor","qualities":"Special"},"Pilum":{"focus":"Thrown Weapons","reach_range":"Close","damage_effects":"4, Piercing 1","size":"Minor","qualities":"Special"},"Plumbata":{"focus":"Thrown Weapons","reach_range":"Close","damage_effects":"2, Piercing 1","size":"Minor","qualities":""},"Sling":{"focus":"Thrown Weapons","reach_range":"Long","damage_effects":"3, Stun","size":"Minor","qualities":"Inaccurate, Subtle, Special"}};
+  
+  // Selecting a weapon from the Name dropdown fills in its stock Focus/
+  // Reach or Range/Damage & Effects/Size/Qualities for that same repeating
+  // row - every field stays freely editable afterward (house-ruled
+  // weapons, printed duplicates with different qualities, etc.), this is
+  // just a convenience preset. Picking the blank "Custom / Other" option
+  // leaves whatever is already in those fields untouched.
+  const ccApplyWeaponPreset = ({trigger, attributes}) => {
+    const profile = ccWeaponProfiles[attributes[trigger.name]];
+    if (!profile) { return; }
+    const [section, rowID] = k.parseRepeatName(trigger.name);
+    Object.keys(profile).forEach((field) => {
+      attributes[`${section}_${rowID}_${field}`] = profile[field];
+    });
+  };
+  k.registerFuncs({ccApplyWeaponPreset});
+  
+  // Weapon "Damage & Effects" fields are stored as free text like
+  // "4, Piercing 1" or "3, Vicious" (see ccWeaponProfiles above) - first
+  // comma-separated token is the weapon's base Damage rating (in Challenge
+  // Dice), everything after that is its list of Damage Effects (Piercing N,
+  // Vicious, Stun, etc, per the rulebook's Chapter 7).
+  const ccParseDamageEffects = (text) => {
+    const parts = String(text || '').split(',').map((s) => s.trim()).filter(Boolean);
+    return {
+      baseRating: Number(parts[0]) || 0,
+      effects: parts.slice(1),
+    };
+  };
+  
+  // Cohors Cthulhu damage is rolled with special 6-sided Challenge Dice.
+  // This sheet has no access to physical Challenge Dice, so damage is
+  // rolled as plain d6s and converted face-by-face using the rulebook's
+  // own "If you don't have Challenge Dice" fallback table: 1->1 pip (a
+  // dagger face), 2->2 pips (a crossed-daggers face), 3/4->blank, 5/6->1
+  // pip plus an Effect (the Cthulhu-face symbol). Symbols here mirror
+  // that table's own iconography (dagger/crossed daggers/dash/Cthulhu
+  // face) rather than a generic pip count, so the roll template reads the
+  // same way the physical dice would.
+  //
+  // The Effect face was originally the octopus emoji (an astral-plane
+  // character, outside the Basic Multilingual Plane), which Roll20's
+  // savesheetsettings endpoint rejected with a 500 the first time this
+  // HTML was pasted into a fresh game - a known failure mode on Roll20's
+  // backend for any 4-byte-UTF-8 character in custom sheet code. Skull
+  // and crossbones reads the same way (a distinct "something happened"
+  // face) and is a plain BMP character, so it saves without issue.
+  const ccChallengeDieFromD6 = (d6) => {
+    switch (Number(d6)) {
+      case 1: return {pips: 1, effect: false, symbol: '†'};
+      case 2: return {pips: 2, effect: false, symbol: '‡'};
+      case 5: return {pips: 1, effect: true, symbol: '☠'};
+      case 6: return {pips: 1, effect: true, symbol: '☠'};
+      default: return {pips: 0, effect: false, symbol: '–'};
+    }
+  };
+  
+  // Weapon roll: attack and damage rolled together in a single message,
+  // since a Cohors Cthulhu attack is an opposed test - there's no static
+  // Difficulty to pass/fail against (the GM's opposing roll decides that),
+  // so damage is rolled unconditionally alongside the attack rather than
+  // as a separate, gated follow-up roll. This also sidesteps having two
+  // separate roll templates in play, since the second one, despite being
+  // built the same way as the proven ccskill template, was showing up in
+  // chat unstyled.
+  //
+  // Unlike a generic Skill/Focus roll, an attack roll always has
+  // Difficulty 1 (no query) and doesn't ask which Attribute to pair -
+  // melee/unarmed weapons always use Agility, ranged/thrown weapons always
+  // use Coordination (Agility + Fighting / Coordination + Fighting, per
+  // RAW). Known-focus status is still checked explicitly (same as Skills'
+  // initiateFocusRoll) since clicking a weapon's roll button isn't itself
+  // a declaration that its Focus is known - crit range only opens up to
+  // Fighting's ranks when that specific focus checkbox is checked, else it
+  // stays a natural-1-only crit like a plain Skill roll.
+  const initiateWeaponRoll = async ({trigger, attributes}) => {
+    const [section, rowID] = k.parseRepeatName(trigger.name);
+    const prefix = `${section}_${rowID}_`;
+    const weaponName = attributes[`${prefix}name`] || 'Weapon';
+    const focus = attributes[`${prefix}focus`] || '';
+    const damageEffects = attributes[`${prefix}damage_effects`] || '';
+  
+    const fightingRanks = Number(attributes.fighting_ranks) || 0;
+    const focusSlug = focus.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
+    const knownFocus = Boolean(focusSlug && attributes[`fighting_focus_${focusSlug}_known`]);
+    const critMax = knownFocus ? fightingRanks : 1;
+  
+    const isRanged = focus.toLowerCase() === 'archery' || focus.toLowerCase() === 'thrown weapons';
+    const attributeRating = Number(attributes[isRanged ? 'coordination_rating' : 'agility_rating']) || 0;
+    const bonusDamage = Number(attributes[isRanged ? 'insight_bonus_damage' : 'brawn_bonus_damage']) || 0;
+  
+    const {baseRating, effects} = ccParseDamageEffects(damageEffects);
+    const diceCount = Math.max(1, baseRating + bonusDamage);
+  
+    console.log('[CC] Weapon roll:', {
+      weaponName, focus, isRanged, attributeRating, fightingRanks, knownFocus, critMax, diceCount,
+    });
+  
+    const complicationQuery = '?{Complication range (1-5)|1}';
+    const bonusDiceQuery = '?{Additional d20s bought (0-3)|0}';
+  
+    const rollString = '&{template:ccskill} ' +
+      `{{character_name=@{character_name}}} ` +
+      `{{skill=${weaponName}}} ` +
+      (focus ? `{{focus=${focus}}} ` : '') +
+      `{{attribute_choice=[[0+${attributeRating}]]}} ` +
+      `{{difficulty=1}} ` +
+      `{{complication_range=[[0+${complicationQuery}]]}} ` +
+      `{{roll1=[[(2+${bonusDiceQuery})d20]]}} ` +
+      `{{target_number=[[0]]}} ` +
+      `{{successes=[[0]]}} ` +
+      `{{dice_text=[[0]]}} ` +
+      `{{outcome=[[0]]}} ` +
+      `{{complications=[[0]]}} ` +
+      `{{bonus_momentum=[[0]]}} ` +
+      `{{momentum_spent=[[0]]}} ` +
+      `{{is_weapon=1}} ` +
+      `{{damage_dice=[[${diceCount}d6]]}} ` +
+      `{{total_damage=[[0]]}} ` +
+      `{{effect_count=[[0]]}} ` +
+      `{{damage_dice_text=[[0]]}} ` +
+      `{{effects_summary=[[0]]}}`;
+  
+    const roll = await startRoll(rollString);
+  
+    try {
+      const complicationRange = Number(roll.results.complication_range.result) || 1;
+  
+      const roll1 = roll.results.roll1;
+      const dice = Array.isArray(roll1.dice) ?
+        roll1.dice :
+        (roll1.rolls && roll1.rolls[0] && roll1.rolls[0].results || []).map((r) => r.v);
+  
+      console.log(`[CC] ${weaponName} attack roll - d20s:`, dice);
+  
+      const targetNumber = attributeRating + fightingRanks;
+      const complicationThreshold = 21 - complicationRange;
+      const successCount = dice.filter((d) => d <= targetNumber).length +
+        dice.filter((d) => d <= critMax).length;
+      const complicationCount = dice.filter((d) => d >= complicationThreshold).length;
+      const passed = successCount >= 1;
+  
+      const damageDice = roll.results.damage_dice;
+      const rawDamageDice = Array.isArray(damageDice.dice) ?
+        damageDice.dice :
+        (damageDice.rolls && damageDice.rolls[0] && damageDice.rolls[0].results || []).map((r) => r.v);
+  
+      console.log(`[CC] ${weaponName} damage roll - raw d6s:`, rawDamageDice);
+  
+      const converted = rawDamageDice.map(ccChallengeDieFromD6);
+      console.log(`[CC] ${weaponName} Challenge Dice faces:`, converted);
+  
+      const isVicious = effects.some((e) => /vicious/i.test(e));
+      const effectCount = converted.filter((c) => c.effect).length;
+      const totalDamage = converted.reduce((sum, c) => sum + c.pips, 0) +
+        (isVicious ? effectCount : 0);
+      const effectsSummary = effectCount > 0 ?
+        `${effectCount}x Effect${effects.length ? ` - ${effects.join(', ')}` : ''}` :
+        'No Effects triggered';
+  
+      console.log(`[CC] ${weaponName} result:`, {
+        targetNumber, successCount, complicationCount, passed, totalDamage, effectCount,
+      });
+  
+      const weaponBonusMomentum = passed ? Math.max(0, successCount - 1) : 0;
+      const weaponBonusDiceBought = Math.max(0, dice.length - 2);
+      await ccSendMomentumSignal(weaponBonusMomentum - weaponBonusDiceBought);
+      await ccSendThreatSignal(complicationCount);
+  
+      finishRoll(roll.rollId, {
+        target_number: targetNumber,
+        successes: successCount,
+        dice_text: dice.join(', '),
+        outcome: passed ? 1 : 0,
+        bonus_momentum: weaponBonusMomentum,
+        complications: complicationCount,
+        momentum_spent: weaponBonusDiceBought,
+        total_damage: totalDamage,
+        effect_count: effectCount,
+        damage_dice_text: converted.map((c) => c.symbol).join(' '),
+        effects_summary: effectsSummary,
+      });
+    } catch (err) {
+      finishRoll(roll.rollId, {
+        target_number: '?',
+        successes: '?',
+        dice_text: `error: ${err.message}`,
+        outcome: 0,
+        complications: 0,
+        total_damage: '?',
+        effect_count: '?',
+        damage_dice_text: `error: ${err.message}`,
+        effects_summary: '',
+      });
+    }
+  };
+  k.registerFuncs({initiateWeaponRoll});
+  
+  
+  // Same pattern as Weapons' ccApplyWeaponPreset/ccWeaponProfiles
+  // (views/panels/_weapons_panel.pug), for the Armor table's Name
+  // dropdown. Setting resistance here still triggers its own
+  // {affects: ['total_armor']} cascade normally (the attribute proxy
+  // re-checks a field's own cascade whenever it's set, regardless of
+  // what set it), so Total Armor stays correct without extra wiring.
+  const ccArmorProfiles = {"Chainmail / Lorica Hamata":{"resistance":"2","qualities":"Uncomfortable"},"Leather Armor":{"resistance":"1","qualities":""},"Lorica Segmentata":{"resistance":"3","qualities":"Uncomfortable"},"Lorica Squamata":{"resistance":"3","qualities":"Heavy, Uncomfortable"}};
+  const ccApplyArmorPreset = ({trigger, attributes}) => {
+    const profile = ccArmorProfiles[attributes[trigger.name]];
+    if (!profile) { return; }
+    const [section, rowID] = k.parseRepeatName(trigger.name);
+    Object.keys(profile).forEach((field) => {
+      attributes[`${section}_${rowID}_${field}`] = profile[field];
+    });
+  };
+  k.registerFuncs({ccApplyArmorPreset});
+  
+  
+  // Same pattern again as Weapons'/Armor's own apply-preset functions, for
+  // both the Name field's own trigger and the row's explicit apply button
+  // (see the comments on both in the markup above for why there are two) -
+  // reads the row's Name value via the row prefix rather than
+  // attributes[trigger.name] directly, since trigger.name is a different
+  // attribute depending on which of those two fired it. A value that
+  // doesn't match any known talent is a normal, expected case (not an
+  // error) for the free-text Name field - it just leaves Keywords/
+  // Requirements/Description untouched, same as picking "Custom / Other"
+  // does for weapons/armor.
+  const ccTalentProfiles = {"The Gods Are with You":{"keywords":"Mystic, Persuasion, Spellcaster","requirements":"Mystic archetype, no other talent with the Spellcaster keyword","description":"You are a spellcaster (see Magic). As a minor action, make a Gravitas + Persuasion test, difficulty 2. On a pass, you and all allies in your zone gain +2 Morale resistance until the end of your next turn."},"Gods Guide You":{"keywords":"Mystic, Academia, Spellcaster","requirements":"Mystic archetype, no other talent with the Spellcaster keyword","description":"You are a spellcaster (see Magic). Once per round, when an ally makes a melee, ranged, or magic attack, or a Reason + Academia test, you may generate 2 Threat to assist them as a reaction."},"Pain Is Nothing":{"keywords":"Mystic, Medicine, Spellcaster","requirements":"Mystic archetype, no other talent with the Spellcaster keyword","description":"You are a spellcaster (see Magic). At the start of any of your turns, you may generate 3 Threat to remove stress equal to your power rating, or to ignore one injury until the end of the scene."},"Aedificator":{"keywords":"Sage, Engineering","requirements":"Sage archetype","description":"When an Engineering-based skill test is part of an extended test with resistance, ignore 1 resistance for each effect rolled."},"The Best Doctor Is Also a Philosopher":{"keywords":"Sage, Medicine","requirements":"Sage archetype","description":"You are fluent in Greek. If you already speak Greek, select one other additional language (fluent). Medicine-based skill test difficulty may be reduced by 1 or 2 but this increases the skill test's complication range by the same amount."},"Deep Expertise":{"keywords":"Sage, Academia","requirements":"Sage archetype","description":"Gain one additional focus for every skill in which you have 3 or more ranks. Afterward, whenever another skill reaches 3 ranks, immediately gain a focus for it too."},"Nero Nihil Verius":{"keywords":"Sage, Observation","requirements":"Sage archetype","description":"Reduce the difficulty of skill tests made to detect danger or hidden enemies by 1."},"Backed by Authority":{"keywords":"Schemer, Persuasion","requirements":"Schemer archetype","description":"You may re-roll 1d20 on Persuasion-based skill tests (must keep the new result). Treat the Restriction rating of all items as 1 lower, to a minimum of 1."},"Et Tu?":{"keywords":"Schemer, Fighting","requirements":"Schemer archetype","description":"If you've passed a Persuasion test to influence or deceive an enemy this scene, a successful surprise attack against them later in the scene lets you roll one bonus die per effect already rolled on the attack; effects from those bonus dice don't chain further."},"Play the Part":{"keywords":"Schemer, Academia","requirements":"Schemer archetype","description":"You may use Academia in place of Stealth when using a disguise."},"Social Network":{"keywords":"Schemer, Observation","requirements":"Schemer archetype","description":"In any location where you've had downtime, you have at least one contact with a fair relationship. The first bonus d20 you buy on a non-combat skill test made during downtime costs no Momentum."},"Cunning Fighter":{"keywords":"Scoundrel, Athletics","requirements":"Scoundrel archetype","description":"When an enemy's melee attack against you deals no stress, they lose Guard. Your next successful attack against them deals bonus damage equal to your Athletics skill."},"Hidden Blade":{"keywords":"Scoundrel, Fighting","requirements":"Scoundrel archetype","description":"When making a melee attack, you may generate 1-3 Threat. On a successful hit, add +1 damage per Threat generated, or apply the Intense or Vicious damage effect once per Threat generated."},"Oculus Aurum":{"keywords":"Scoundrel, Observation","requirements":"Scoundrel archetype","description":"As a free action, generate 1 Threat to identify the most valuable object in your zone. Generate 1 more Threat to learn its approximate value and Restriction rating."},"Unremarkable":{"keywords":"Scoundrel, Stealth","requirements":"Scoundrel archetype","description":"While blending in, tests made to notice you have their difficulty increased by 1."},"Eye for Weakness":{"keywords":"Scout, Observation","requirements":"Scout archetype","description":"After spending Momentum to Obtain Information about a creature, your attacks against it gain the Piercing 1 effect (or +1 Piercing if it already has that effect) until the end of the scene."},"Strike from Hiding":{"keywords":"Scout, Fighting","requirements":"Scout archetype","description":"A successful surprise attack lets you roll one bonus die per effect already rolled on the attack; effects from those bonus dice don't chain further."},"Survivalist":{"keywords":"Scout, Survival","requirements":"Scout archetype","description":"Extended tests to forage, hunt, build shelter, or gather supplies in the wilderness gain the Vicious damage effect."},"Woodland Stride":{"keywords":"Scout, Athletics","requirements":"Scout archetype","description":"Reduce the difficulty of tests to move through difficult or hazardous terrain by 1 (minimum 0). At 0, that terrain no longer impedes your movement at all."},"Brute":{"keywords":"Soldier, Athletics","requirements":"Soldier archetype","description":"When making a melee attack, you may re-roll any number of the challenge dice used to determine stress and damage effects."},"Flashing Steel":{"keywords":"Soldier, Fighting","requirements":"Soldier archetype","description":"After an Attack major action, make a second attack as a minor action against a different target within Reach. Against a mob, instead double the stress your attack deals."},"Hold Fast":{"keywords":"Soldier, Resilience","requirements":"Soldier archetype","description":"When you or an ally in your zone is targeted by a melee attack, generate 1 Threat to increase the attacker's difficulty by 1."},"Shield Wall":{"keywords":"Soldier, Tactics","requirements":"Soldier archetype","description":"As a minor action, lock shields with an allied, shield-equipped character within Reach. While locked together, each of you gains +2 Cover resistance from your shield, as long as you still have Guard."},"Advisor":{"keywords":"<Skill>","requirements":"","description":"Choose a skill. When you assist an ally using that skill, they may re-roll one d20 in their pool."},"Bold":{"keywords":"<Skill>","requirements":"","description":"Choose a skill. When you buy bonus d20s by generating Threat on a test with that skill, you may re-roll one d20 in the pool."},"Prodigialis Fortuna":{"keywords":"Fortune","requirements":"","description":"Whenever you spend a Fortune point, roll one die. An effect result immediately refunds the point; a blank instead generates 3 Threat."},"Skin of Your Teeth":{"keywords":"Fortune","requirements":"","description":"Once per scene, spend a Fortune point when dealt an injury to avoid suffering it."},"Cautious":{"keywords":"<Skill>","requirements":"","description":"Choose a skill. When you buy bonus d20s by spending Momentum on a test with that skill, you may re-roll one d20 in the pool."},"Applied Knowledge":{"keywords":"Academia","requirements":"","description":"Once per scene, substitute Academia for another skill on a test, treating yourself as having a focus for it."},"Collaboration":{"keywords":"Academia","requirements":"","description":"Passing an Academia-based skill test grants +1 bonus Momentum, which cannot be saved."},"Magister's Favorite":{"keywords":"<Skill>","requirements":"Advanced","description":"Choose a skill in which you have 3+ ranks. When a communicating ally makes a test with that skill, spend 2 Momentum to let them use your ranks (and a relevant focus) instead of their own."},"Cool Under Pressure":{"keywords":"<Skill>, Fortune","requirements":"","description":"Choose a skill. Spend a Fortune point to automatically pass a test with that skill, though it generates no Momentum."},"Platonist":{"keywords":"Academia","requirements":"","description":"Gain Courage resistance equal to your Academia ranks. Does not stack with other talents that grant bonus Courage resistance."},"Savant":{"keywords":"Academia","requirements":"","description":"Choose two skills that your archetype granted bonus ranks in. For each, either increase its ranks by 1 or gain a focus for it."},"Ludi Champion":{"keywords":"Athletics","requirements":"","description":"Ignore the first complication rolled on Athletics-based tests to run, ride, or swim."},"Marathon Runner":{"keywords":"Athletics","requirements":"","description":"You may take the Rush major action even after already taking the Movement minor action this turn."},"Quality Crafting":{"keywords":"Engineering","requirements":"","description":"Objects you build have their maximum stress increased by 2 and can sustain 1 additional injury."},"The Tool for the Job":{"keywords":"Engineering","requirements":"","description":"Damage rolled on Engineering-based tests that are part of an extended test gains the Piercing 1 effect."},"Sculpted from Marble":{"keywords":"Athletics","requirements":"","description":"You may re-roll any number of dice on Athletics-based tests to lift, run, throw, or swim."},"Aggressive":{"keywords":"Fighting","requirements":"","description":"On a melee attack, the first bonus d20 you buy costs no Momentum; doing so reduces the difficulty of attacks against you by 1 until the start of your next turn. Incompatible with the Defensive talent."},"Field Repair":{"keywords":"Crafting","requirements":"","description":"On an Insight + Crafting test to repair an item in the field, generate 2 Threat to reduce the difficulty by 1 (minimum 1). The repaired item gains the Field Repairs truth."},"Scavenger":{"keywords":"Crafting","requirements":"","description":"Spend half an hour scrounging and pass an Insight + Crafting test (difficulty 1) to replenish a crafting kit's resources."},"Demolitionist":{"keywords":"Engineering","requirements":"","description":"When attacking an object, structure, or stationary vehicle, use Engineering in place of Fighting, and Reason in place of Brawn or Insight for bonus damage. Spend 2 Momentum to convert a number of rolled blanks (up to your Engineering ranks) into effects."},"Defensive":{"keywords":"Fighting","requirements":"","description":"Choose melee or ranged attacks. Attacks of that type made against you have their difficulty increased by 1. May be taken twice, once per type. Incompatible with the Aggressive talent."},"Skirmisher":{"keywords":"Fighting","requirements":"","description":"Once per round, when an enemy's melee or ranged attack against you misses, generate 2 Threat to move anywhere within Medium range as a free action and gain +2 Cover resistance against melee and ranged attacks until the start of your next turn."},"Steady Aim":{"keywords":"Fighting","requirements":"","description":"The Aim minor action with a ranged weapon lets you re-roll 2d20 on that turn's attack, instead of 1."},"Anatomist":{"keywords":"Medicine","requirements":"","description":"Against a human, or an animal or creature you've previously dissected, use Medicine in place of Fighting for attacks, and add the Vicious damage effect."},"Imposing Presence":{"keywords":"Persuasion","requirements":"","description":"Make a mental attack with a melee weapon using Gravitas + Persuasion, without needing the Fearsome X rule. It deals mental damage equal to the weapon's rating plus your Will-based bonus damage, with your choice of Piercing 1 or Stun."},"Combat Medicus":{"keywords":"Medicine","requirements":"","description":"On the Stabilize major action, re-roll 1d20 of your Coordination + Medicine test. If it passes, also remove one condition from the target."},"Keen Eyed":{"keywords":"Observation","requirements":"","description":"Reduce by 1 the extra difficulty Perception-based tests suffer beyond Close range. Additionally, your ranged weapons' effective range extends one zone further without the usual difficulty increase."},"Predator's Senses":{"keywords":"Observation","requirements":"","description":"While conscious, you cannot be the target of a surprise attack. The GM must spend 1 additional Threat to have NPCs act first in a combat encounter."},"Suspicious":{"keywords":"Observation","requirements":"","description":"Before your first turn in combat, hostile physical or mental attacks against you have their difficulty increased by 1."},"Lingua Argentea":{"keywords":"Persuasion","requirements":"","description":"Reduce the difficulty of Persuasion-based tests to sway someone's opinion or to haggle by 1."},"Iron Hide":{"keywords":"Resilience","requirements":"","description":"Your first injury doesn't count toward increasing your complication range. You are defeated after 4 injuries instead of 3 (GM determines whether you're dying or irrational)."},"Mithradatic":{"keywords":"Resilience","requirements":"","description":"Reduce the difficulty of Resilience-based tests to resist poisons, toxins, or drugs by 1; at 0, no test is needed at all."},"Second Wind":{"keywords":"Resilience","requirements":"","description":"When you take the Catch Breath major action, roll a number of dice equal to your Resilience ranks; each effect result removes 1 additional point of stress."},"Fade Away":{"keywords":"Stealth","requirements":"","description":"Once per scene, as a minor action, generate 2 Threat to become immune to being targeted (except by Area attacks) until the start of your next turn. Free if you're already in heavy cover."},"Low Profile":{"keywords":"Stealth","requirements":"","description":"Any Cover resistance you gain is increased by 1."},"Bestiarius":{"keywords":"Survival","requirements":"","description":"Gain a non-sapient companion creature (a Companion Creature profile of your choice), treated as an allied NPC under your command; it looks after itself while you forage. If it's slain, gain a nonrefreshing Fortune point, and either retrain this talent for a new companion or replace it with a different talent."},"Coordinator":{"keywords":"Tactics","requirements":"","description":"Whenever you take part in an assisted skill test, whether leading or assisting, each participating player may re-roll one d20 (keeping the new result)."},"Inconspicuous":{"keywords":"Tactics","requirements":"","description":"Reduce any Threat generated by your weapons or equipment by 1 (a relic or profane item's bonus Threat cannot be reduced below 1 this way)."},"Untraceable":{"keywords":"Survival","requirements":"","description":"While traveling alone or leading a group, increase the difficulty of tests to track your movements by half your Survival ranks (rounded down)."},"Rallying Cry":{"keywords":"Tactics","requirements":"","description":"Roll a number of dice equal to your Tactics ranks. Rather than dealing stress, each stress result removes 1 stress (2 per effect result) from you or an ally within Close range, apportioned as you choose."},"Bizarre Insight":{"keywords":"Weird","requirements":"","description":"Once per scene, generate 1 Threat to Obtain Information without needing to pass a skill test."},"Foreboding Survival":{"keywords":"Weird","requirements":"","description":"Once per session, when dealt an injury, generate 3 Threat to avoid it. The GM may offer the same trade to avoid other misfortunes."},"Mystical Power":{"keywords":"Weird","requirements":"","description":"Requires being a spellcaster. Gain an additional personal truth reflecting the toll of forbidden knowledge (such as Glimpsed What Mortals Should Not Know). When casting a spell, you may increase your power rating by 2; if you do, each ally within Close range suffers 1 mental stress per effect rolled on the spell's cost."},"Numb to the Horrors":{"keywords":"Weird","requirements":"","description":"Gain +6 Courage resistance (no other source of Courage resistance may be added). Re-roll 1d20 on tests to determine whether you gain a mental scar. However, your detached manner increases the complication range of your Persuasion-based tests by 1."},"Occult Dabbler":{"keywords":"Spellcaster, Weird","requirements":"","description":"You become a dabbling spellcaster (see Magic)."},"Spectral Hunter":{"keywords":"Lupercus, Spellcaster","requirements":"Mystic archetype, no other talent with the Spellcaster keyword","description":"You are a spellcaster (see Magic). When you take stress from a battlefield spell's cost, immediately move anywhere within Medium range. May replace another talent with the Spellcaster keyword (only one such talent may be held at a time)."},"Hasty Ritual":{"keywords":"Lupercus","requirements":"Spectral Hunter talent","description":"Choose a spell you know. Once per scene, cast it without the Prepare minor action, though it's cast as a flawed spell."},"Instinctive Magic":{"keywords":"Lupercus, Resilience","requirements":"Hasty Ritual talent","description":"Once per scene, cast a battlefield spell using Resilience (the Fortitude focus applies) instead of its normal skill, and reduce its cost by 2 (minimum 1)."},"Jaws of the Wolf":{"keywords":"Lupercus","requirements":"Hasty Ritual talent","description":"Successfully casting an attack spell grants +1 bonus Momentum, usable only to add +1 to the spell's damage."},"Lupercalia":{"keywords":"Lupercus","requirements":"Jaws of the Wolf talent","description":"Passing one of a ritual's component tests lets you ignore up to 2 resistance per effect rolled."},"Wolf Howl":{"keywords":"Lupercus, Persuasion, Survival","requirements":"Jaws of the Wolf talent","description":"Make a mental attack (no Fearsome X needed) against an aware target within Medium range using Will + Persuasion or Will + Survival, difficulty 1. On a pass, deal mental damage equal to your power rating + 2."},"Quiet Wisdom":{"keywords":"Staff Bearer, Persuasion, Spellcaster","requirements":"Mystic archetype","description":"You are a spellcaster (see Magic). Re-roll 1d20 on Persuasion-based tests (keeping the new result). May replace another talent with the Spellcaster keyword (only one such talent may be held at a time)."},"Know the Signs":{"keywords":"Staff Bearer, Observation, Spellcaster","requirements":"Mystic archetype","description":"You are a spellcaster (see Magic). Near a person or object touched by supernatural power within the last six hours, make an Insight + Observation test with difficulty equal to the hours elapsed. On a pass, you sense the taint; spend 2 Momentum to identify the specific power used. May replace another talent with the Spellcaster keyword (only one such talent may be held at a time)."},"Do We Fear This?":{"keywords":"Staff Bearer, Persuasion","requirements":"Force of Presence talent or Protective Superstitions talent","description":"As a minor action, spend 1 Fortune point to grant each ally within Close range Morale resistance equal to your Persuasion ranks, lasting until the end of the scene."},"Force of Presence":{"keywords":"Staff Bearer, Weird","requirements":"Quiet Wisdom talent","description":"Your bonus damage on mental-damage attacks increases by 1."},"Runecasting":{"keywords":"Staff Bearer, Observation","requirements":"Quiet Wisdom talent or Know the Signs talent","description":"Once every 24 hours, make an Insight + Observation test at a difficulty of your choice (1-5). On a pass, roll that many d20s and record each result. Until the next morning, whenever you or anyone within line of sight makes a skill test, you may substitute one or more of the rolled dice with a recorded result (each recorded result can replace only one die, and you need not use them all)."},"Protective Superstitions":{"keywords":"Staff Bearer, Observation","requirements":"Know the Signs talent","description":"When resisting a spell, gain +1 bonus Momentum per rank in Observation."},"Fabricator":{"keywords":"Engineer, Crafting, Engineering","requirements":"Sage archetype","description":"Re-roll 1d20 on Crafting- or Engineering-based tests (keeping the new result)."},"Dedication":{"keywords":"Engineer, Momentum","requirements":"Fabricator talent","description":"At the start of a scene, if the group's Momentum pool is empty, roll 1d20. If the result is at or below your Will rating, add 1 Momentum to the pool."},"In the Nick of Time":{"keywords":"Engineer, Academia, Engineering","requirements":"Intense Study talent, 3+ ranks in Academia or Engineering","description":"Passing an Academia- or Engineering-based test that's part of an extended test grants the Vicious damage effect on it."},"Incisive Scrutiny":{"keywords":"Engineer","requirements":"Fabricator talent","description":"Passing an Insight- or Reason-based test grants +1 bonus Momentum, usable only for the Obtain Information option."},"Intense Scrutiny":{"keywords":"Engineer","requirements":"(Incisive Scrutiny talent or Intense Study talent) and 3+ ranks in Academia or Engineering","description":"Reason- or Will-based tests that are part of an extended test gain the Piercing 2 damage effect."},"Intense Study":{"keywords":"Engineer","requirements":"Dedication talent or Intense Scrutiny talent","description":"Twice per session, before a skill test, choose a focus you don't have and use it for that test; you retain it for the rest of the session."},"Physician":{"keywords":"Medicus, Medicine","requirements":"Sage archetype, 1+ ranks in Medicine","description":"Re-roll 1d20 on Medicine-based tests (keeping the new result)."},"Emergency Doctor":{"keywords":"Medicus, Medicine","requirements":"Physician talent","description":"Reduce the difficulty of the Stabilize major action by 1 (minimum 0)."},"Fast Aid":{"keywords":"Medicus, Medicine","requirements":"Physician talent","description":"On a Medicine-based test, you may accept one additional complication in exchange for one automatic success."},"Field Medicine":{"keywords":"Medicus, Medicine","requirements":"Physician talent","description":"Ignore any difficulty increase on Medicine-based tests caused by lacking proper tools or equipment."},"First Response":{"keywords":"Medicus, Medicine","requirements":"Fast Aid talent, 3+ ranks in Medicine","description":"In combat, the Stabilize major action can also target characters who aren't dying. On a pass, choose one: remove stress equal to your Medicine ranks (plus 1 more per Momentum spent); remove a condition; or remove an ongoing damage effect such as Persistent."},"Triage":{"keywords":"Medicus, Medicine","requirements":"Emergency Doctor talent or First Response talent, 3+ ranks in Medicine","description":"Make a Reason + Medicine test to diagnose a patient's injuries, illness, or its severity; on a pass, gain +1 bonus Momentum usable only for Obtain Information. When you pass a Reason + Medicine test to remove a scar, spend Momentum to remove the same scar from one additional patient per point spent."},"Sharp Senses":{"keywords":"Frumentarius, Observation","requirements":"Schemer archetype","description":"Re-roll 1d20 on Observation-based tests (keeping the new result)."},"Do or Die":{"keywords":"Frumentarius, Morale","requirements":"Sharp Senses talent","description":"Generate 1 Threat to gain +2 Morale resistance until the end of the scene."},"Interrogation":{"keywords":"Frumentarius","requirements":"Know Thy Enemy talent","description":"Passing a test to coerce information during a social conflict grants +1 bonus Momentum, usable only for Obtain Information."},"Know Thy Enemy":{"keywords":"Frumentarius","requirements":"Sharp Senses talent","description":"The first bonus d20 you buy on an Insight-based test to detect lies or hidden truths costs no Momentum."},"Perfect Facade":{"keywords":"Frumentarius, Stealth","requirements":"Sharp Senses talent","description":"Passing a Stealth-based test to create or use a disguise grants bonus Momentum equal to your Stealth ranks, to a maximum of +3."},"Thorough Search":{"keywords":"Frumentarius","requirements":"Interrogation talent","description":"Passing a test to search for evidence grants +1 bonus Momentum, usable only for Obtain Information. If you assist such a search and the leader passes, they receive this bonus instead."},"Charismatic":{"keywords":"Magistrate, Persuasion","requirements":"Schemer archetype","description":"Re-roll 1d20 on Persuasion-based tests (keeping the new result)."},"Commanding Presence":{"keywords":"Magistrate, Persuasion, Tactics","requirements":"Charismatic talent","description":"The first bonus d20 you buy on Persuasion- or Tactics-based tests costs no Momentum."},"Honestas":{"keywords":"Magistrate","requirements":"Charismatic talent","description":"Reduce by 1 (minimum 0) the difficulty of tests to resist being coerced into breaking a promise or acting dishonorably."},"Lictors":{"keywords":"Magistrate, Tactics","requirements":"Commanding Presence talent","description":"Designate allies in your zone, up to your Tactics rank, as lictors. For the rest of the scene, when you're targeted by an attack, a lictor may take your place as the target, gaining Courage resistance equal to your Tactics ranks against it."},"Rhetoric":{"keywords":"Magistrate","requirements":"Charismatic talent","description":"When buying bonus d20s on a test to address a crowd, you may re-roll one of them."},"Stoic":{"keywords":"Magistrate","requirements":"Honestas talent","description":"Reduce by 2 (minimum 0) the difficulty of tests to resist coercion, mental intrusion, pain, or other mental attacks."},"Hasty Retreat":{"keywords":"Robber","requirements":"Scoundrel archetype","description":"When buying bonus d20s on a test to evade pursuit, you may re-roll one of them."},"Inconspicuous (Robber)":{"keywords":"Robber, Stealth","requirements":"Scoundrel archetype","description":"If non-enemies are within Close range, make an Insight + Stealth test to hide or avoid notice even while visible to an enemy (the GM may raise the difficulty if you stand out)."},"Alter Ego":{"keywords":"Robber","requirements":"Inconspicuous talent","description":"On entering a scene, you may adopt a persona, gaining a new truth that represents it until you're discovered or drop the disguise. While out of sight, spend a major action and generate 2 Threat to quick-change into a new disguise."},"Nimble":{"keywords":"Robber, Movement","requirements":"Hasty Retreat talent","description":"Reduce by 2 the difficulty of tests to move through difficult terrain or obstacles (such as during a pursuit or skirmish); at 0, you move through it freely."},"Ransack":{"keywords":"Robber, Observation","requirements":"Scotopia talent","description":"On an Observation-based test to search an area, generate 2 Threat to reduce the difficulty by 1 and halve the time the search takes."},"Scotopia (Robber)":{"keywords":"Robber","requirements":"Alter Ego talent or Nimble talent","description":"Ignore skill test penalties from poor illumination or low light (not total darkness)."},"Subtle Step":{"keywords":"Sicarius, Stealth","requirements":"Scoundrel archetype","description":"The first bonus d20 you buy on a Stealth-based test to sneak or pass unseen costs no Momentum."},"Assassin":{"keywords":"Sicarius","requirements":"Death Dealer talent or Silent Strike talent","description":"When attacking with a melee weapon that has the Hidden quality, spend 2 Momentum to treat every blank rolled in the attack's pool as an effect instead."},"Backstabber":{"keywords":"Sicarius","requirements":"Guard Break talent or Subtle Step talent","description":"Attacks against a target without Guard gain the Intense damage effect, if they don't already have it."},"Death Dealer":{"keywords":"Sicarius, Stealth","requirements":"Guard Break talent or Silent Strike talent","description":"While wielding a weapon with the Hidden quality, use Stealth in place of Fighting to attack with it, and increase its damage by 1."},"Guard Break":{"keywords":"Sicarius","requirements":"Backstabber talent or Subtle Step talent","description":"When attacking an opponent with greater Reach than yours, treat their Reach as 1 point lower."},"Silent Strike":{"keywords":"Sicarius","requirements":"Backstabber talent or Death Dealer talent","description":"Attacks with a melee weapon that has Reach 1 gain the Subtle quality."},"Tracker":{"keywords":"Hunter","requirements":"Scout archetype","description":"The first bonus d20 you buy on a test to discover or follow tracks costs no Momentum."},"Constantly Watching":{"keywords":"Hunter","requirements":"Tracker talent","description":"Reduce by 1 (minimum 0) the difficulty of tests to detect danger or hidden enemies."},"Dead Eye":{"keywords":"Hunter","requirements":"Expert Aim talent","description":"Ranged weapon attacks deal +1 damage."},"Expert Aim":{"keywords":"Hunter","requirements":"Tracker talent","description":"The Aim minor action lets you, instead of re-rolling a d20, designate one d20 in your pool before rolling and treat it as having rolled a 1."},"Scotopia (Hunter)":{"keywords":"Hunter","requirements":"Constantly Watching talent","description":"Ignore skill test penalties from poor illumination or low light (not total darkness)."},"Self Sufficient":{"keywords":"Hunter, Survival","requirements":"Tracker talent","description":"Re-roll 1d20 on Survival-based tests (keeping the new result)."},"Pack Tactics":{"keywords":"Veles","requirements":"Scout archetype","description":"When you assist an ally in combat and their test passes, they gain +1 bonus Momentum."},"Acrobatic Dodge":{"keywords":"Veles, Athletics","requirements":"Swift Victory talent","description":"Oppose an enemy's melee attack with Agility + Athletics instead of Agility + Fighting. Winning deals no damage but lets you move to anywhere within Close range (or Medium range, for 1 Momentum)."},"Assail":{"keywords":"Veles, Fighting","requirements":"Pack Tactics talent","description":"When making a ranged attack with a Thrown Weapons-focus weapon, spend 2 Momentum to take a second major action this turn."},"Fortune Favors the Bold":{"keywords":"Veles, Fortune","requirements":"Rejuvenation talent","description":"When spending Fortune to re-roll a failed test, you may first increase its difficulty by 1; if the re-roll then passes, regain the spent Fortune point."},"Rejuvenation":{"keywords":"Veles, Resilience","requirements":"Pack Tactics talent","description":"Reduce the difficulty of the Catch Breath major action by 1 (minimum 0), and each Momentum spent on it to remove stress removes 2 instead of 1."},"Swift Victory":{"keywords":"Veles","requirements":"Pack Tactics talent","description":"On an Athletics-based test for a Rush action or to cross difficult terrain, accept one additional complication for one automatic success. At the start of any conflict, generate 1 Threat to act first, regardless of who'd normally go first."},"Head Taker":{"keywords":"Berserker, Fighting","requirements":"Soldier archetype","description":"Choose a visible Toughened or Nemesis NPC. Your melee attacks against them gain +1, until they die, the scene ends, or they deal you stress. Defeating them grants a nonrefreshing Fortune point, lost at the end of the scene."},"War Cry":{"keywords":"Berserker","requirements":"Head Taker talent","description":"When your Head Taker target attacks you in melee, as a reaction, before the dice are rolled, designate one d20 in their pool to automatically count as a 20; the attack's complication range also increases by 1."},"Hack and Slash":{"keywords":"Berserker, Fighting","requirements":"Head Taker talent","description":"The first bonus d20 you buy on a melee attack against a creature you've already hit this scene costs no Momentum."},"Brutal Fighter":{"keywords":"Berserker","requirements":"Hack and Slash talent","description":"All weapons you wield gain the Vicious damage effect; a weapon that already has Vicious instead deals +2 damage."},"Bloody Handed":{"keywords":"Berserker, Fighting","requirements":"Brutal Fighter talent","description":"On a melee attack, add the Area effect, striking one additional GM-chosen target within Close range per effect rolled, and add 1 Threat per effect rolled. The GM may spend that Threat (2 per target) to have the attack strike unintended targets instead."},"Onslaught":{"keywords":"Berserker, Movement","requirements":"Head Taker talent","description":"After a melee attack of yours deals stress, move anywhere within Medium range as a free action."},"Berserker Rush":{"keywords":"Berserker, Fighting","requirements":"Onslaught talent","description":"After using the Rush major action, spend 2 Momentum to make a melee attack at the end of your movement; if it deals damage, add +1."},"Legionary Training":{"keywords":"Legionary, Fighting","requirements":"Soldier archetype","description":"Re-roll 1d20 on Fighting-based tests made with a spear, gladius, or pilum (keeping the new result)."},"Legionary Veteran":{"keywords":"Legionary","requirements":"Legionary Training talent","description":"Gain +2 Courage resistance."},"Precision Strikes":{"keywords":"Legionary","requirements":"Legionary Training talent","description":"Weapons you wield gain the Piercing 1 damage effect; a weapon that already has Piercing instead gets +1 to it."},"Strike as One":{"keywords":"Legionary, Tactics","requirements":"Precision Strikes talent","description":"As a minor action before attacking, spend Momentum (up to your Tactics rank) to order one ally to strike per point spent. When you then make your attack, each ordered ally may use their Reaction to make a melee or ranged attack."},"Scutarius":{"keywords":"Legionary","requirements":"Legionary Training talent","description":"As a major action, lock shields with a shield-equipped ally in your zone. While locked, you each gain bonus Cover resistance equal to the other's shield's Shield X rating."},"Brace for Impact":{"keywords":"Legionary, Fighting","requirements":"Scutarius talent","description":"When targeted by a melee attack, before its dice are rolled, brace in formation with a shield-equipped ally in your zone (you must also have a shield); you each gain +1 Cover resistance. Winning the opposed Agility + Fighting test lets you deal damage and force the attacker back to a point within Close range."},"Formation Tactics":{"keywords":"Legionary","requirements":"Brace for Impact talent","description":"As a major action, form up with an ally in your zone who's also equipped with a shield and a gladius or similar sword. While in formation, you may regain Guard as a free action even with an enemy within Reach, and any enemy who successfully attacks either of you takes 2 physical damage."},"Purse Strings":{"keywords":"Servant","requirements":"Servant caste","description":"Once per adventure, purchase an item with Restriction 3 or lower using your employer's wealth or requisition points instead of your own. You must return the item after the adventure ends."},"Envy and Attention":{"keywords":"Noble","requirements":"Noble caste","description":"The first bonus d20 you buy on Gravitas-based tests to sway or influence others costs no Momentum, but the GM starts each adventure with 2 additional Threat. This talent can't be retrained unless you lose your Noble caste status."},"Alea Iacta Est (The Die Is Cast)":{"keywords":"Roman Citizen","requirements":"Roman Citizen culture","description":"Once per scene, when an NPC suffers a complication, raise the GM's Threat cost to cancel it to 4."},"All Roads Lead to Rome":{"keywords":"Roman Citizen","requirements":"Roman Citizen culture","description":"Reduce by 1 (minimum 0) the difficulty of tests to learn about, or act appropriately within, an unfamiliar culture."},"Unyielding":{"keywords":"Germanic Tribe","requirements":"Germanic Tribe culture","description":"Increase your maximum stress by 3."},"Woodwise":{"keywords":"Germanic Tribe","requirements":"Germanic Tribe culture","description":"In the woodlands of Germania, reduce by 1 (minimum 0) the difficulty of tests to find food or shelter, navigate, or travel through the forest."},"Balancing the Scales":{"keywords":"Ægyptus","requirements":"Ægyptus culture","description":"On a test to haggle over price, generate 2 Threat to reduce the difficulty by 1 (minimum 1)."},"Writ in Stone":{"keywords":"Ægyptus, Academia","requirements":"Ægyptus culture","description":"Re-roll every die that fails to generate a success on Academia-based tests to recall history or lore."},"Night Raiders":{"keywords":"Briton","requirements":"Briton culture","description":"Ignore location truths that penalize skill tests due to poor illumination or low light (not total darkness)."},"Warrior Born":{"keywords":"Briton","requirements":"Briton culture","description":"Begin the game with +2 Courage resistance."},"Noble Line":{"keywords":"Gaul","requirements":"Gaul culture","description":"Re-roll 1d20 on tests to gain support or aid from a non-Roman (keeping the new result)."},"Undergoing All Dangers":{"keywords":"Gaul","requirements":"Gaul culture","description":"Begin the game with +1 Courage resistance."},"Cosmopolitan":{"keywords":"Greek","requirements":"Greek culture","description":"You can communicate clearly with someone who doesn't share a language with you, through pidgin and gesture, as long as the information isn't too complex."},"Practiced Listener":{"keywords":"Greek","requirements":"Greek culture","description":"Re-roll one die that fails to generate a success on an Insight-based test to judge a speaker's honesty."},"Do as the Romans Do":{"keywords":"Other Culture / Foederati","requirements":"Other Culture / Foederati culture","description":"Choose and gain one culture talent available to Roman citizens."},"Hidden Potential":{"keywords":"Other Culture / Foederati","requirements":"Other Culture / Foederati culture","description":"Once per scene, generate 2 Threat to treat a skill you have no ranks in as having 2 ranks (plus a relevant focus) for the rest of the scene."},"World Weary":{"keywords":"Other Culture / Foederati","requirements":"Other Culture / Foederati culture","description":"Add one automatic success to Will-based tests."}};
+  const ccApplyTalentPreset = ({trigger, attributes}) => {
+    const [section, rowID] = k.parseRepeatName(trigger.name);
+    const prefix = `${section}_${rowID}_`;
+    const profile = ccTalentProfiles[attributes[`${prefix}name`]];
+    if (!profile) { return; }
+    Object.keys(profile).forEach((field) => {
+      attributes[`${prefix}${field}`] = profile[field];
+    });
+  };
+  k.registerFuncs({ccApplyTalentPreset});
+  
+  
+  const calcXpAvailable = ({attributes}) => {
+    return (Number(attributes.xp_earned) || 0) - (Number(attributes.xp_spent) || 0);
+  };
+  k.registerFuncs({calcXpAvailable});
 
 console.debug = vi.fn(a => null);
 console.log = vi.fn(a => null);

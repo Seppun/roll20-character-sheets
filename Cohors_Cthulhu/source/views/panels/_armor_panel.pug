@@ -1,0 +1,80 @@
+//- views/panels/_armor_panel.pug
+//- Armor repeating section. Armor profiles from the rulebook's Chapter 7
+//- (Armor table). Same single-source-of-truth approach and same "write
+//- out +option() calls individually" caveat as
+//- views/panels/_weapons_panel.pug's ccWeaponProfiles - see its own
+//- comment for why.
+-
+  const ccArmorProfiles = {
+    'Chainmail / Lorica Hamata': {resistance: '2', qualities: 'Uncomfortable'},
+    'Leather Armor': {resistance: '1', qualities: ''},
+    'Lorica Segmentata': {resistance: '3', qualities: 'Uncomfortable'},
+    'Lorica Squamata': {resistance: '3', qualities: 'Heavy, Uncomfortable'},
+  };
+
+.cc-panel.cc-armor
+  .cc-banner Armor
+  .cc-rep-table.cc-rep-armor
+    .cc-rep-header
+      span Name
+      span Resistance
+      span Qualities
+    //- trigger.affects here handles deleting a row: Roll20 fires
+    //- remove:repeating_armor (with a removedInfo payload, no specific
+    //- row id) when a row is removed, which - now that the fieldset
+    //- itself declares a trigger - k-scaffold wires up the same way it
+    //- wires up any other attribute's change listener, recalculating
+    //- total_armor (views/panels/_vitals_panel.pug) from whatever rows
+    //- remain. Without this, only EDITING a row's resistance (via that
+    //- field's own trigger below) ever recalculated total_armor -
+    //- deleting the row it came from left the old total in place until
+    //- something else changed.
+    +fieldset({name: 'armor', trigger: {affects: ['total_armor']}})
+      //- Options written out individually, not via an `each` loop -
+      //- see the comment above ccWeaponProfiles (views/panels/
+      //- _weapons_panel.pug) for why.
+      +select({
+        name: 'name',
+        trigger: {triggeredFuncs: ['ccApplyArmorPreset']}
+      })
+        +option({value: ''})
+          | Custom / Other
+        +option({value: 'Chainmail / Lorica Hamata'})
+          | Chainmail / Lorica Hamata
+        +option({value: 'Leather Armor'})
+          | Leather Armor
+        +option({value: 'Lorica Segmentata'})
+          | Lorica Segmentata
+        +option({value: 'Lorica Squamata'})
+          | Lorica Squamata
+      +number({name: 'resistance', trigger: {affects: ['total_armor']}})
+      +text({name: 'qualities'})
+
++scss.
+  .cc-character {
+    .cc-rep-armor {
+      .cc-rep-header,
+      fieldset,
+      .repcontainer .repitem {
+        grid-template-columns: 1.5fr 1fr 2.5fr;
+      }
+    }
+  }
+
++module.
+  // Same pattern as Weapons' ccApplyWeaponPreset/ccWeaponProfiles
+  // (views/panels/_weapons_panel.pug), for the Armor table's Name
+  // dropdown. Setting resistance here still triggers its own
+  // {affects: ['total_armor']} cascade normally (the attribute proxy
+  // re-checks a field's own cascade whenever it's set, regardless of
+  // what set it), so Total Armor stays correct without extra wiring.
+  const ccArmorProfiles = !{JSON.stringify(ccArmorProfiles)};
+  const ccApplyArmorPreset = ({trigger, attributes}) => {
+    const profile = ccArmorProfiles[attributes[trigger.name]];
+    if (!profile) { return; }
+    const [section, rowID] = k.parseRepeatName(trigger.name);
+    Object.keys(profile).forEach((field) => {
+      attributes[`${section}_${rowID}_${field}`] = profile[field];
+    });
+  };
+  k.registerFuncs({ccApplyArmorPreset});

@@ -1,0 +1,216 @@
+//- views/_global_sheetworker.pug
+//- Sheet-worker helpers/functions shared by more than one panel file (and,
+//- for several of these, by views/_spells.pug too - a completely separate
+//- tab, not just a different panel). None of these are registered against
+//- any specific field's own trigger here - k-scaffold's cascade wiring
+//- (the `calculation`/`triggeredFuncs`/`affects` strings on a +number/
+//- +radio/+action) works purely by name lookup against the compiled
+//- cascades object, resolved across every included file, so a panel-local
+//- calc function being called BY NAME from another file's markup needs no
+//- help from this file at all. What DOES need this file is a function
+//- called BY DIRECT JS REFERENCE from code living in more than one other
+//- file - that requires the callee to already be defined in the same
+//- concatenated script by the time the caller's own code runs, which is
+//- only guaranteed if it's declared somewhere included before all of its
+//- callers. This file is included first (see _character.pug) for exactly
+//- that reason - every panel file, and views/_spells.pug, can rely on
+//- everything below already being in scope.
++module.
+  // Shared lookup table used by Attributes' Bonus Damage, Vitals' Base
+  // Armour/Courage/Total Armor, and (in views/_spells.pug) spellcasting
+  // Power Rating - four different panel/tab files. Rulebook table:
+  // rating <=8 -> 0, 9 -> +1, 10-11 -> +2, 12-13 -> +3, 14-15 -> +4, 16+ -> +5.
+  const ccAttributeBonus = (rating) => {
+    const r = Number(rating) || 0;
+    return r <= 8 ? 0 : Math.min(5, Math.ceil((r - 7) / 2));
+  };
+
+  const ccCapitalize = (s) => s.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+
+  // Action-button trigger.name is normalized with dashes (e.g.
+  // "academia-focus-finance-roll"), not the underscores used everywhere
+  // else on this sheet (attribute/calculation trigger names) - confirmed
+  // by inspecting the compiled sheet's own cascade data. Normalize before
+  // matching so the regexes in Attributes'/Skills' own roll initiators
+  // (written against underscore form) work. Shared between those two
+  // panel files' roll initiators - see ccNormalizeName's own comment
+  // further below for the same quirk (referring to this one).
+  const ccNormalizeName = (name) => name.replace(/-/g, '_');
+
+  // Momentum in Cohors Cthulhu (as in the wider 2d20 System) is a shared
+  // party resource, not a per-character stat, so it isn't tracked on this
+  // sheet at all - instead every roll that generates or spends it sends a
+  // hidden signal here for a companion Roll20 API script
+  // (api-scripts/ccmomentum.js in this repo) to keep a single game-wide
+  // pool in sync and display it to the table. delta is net: positive for
+  // Momentum a passed roll generates, negative for Momentum spent (buying
+  // additional d20s, or - for spells - declaring Extra Momentum spent).
+  // Called from Attributes/Skills' shared runCcRoll below, Vitals' own
+  // Fatigue resist roll, Weapons' weapon roll, and Spells' spell roll
+  // (views/_spells.pug) - five different call sites across panels/tabs.
+  //
+  // Originally tried calling sendChat() directly - confirmed live in a
+  // real game that sheet workers have no such function at all ("sendChat
+  // is not defined"), unlike the API sandbox's own sendChat. The only way
+  // sheet-worker code can put anything into chat is a real dice roll via
+  // startRoll, so this rides a dedicated, hidden roll template
+  // (ccmomentumsignal, in rolltemplate/_index.pug) instead - whispered to
+  // the GM and display:none besides, so nobody at the table ever sees it,
+  // but its rendered HTML still reaches the API's chat:message handler
+  // for parsing. Harmless with no such script installed - Roll20 still
+  // renders (and immediately hides) a card nobody looks at.
+  const ccSendMomentumSignal = async (delta) => {
+    if (!delta) { return; }
+    try {
+      // Confirmed live: a startRoll() a sheet worker never finishRoll()s
+      // doesn't post its real template content at all - Roll20 replaces
+      // it with a generic "A roll was initiated by a character sheet,
+      // but it was not finished: {{delta=$[[0]]}}" placeholder message
+      // instead (missing the &{template:...} reference entirely, though
+      // the actual computed inline-roll value is still present and
+      // correct). finishRoll with no overrides completes the roll
+      // properly since delta needs no override to begin with.
+      const roll = await startRoll(`/w gm &{template:ccmomentumsignal} {{ccmomentumdelta=[[0+${delta}]]}}`);
+      finishRoll(roll.rollId, {});
+    } catch (err) {
+      console.log('[CC] Momentum pool signal failed:', err.message);
+    }
+  };
+
+  // Threat is the GM's mirror of Momentum: also a shared, game-wide
+  // resource, so it isn't tracked on this sheet either - a companion
+  // Roll20 API script (api-scripts/ccthreat.js) keeps that pool in sync
+  // instead. Unlike Momentum, RAW gives players no way to spend Threat
+  // directly from their own sheet - only to generate it - so delta here
+  // is always the Complications a roll produced (2d20 RAW: each
+  // Complication generates 1 point of Threat for the GM), never negative.
+  // Kept as a fully separate hidden roll/template/API script from
+  // ccSendMomentumSignal above rather than folding the two signals into
+  // one roll, so this addition can never risk the already-proven-working
+  // Momentum pool plumbing.
+  const ccSendThreatSignal = async (delta) => {
+    if (!delta) { return; }
+    try {
+      const roll = await startRoll(`/w gm &{template:ccthreatsignal} {{ccthreatdelta=[[0+${delta}]]}}`);
+      finishRoll(roll.rollId, {});
+    } catch (err) {
+      console.log('[CC] Threat pool signal failed:', err.message);
+    }
+  };
+
+  // Shared 2d20 roll core, used for Attribute-only rolls (Attributes
+  // panel), plain Skill rolls (no focus), and Focus rolls (both Skills
+  // panel) - three call sites across two panel files. attributeExpr is
+  // either a literal rating (attribute-only roll, no choice to make) or
+  // the ?{Attribute} query string (skill/focus rolls, since skill-to-
+  // attribute pairing isn't fixed by RAW - see ccAttributeQuery in
+  // views/panels/_skills_panel.pug). critMax is the die value at/under
+  // which a die is a critical success (this skill's ranks if a focus
+  // applies, else 1).
+  const runCcRoll = async ({skillLabel, focusLabel, attributeExpr, skillRanks, critMax}) => {
+    const difficultyQuery = '?{Difficulty|1}';
+    const complicationQuery = '?{Complication range (1-5)|1}';
+    const bonusDiceQuery = '?{Additional d20s bought (0-3)|0}';
+
+    // Every field we plan to set via finishRoll must already exist in the
+    // original roll string as a [[0]] placeholder - Roll20's finishRoll can
+    // only update fields that were part of the initial message, it cannot
+    // inject brand new field names. (Confirmed the hard way: character_name/
+    // skill/difficulty, which WERE declared upfront, rendered fine; target_
+    // number/successes/etc, which were only ever set via finishRoll's second
+    // argument, never appeared at all.)
+    const rollString = '&{template:ccskill} ' +
+      `{{character_name=@{character_name}}} ` +
+      `{{skill=${skillLabel}}} ` +
+      (focusLabel ? `{{focus=${focusLabel}}} ` : '') +
+      `{{attribute_choice=[[0+${attributeExpr}]]}} ` +
+      `{{difficulty=[[0+${difficultyQuery}]]}} ` +
+      `{{complication_range=[[0+${complicationQuery}]]}} ` +
+      `{{roll1=[[(2+${bonusDiceQuery})d20]]}} ` +
+      `{{target_number=[[0]]}} ` +
+      `{{successes=[[0]]}} ` +
+      `{{dice_text=[[0]]}} ` +
+      `{{outcome=[[0]]}} ` +
+      `{{complications=[[0]]}} ` +
+      `{{bonus_momentum=[[0]]}} ` +
+      `{{momentum_spent=[[0]]}}`;
+
+    const roll = await startRoll(rollString);
+
+    try {
+      const attributeChoice = Number(roll.results.attribute_choice.result) || 0;
+      const difficulty = Number(roll.results.difficulty.result) || 1;
+      const complicationRange = Number(roll.results.complication_range.result) || 1;
+
+      // Roll20's documented result shape nests individual dice under
+      // rolls[0].results[].v; some sheets also see a flattened .dice
+      // array, so try that first if present, then fall back.
+      const roll1 = roll.results.roll1;
+      const dice = Array.isArray(roll1.dice) ?
+        roll1.dice :
+        (roll1.rolls && roll1.rolls[0] && roll1.rolls[0].results || []).map((r) => r.v);
+
+      console.log(`[CC] ${skillLabel}${focusLabel ? ` (${focusLabel})` : ''} roll - d20s:`, dice);
+
+      if (!dice.length) {
+        finishRoll(roll.rollId, {
+          target_number: '?',
+          successes: '?',
+          dice_text: `error: could not read dice from ${JSON.stringify(roll1)}`,
+          outcome: 0,
+          complications: 0,
+        });
+        return;
+      }
+
+      const targetNumber = attributeChoice + skillRanks;
+      const complicationThreshold = 21 - complicationRange;
+      const successCount = dice.filter((d) => d <= targetNumber).length +
+        dice.filter((d) => d <= critMax).length;
+      const complicationCount = dice.filter((d) => d >= complicationThreshold).length;
+      const passed = successCount >= difficulty;
+      const bonusMomentum = passed ? Math.max(0, successCount - difficulty) : 0;
+
+      // Buying additional d20s costs 1 Momentum each, win or lose (2d20
+      // RAW) - dice.length is 2 plus however many were bought via
+      // bonusDiceQuery above, so this recovers that count without needing
+      // its own roll-string field.
+      const bonusDiceBought = Math.max(0, dice.length - 2);
+      await ccSendMomentumSignal(bonusMomentum - bonusDiceBought);
+      await ccSendThreatSignal(complicationCount);
+
+      // outcome is a plain 0/1 flag (rather than separate passed/failed
+      // fields) because the Passed/Failed blocks are gated with the
+      // rollTotal() helper (an exact-value comparison on the computed
+      // override), not a plain {{#field}} truthiness check - which,
+      // like {{fieldname}} display, doesn't respect finishRoll overrides
+      // on a field that started life as a [[0]] roll expression.
+      const overrides = {
+        target_number: targetNumber,
+        successes: successCount,
+        dice_text: dice.join(', '),
+        outcome: passed ? 1 : 0,
+        bonus_momentum: bonusMomentum,
+        complications: complicationCount,
+        momentum_spent: bonusDiceBought,
+      };
+
+      console.log(`[CC] ${skillLabel} outcome:`, {
+        targetNumber, critMax, difficulty, successCount, complicationCount, passed,
+      });
+
+      finishRoll(roll.rollId, overrides);
+      return passed;
+    } catch (err) {
+      // Surface failures in chat instead of leaving the template blank
+      // with no clue why.
+      finishRoll(roll.rollId, {
+        target_number: '?',
+        successes: '?',
+        dice_text: `error: ${err.message}`,
+        outcome: 0,
+        complications: 0,
+      });
+      return false;
+    }
+  };

@@ -1,0 +1,89 @@
+//- views/panels/_truths_scars_panel.pug
+//- Personal Truths & Scars panel. Pure markup/CSS - no sheet-worker logic
+//- of its own.
+.cc-panel.cc-truths-scars
+  .cc-banner Personal Truths &amp; Scars
+  //- 3 columns (not 5) so each field is wider/easier to read from -
+  //- with 5 truths + 5 scars that's 4 rows total (3+3+3+1), which is
+  //- exactly the "4 rows" asked for once the grid is 3-wide, with no
+  //- need to add more fields. Rows 1-2 (truth 1-5 and scar 1) always
+  //- show; rows 3-4 (scar 2-5) sit behind the expand toggle below,
+  //- via the standard checkbox-hack (:checked sibling selector) -
+  //- same technique as .cc-stress-max-marker in _vitals_panel.pug,
+  //- just with a plain visible checkbox/label instead of a hidden one.
+  .cc-truths-scars-grid
+    each n in [1, 2, 3, 4, 5]
+      +text({name: `truth ${n}`}).cc-truth
+    +text({name: 'scar 1'}).cc-scar
+  +checkbox({name: 'truths scars expanded', id: 'cc-truths-scars-expand'}).cc-truths-scars-checkbox
+  label.cc-truths-scars-toggle(for='cc-truths-scars-expand')
+    span.cc-truths-scars-arrow
+    span Scars 2-5
+  .cc-truths-scars-grid.cc-truths-scars-extra
+    each n in [2, 3, 4, 5]
+      +text({name: `scar ${n}`}).cc-scar
+
++scss.
+  .cc-character {
+    .cc-truths-scars-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.3rem;
+
+      .cc-truth,
+      .cc-scar {
+        width: 100%;
+        background: transparent;
+        border: none;
+        border-bottom: 1px solid var(--cc-rule);
+        color: var(--cc-ink);
+        padding: 0.15rem 0.1rem;
+      }
+    }
+
+    // Hidden not via display:none directly on the input (Roll20/browsers
+    // sometimes fight custom checkbox styling worse that way) but via
+    // the same visually-hidden-but-still-:checked-able pattern used for
+    // .cc-stress-max-marker in _vitals_panel.pug - it just needs to exist
+    // and be toggleable, never to be seen itself.
+    .cc-truths-scars-checkbox {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .cc-truths-scars-extra {
+      display: none;
+    }
+
+    .cc-truths-scars-checkbox:checked ~ .cc-truths-scars-extra {
+      display: grid;
+    }
+
+    .cc-truths-scars-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.3rem;
+      margin-top: 0.3rem;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      color: var(--cc-rule);
+      cursor: pointer;
+
+      .cc-truths-scars-arrow {
+        display: inline-block;
+        transition: transform 150ms ease-out;
+
+        &:before {
+          content: '\25BE'; // ▾ - a plain BMP character, not an emoji/astral one (see README's "hard-won lessons" for why that distinction matters here)
+        }
+      }
+    }
+
+    .cc-truths-scars-checkbox:checked ~ .cc-truths-scars-toggle .cc-truths-scars-arrow {
+      transform: rotate(180deg);
+    }
+  }

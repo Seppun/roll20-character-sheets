@@ -1,0 +1,154 @@
+//- views/panels/_talents_panel.pug
+//- Talents repeating section. Talent profiles (Name/Keywords/Requirements/
+//- Description) covering Chapter 6's Common Talents (organized by skill),
+//- each archetype's own talent list and specialization talent trees in
+//- Chapter 5 (Mystic/Sage/Schemer/Scoundrel/Scout/Soldier and their
+//- specializations), the Caste-granted talents, and the per-Culture
+//- talents. Too many to hand-write inline like Weapons'/Armor's own
+//- profile objects, so this loads from a JSON file instead
+//- (source/data/talents.json) via the `require` local that generate.js's
+//- pugOptions exposes to every template. An initial pass at this data
+//- (built from the PDF's text layer alone) silently mismatched several
+//- specialization/culture talents' names to the wrong descriptions,
+//- courtesy of the source PDF's two-column layout - the final data here
+//- was instead transcribed directly from the rendered page images to
+//- catch exactly that. A couple of pairs of talents across different
+//- specializations share the same name with different effects (e.g.
+//- "Scotopia" appears in both the Robber and Hunter specializations) -
+//- those are disambiguated as "NAME (SPECIALIZATION)" in this data/
+//- dropdown.
+-
+  const ccTalentProfiles = require('./source/data/talents.json');
+  const ccTalentNames = Object.keys(ccTalentProfiles).sort();
+
+.cc-panel.cc-talents
+  .cc-banner Talents
+  .cc-rep-table.cc-rep-talents
+    .cc-rep-header
+      span
+      span Name
+      span Keywords
+      span Requirements
+      span Description
+    //- trigger.affects here handles deleting a talent row (e.g.
+    //- removing Unyielding) the same way Armor's own fieldset trigger
+    //- (views/panels/_armor_panel.pug) handles deleting an armor row -
+    //- see that comment for the full explanation of why this is needed
+    //- at the fieldset level, not just on the Name field's own trigger
+    //- below (which only fires on EDITING a row, never on removing one).
+    +fieldset({name: 'talent', trigger: {affects: ['stress_max_base', 'stress_max', 'stress_max_marker', 'fatigue_max_marker']}})
+      //- The talent list (159 entries) is far too long for a plain
+      //- dropdown, so this uses a text input paired with a <datalist>
+      //- instead of k-scaffold's +select/+option - a native HTML
+      //- combobox that lets the browser filter the suggestion list to
+      //- entries matching what's typed so far, while still accepting
+      //- any free-text value for talents not in the list. The
+      //- datalist itself is declared once, below, and shared by every
+      //- row via the matching id.
+      //-
+      //- Unlike a real <select> (used for Weapons/Armor), picking a
+      //- suggestion from a <datalist> only fires the input's 'input'
+      //- event, not 'change' - and Roll20's sheet framework only
+      //- reacts to 'change', which a plain text input doesn't fire
+      //- until it loses focus. So the trigger on the Name field below
+      //- still works, but only once you click/tab elsewhere. This
+      //- apply button (a real click, always instant) is the reliable
+      //- alternative for right after picking a name from the list.
+      +action({
+        name: 'talent apply',
+        class: 'cc-talent-apply',
+        trigger: {triggeredFuncs: ['ccApplyTalentPreset']}
+      })
+      //- affects recalculates Max Stress whenever a talent name
+      //- changes, in case it's Unyielding (see calcStressMaxBase,
+      //- views/panels/_vitals_panel.pug) - same affects-on-repeating-
+      //- row-field pattern as Armor's resistance field triggering
+      //- total_armor.
+      +text({
+        name: 'name',
+        list: 'cc-talent-options',
+        trigger: {triggeredFuncs: ['ccApplyTalentPreset'], affects: ['stress_max_base', 'stress_max', 'stress_max_marker', 'fatigue_max_marker']}
+      })
+      +text({name: 'keywords'}).cc-talent-keywords
+      +text({name: 'requirements'}).cc-talent-requirements
+      +textarea({name: 'description'}).cc-talent-description
+  datalist#cc-talent-options
+    each talentName in ccTalentNames
+      option(value=talentName)
+
++scss.
+  .cc-character {
+    .cc-rep-talents {
+      .cc-rep-header,
+      fieldset,
+      .repcontainer .repitem {
+        grid-template-columns: 1.6rem 1.4fr 1fr 1.4fr 3fr;
+        align-items: center;
+      }
+
+      .cc-talent-apply {
+        background: none;
+        border: none;
+        padding: 0;
+        color: inherit;
+        font-size: 1rem;
+        cursor: pointer;
+        justify-self: center;
+
+        &:before {
+          content: '\21BB';
+          opacity: 0.8;
+        }
+
+        &:hover:before {
+          opacity: 1;
+        }
+      }
+
+      // Tight, single-line spacing on every field in the row (browsers'
+      // default line-height/padding leaves visibly loose gaps around the
+      // text, especially wrapped lines in the Description textarea).
+      input,
+      textarea {
+        line-height: 1.2;
+        padding: 0.15rem 0.3rem;
+      }
+
+      // Keywords/Requirements/Description hold short reference text, not
+      // something a player types much of - a smaller font keeps rows
+      // compact given how many there can be, while the Name field stays
+      // full-size since it's what's actively typed into.
+      .cc-talent-keywords,
+      .cc-talent-requirements,
+      .cc-talent-description {
+        font-size: 0.7rem;
+      }
+
+      textarea {
+        min-height: 3rem;
+      }
+    }
+  }
+
++module.
+  // Same pattern again as Weapons'/Armor's own apply-preset functions, for
+  // both the Name field's own trigger and the row's explicit apply button
+  // (see the comments on both in the markup above for why there are two) -
+  // reads the row's Name value via the row prefix rather than
+  // attributes[trigger.name] directly, since trigger.name is a different
+  // attribute depending on which of those two fired it. A value that
+  // doesn't match any known talent is a normal, expected case (not an
+  // error) for the free-text Name field - it just leaves Keywords/
+  // Requirements/Description untouched, same as picking "Custom / Other"
+  // does for weapons/armor.
+  const ccTalentProfiles = !{JSON.stringify(ccTalentProfiles)};
+  const ccApplyTalentPreset = ({trigger, attributes}) => {
+    const [section, rowID] = k.parseRepeatName(trigger.name);
+    const prefix = `${section}_${rowID}_`;
+    const profile = ccTalentProfiles[attributes[`${prefix}name`]];
+    if (!profile) { return; }
+    Object.keys(profile).forEach((field) => {
+      attributes[`${prefix}${field}`] = profile[field];
+    });
+  };
+  k.registerFuncs({ccApplyTalentPreset});
