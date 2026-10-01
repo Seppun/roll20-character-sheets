@@ -239,6 +239,18 @@ body {
      a literal rgba() repeated at every one of those call sites, so the
      opacity (currently 50%, per request) can be tuned in one place. */
   --cc-editable-fill: rgba(255, 255, 255, 0.5);
+  /* Carved-stone-block look for the die-roll buttons (Skill, Focus,
+     Weapon, Spell Cast) - a gradient fill between these two tones plus a
+     dark bezel border and an inset highlight/shadow (see each button's
+     own box-shadow) reads as a raised, worn stone block rather than a
+     flat colored chip. Same warm brown/tan hue family as the travertine
+     panel texture (images/stone-texture.png) and --cc-rule/--cc-ink,
+     just richer/darker than the pale page tones so the button still
+     reads as a distinct object sitting on top of the panel or banner
+     behind it. */
+  --cc-stone-light: #cbb896;
+  --cc-stone-dark: #9c8862;
+  --cc-stone-bezel: #4a3c28;
   /* Regular/base text size for the sheet. rem-based sizes elsewhere (tab
      buttons, table headers, small labels, etc.) are set relative to
      html's own 16px root above and are unaffected by this - only text
@@ -1666,7 +1678,7 @@ body .ui-dialog .tab-content .charsheet .cc-character .cc-footer {
   opacity: 0.6;
 }
 body .ui-dialog .tab-content .charsheet .cc-character .cc-build-css::after {
-  content: "CSS build: 2026-10-01 16:10:00 UTC";
+  content: "CSS build: 2026-10-01 17:27:15 UTC";
 }
 body .ui-dialog .tab-content .charsheet .cc-character .cc-truths-scars-grid {
   display: grid;
@@ -1923,11 +1935,12 @@ body .ui-dialog .tab-content .charsheet .cc-character .cc-skills-table .cc-skill
   justify-content: flex-start;
   gap: 0.3rem;
   width: 8.5rem;
-  background: rgba(255, 255, 255, 0.15);
-  border: 1px solid var(--cc-banner-text);
-  border-radius: 4px;
+  background: linear-gradient(145deg, var(--cc-stone-light) 0%, var(--cc-stone-dark) 100%);
+  border: 2px solid var(--cc-stone-bezel);
+  border-radius: 6px;
+  box-shadow: inset 1px 1px 1px rgba(255, 255, 255, 0.5), inset -1px -1px 2px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.35);
   padding: 0.15rem 0.5rem;
-  color: inherit;
+  color: var(--cc-ink);
   font: inherit;
   text-transform: inherit;
   letter-spacing: inherit;
@@ -1935,8 +1948,7 @@ body .ui-dialog .tab-content .charsheet .cc-character .cc-skills-table .cc-skill
   cursor: pointer;
 }
 body .ui-dialog .tab-content .charsheet .cc-character .cc-skills-table .cc-skill-name-roll:hover {
-  background: var(--cc-banner-text);
-  color: var(--cc-banner);
+  background: linear-gradient(145deg, var(--cc-stone-dark) 0%, var(--cc-stone-light) 100%);
 }
 body .ui-dialog .tab-content .charsheet .cc-character .cc-skills-table .cc-skill-name-roll:before {
   content: "0";
@@ -1977,9 +1989,10 @@ body .ui-dialog .tab-content .charsheet .cc-character .cc-focus-item .cc-focus-r
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
-  background: var(--cc-parchment);
-  border: 1px solid var(--cc-rule);
-  border-radius: 3px;
+  background: linear-gradient(145deg, var(--cc-stone-light) 0%, var(--cc-stone-dark) 100%);
+  border: 2px solid var(--cc-stone-bezel);
+  border-radius: 6px;
+  box-shadow: inset 1px 1px 1px rgba(255, 255, 255, 0.5), inset -1px -1px 2px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.35);
   padding: 0.05rem 0.35rem;
   color: var(--cc-ink);
   font-size: inherit;
@@ -1987,8 +2000,7 @@ body .ui-dialog .tab-content .charsheet .cc-character .cc-focus-item .cc-focus-r
   cursor: pointer;
 }
 body .ui-dialog .tab-content .charsheet .cc-character .cc-focus-item .cc-focus-roll:hover {
-  background: var(--cc-banner);
-  color: var(--cc-banner-text);
+  background: linear-gradient(145deg, var(--cc-stone-dark) 0%, var(--cc-stone-light) 100%);
 }
 body .ui-dialog .tab-content .charsheet .cc-character .cc-focus-item .cc-focus-roll:before {
   content: "0";
@@ -2010,9 +2022,10 @@ body .ui-dialog .tab-content .charsheet .cc-character .cc-rep-weapons .cc-weapon
   justify-content: center;
   width: 1.4rem;
   height: 1.4rem;
-  background: var(--cc-parchment);
-  border: 1px solid var(--cc-rule);
-  border-radius: 3px;
+  background: linear-gradient(145deg, var(--cc-stone-light) 0%, var(--cc-stone-dark) 100%);
+  border: 2px solid var(--cc-stone-bezel);
+  border-radius: 6px;
+  box-shadow: inset 1px 1px 1px rgba(255, 255, 255, 0.5), inset -1px -1px 2px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.35);
   color: var(--cc-ink);
   font-size: 1.1rem;
   cursor: pointer;
@@ -2023,8 +2036,7 @@ body .ui-dialog .tab-content .charsheet .cc-character .cc-rep-weapons .cc-weapon
   opacity: 1;
 }
 body .ui-dialog .tab-content .charsheet .cc-character .cc-rep-weapons .cc-weapon-roll:hover {
-  background: var(--cc-banner);
-  color: var(--cc-banner-text);
+  background: linear-gradient(145deg, var(--cc-stone-dark) 0%, var(--cc-stone-light) 100%);
 }
 body .ui-dialog .tab-content .charsheet .cc-character .cc-rep-armor .cc-rep-header,
 body .ui-dialog .tab-content .charsheet .cc-character .cc-rep-armor fieldset,
@@ -2104,19 +2116,26 @@ body .ui-dialog .tab-content .charsheet .cc-spells .cc-spell-name-row select {
   flex: 1 1 auto;
 }
 body .ui-dialog .tab-content .charsheet .cc-spells .cc-spell-cast {
-  background: none;
-  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.4rem;
+  height: 1.4rem;
+  background: linear-gradient(145deg, var(--cc-stone-light) 0%, var(--cc-stone-dark) 100%);
+  border: 2px solid var(--cc-stone-bezel);
+  border-radius: 6px;
+  box-shadow: inset 1px 1px 1px rgba(255, 255, 255, 0.5), inset -1px -1px 2px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.35);
   padding: 0;
-  color: inherit;
+  color: var(--cc-ink);
   font-size: 1.1rem;
   cursor: pointer;
 }
 body .ui-dialog .tab-content .charsheet .cc-spells .cc-spell-cast:before {
   content: "0";
-  opacity: 0.8;
-}
-body .ui-dialog .tab-content .charsheet .cc-spells .cc-spell-cast:hover:before {
   opacity: 1;
+}
+body .ui-dialog .tab-content .charsheet .cc-spells .cc-spell-cast:hover {
+  background: linear-gradient(145deg, var(--cc-stone-dark) 0%, var(--cc-stone-light) 100%);
 }
 body .ui-dialog .tab-content .charsheet .cc-spells .cc-spell-collapse-toggle {
   appearance: none;
@@ -2219,7 +2238,7 @@ body {
   opacity: 0.6;
 }
 .cc-character .cc-build-css::after {
-  content: "CSS build: 2026-10-01 16:10:00 UTC";
+  content: "CSS build: 2026-10-01 17:27:15 UTC";
 }
 .cc-character .cc-truths-scars-grid {
   display: grid;
@@ -2476,11 +2495,12 @@ body {
   justify-content: flex-start;
   gap: 0.3rem;
   width: 8.5rem;
-  background: rgba(255, 255, 255, 0.15);
-  border: 1px solid var(--cc-banner-text);
-  border-radius: 4px;
+  background: linear-gradient(145deg, var(--cc-stone-light) 0%, var(--cc-stone-dark) 100%);
+  border: 2px solid var(--cc-stone-bezel);
+  border-radius: 6px;
+  box-shadow: inset 1px 1px 1px rgba(255, 255, 255, 0.5), inset -1px -1px 2px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.35);
   padding: 0.15rem 0.5rem;
-  color: inherit;
+  color: var(--cc-ink);
   font: inherit;
   text-transform: inherit;
   letter-spacing: inherit;
@@ -2488,8 +2508,7 @@ body {
   cursor: pointer;
 }
 .cc-character .cc-skills-table .cc-skill-name-roll:hover {
-  background: var(--cc-banner-text);
-  color: var(--cc-banner);
+  background: linear-gradient(145deg, var(--cc-stone-dark) 0%, var(--cc-stone-light) 100%);
 }
 .cc-character .cc-skills-table .cc-skill-name-roll:before {
   content: "0";
@@ -2530,9 +2549,10 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
-  background: var(--cc-parchment);
-  border: 1px solid var(--cc-rule);
-  border-radius: 3px;
+  background: linear-gradient(145deg, var(--cc-stone-light) 0%, var(--cc-stone-dark) 100%);
+  border: 2px solid var(--cc-stone-bezel);
+  border-radius: 6px;
+  box-shadow: inset 1px 1px 1px rgba(255, 255, 255, 0.5), inset -1px -1px 2px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.35);
   padding: 0.05rem 0.35rem;
   color: var(--cc-ink);
   font-size: inherit;
@@ -2540,8 +2560,7 @@ body {
   cursor: pointer;
 }
 .cc-character .cc-focus-item .cc-focus-roll:hover {
-  background: var(--cc-banner);
-  color: var(--cc-banner-text);
+  background: linear-gradient(145deg, var(--cc-stone-dark) 0%, var(--cc-stone-light) 100%);
 }
 .cc-character .cc-focus-item .cc-focus-roll:before {
   content: "0";
@@ -2563,9 +2582,10 @@ body {
   justify-content: center;
   width: 1.4rem;
   height: 1.4rem;
-  background: var(--cc-parchment);
-  border: 1px solid var(--cc-rule);
-  border-radius: 3px;
+  background: linear-gradient(145deg, var(--cc-stone-light) 0%, var(--cc-stone-dark) 100%);
+  border: 2px solid var(--cc-stone-bezel);
+  border-radius: 6px;
+  box-shadow: inset 1px 1px 1px rgba(255, 255, 255, 0.5), inset -1px -1px 2px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.35);
   color: var(--cc-ink);
   font-size: 1.1rem;
   cursor: pointer;
@@ -2576,8 +2596,7 @@ body {
   opacity: 1;
 }
 .cc-character .cc-rep-weapons .cc-weapon-roll:hover {
-  background: var(--cc-banner);
-  color: var(--cc-banner-text);
+  background: linear-gradient(145deg, var(--cc-stone-dark) 0%, var(--cc-stone-light) 100%);
 }
 .cc-character .cc-rep-armor .cc-rep-header,
 .cc-character .cc-rep-armor fieldset,
@@ -2658,19 +2677,26 @@ body {
   flex: 1 1 auto;
 }
 .cc-spells .cc-spell-cast {
-  background: none;
-  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.4rem;
+  height: 1.4rem;
+  background: linear-gradient(145deg, var(--cc-stone-light) 0%, var(--cc-stone-dark) 100%);
+  border: 2px solid var(--cc-stone-bezel);
+  border-radius: 6px;
+  box-shadow: inset 1px 1px 1px rgba(255, 255, 255, 0.5), inset -1px -1px 2px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.35);
   padding: 0;
-  color: inherit;
+  color: var(--cc-ink);
   font-size: 1.1rem;
   cursor: pointer;
 }
 .cc-spells .cc-spell-cast:before {
   content: "0";
-  opacity: 0.8;
-}
-.cc-spells .cc-spell-cast:hover:before {
   opacity: 1;
+}
+.cc-spells .cc-spell-cast:hover {
+  background: linear-gradient(145deg, var(--cc-stone-dark) 0%, var(--cc-stone-light) 100%);
 }
 .cc-spells .cc-spell-collapse-toggle {
   appearance: none;

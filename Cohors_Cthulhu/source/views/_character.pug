@@ -971,8 +971,9 @@
         border-bottom: none;
       }
 
-      // Same "make it read as a button, enlarge the die icon" treatment as
-      // .cc-attribute-roll above - see its comment for why. A fixed width
+      // Carved-stone-block look (see --cc-stone-* in scss/_variables.scss)
+      // instead of the old translucent-white "chip on a dark banner" look
+      // this used to share with .cc-attribute-roll - a fixed width
       // (rather than sizing to each skill name's own text, which made
       // every button a different width - "Stealth" vs "Engineering")
       // keeps the whole column uniform; sized to fit the longest name
@@ -983,11 +984,15 @@
         justify-content: flex-start;
         gap: 0.3rem;
         width: 8.5rem;
-        background: rgba(255, 255, 255, 0.15);
-        border: 1px solid var(--cc-banner-text);
-        border-radius: 4px;
+        background: linear-gradient(145deg, var(--cc-stone-light) 0%, var(--cc-stone-dark) 100%);
+        border: 2px solid var(--cc-stone-bezel);
+        border-radius: 6px;
+        box-shadow:
+          inset 1px 1px 1px rgba(255, 255, 255, 0.5),
+          inset -1px -1px 2px rgba(0, 0, 0, 0.4),
+          0 1px 2px rgba(0, 0, 0, 0.35);
         padding: 0.15rem 0.5rem;
-        color: inherit;
+        color: var(--cc-ink);
         font: inherit;
         text-transform: inherit;
         letter-spacing: inherit;
@@ -995,8 +1000,7 @@
         cursor: pointer;
 
         &:hover {
-          background: var(--cc-banner-text);
-          color: var(--cc-banner);
+          background: linear-gradient(145deg, var(--cc-stone-dark) 0%, var(--cc-stone-light) 100%);
         }
 
         &:before {
@@ -1047,22 +1051,21 @@
         background: var(--cc-parchment) !important;
       }
 
-      // Same "make it read as a button, enlarge the die icon" treatment as
-      // .cc-attribute-roll above, adapted for parchment (not banner)
-      // background - a compact pill rather than that one's bigger chip,
-      // since many of these wrap per skill row and need to stay small.
+      // Carved-stone-block look (see --cc-stone-* in scss/_variables.scss)
+      // instead of the old flat --cc-parchment ("limestone") chip - a
+      // compact pill rather than .cc-skill-name-roll's bigger one, since
+      // many of these wrap per skill row and need to stay small.
       .cc-focus-roll {
         display: inline-flex;
         align-items: center;
         gap: 0.25rem;
-        // Was --cc-parchment-dark, the exact same color as .cc-panel's own
-        // background (see _index.scss), so the button's border was the
-        // only thing distinguishing it from the section behind it -
-        // --cc-parchment (lighter) makes it read as a raised chip instead,
-        // matching the die icon buttons above it.
-        background: var(--cc-parchment);
-        border: 1px solid var(--cc-rule);
-        border-radius: 3px;
+        background: linear-gradient(145deg, var(--cc-stone-light) 0%, var(--cc-stone-dark) 100%);
+        border: 2px solid var(--cc-stone-bezel);
+        border-radius: 6px;
+        box-shadow:
+          inset 1px 1px 1px rgba(255, 255, 255, 0.5),
+          inset -1px -1px 2px rgba(0, 0, 0, 0.4),
+          0 1px 2px rgba(0, 0, 0, 0.35);
         padding: 0.05rem 0.35rem;
         color: var(--cc-ink);
         font-size: inherit;
@@ -1070,8 +1073,7 @@
         cursor: pointer;
 
         &:hover {
-          background: var(--cc-banner);
-          color: var(--cc-banner-text);
+          background: linear-gradient(145deg, var(--cc-stone-dark) 0%, var(--cc-stone-light) 100%);
         }
 
         &:before {
@@ -1094,24 +1096,23 @@
         align-items: center;
       }
 
-      // Same "make it read as a button" treatment as .cc-attribute-roll/
-      // .cc-skill-name-roll/.cc-focus-roll (see their comments) - a small
-      // square chip rather than a wider pill, since this column is only
-      // 1.6rem wide and carries no text, just the die icon itself.
-      // Background/border-radius match .cc-focus-roll exactly (was
-      // --cc-parchment-dark, the same color as .cc-panel's own background,
-      // same bug .cc-focus-roll's own comment already describes fixing
-      // for itself - the border was the only thing distinguishing this
-      // button from the section behind it).
+      // Same carved-stone-block look as .cc-skill-name-roll/.cc-focus-roll
+      // (see --cc-stone-* in scss/_variables.scss) - a small square chip
+      // rather than a wider pill, since this column is only 1.6rem wide
+      // and carries no text, just the die icon itself.
       .cc-weapon-roll {
         display: inline-flex;
         align-items: center;
         justify-content: center;
         width: 1.4rem;
         height: 1.4rem;
-        background: var(--cc-parchment);
-        border: 1px solid var(--cc-rule);
-        border-radius: 3px;
+        background: linear-gradient(145deg, var(--cc-stone-light) 0%, var(--cc-stone-dark) 100%);
+        border: 2px solid var(--cc-stone-bezel);
+        border-radius: 6px;
+        box-shadow:
+          inset 1px 1px 1px rgba(255, 255, 255, 0.5),
+          inset -1px -1px 2px rgba(0, 0, 0, 0.4),
+          0 1px 2px rgba(0, 0, 0, 0.35);
         color: var(--cc-ink);
         font-size: 1.1rem;
         cursor: pointer;
@@ -1123,8 +1124,7 @@
         }
 
         &:hover {
-          background: var(--cc-banner);
-          color: var(--cc-banner-text);
+          background: linear-gradient(145deg, var(--cc-stone-dark) 0%, var(--cc-stone-light) 100%);
         }
       }
     }

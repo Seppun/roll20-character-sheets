@@ -32,6 +32,18 @@
      a literal rgba() repeated at every one of those call sites, so the
      opacity (currently 50%, per request) can be tuned in one place. */
   --cc-editable-fill: rgba(255, 255, 255, 0.5);
+  /* Carved-stone-block look for the die-roll buttons (Skill, Focus,
+     Weapon, Spell Cast) - a gradient fill between these two tones plus a
+     dark bezel border and an inset highlight/shadow (see each button's
+     own box-shadow) reads as a raised, worn stone block rather than a
+     flat colored chip. Same warm brown/tan hue family as the travertine
+     panel texture (images/stone-texture.png) and --cc-rule/--cc-ink,
+     just richer/darker than the pale page tones so the button still
+     reads as a distinct object sitting on top of the panel or banner
+     behind it. */
+  --cc-stone-light: #cbb896;
+  --cc-stone-dark: #9c8862;
+  --cc-stone-bezel: #4a3c28;
 }
 
 @mixin dark {
