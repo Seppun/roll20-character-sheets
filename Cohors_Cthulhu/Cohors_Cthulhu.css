@@ -1683,7 +1683,7 @@ body .ui-dialog .tab-content .charsheet .cc-character .cc-footer {
   opacity: 0.6;
 }
 body .ui-dialog .tab-content .charsheet .cc-character .cc-build-css::after {
-  content: "CSS build: 2026-10-01 19:13:49 UTC";
+  content: "CSS build: 2026-10-01 20:05:18 UTC";
 }
 body .ui-dialog .tab-content .charsheet .cc-character .cc-truths-scars-grid {
   display: grid;
@@ -1753,6 +1753,12 @@ body .ui-dialog .tab-content .charsheet .cc-character .cc-stress-max {
 body .ui-dialog .tab-content .charsheet .cc-character .cc-fill-left-zero {
   display: none;
 }
+body .ui-dialog .tab-content .charsheet .cc-character .cc-track-value-marker {
+  display: none;
+}
+body .ui-dialog .tab-content .charsheet .cc-character .cc-track-value-marker:checked ~ .fill-left__radio {
+  background-color: var(--fillLeftUnselectedColor);
+}
 body .ui-dialog .tab-content .charsheet .cc-character .cc-stress-track {
   display: grid;
   grid-template-columns: repeat(10, 1fr);
@@ -1764,6 +1770,8 @@ body .ui-dialog .tab-content .charsheet .cc-character .cc-stress-track .fill-lef
   width: 0.9rem;
   height: 0.9rem;
   border: 1px solid var(--cc-rule);
+  padding: 0;
+  margin: 0;
 }
 body .ui-dialog .tab-content .charsheet .cc-character .cc-stress-track .cc-stress-max-marker {
   display: none;
@@ -1784,23 +1792,8 @@ body .ui-dialog .tab-content .charsheet .cc-character .cc-fortune-track .fill-le
   width: 0.9rem;
   height: 0.9rem;
   border: 1px solid var(--cc-rule);
-}
-body .ui-dialog .tab-content .charsheet .cc-character .cc-track-clear {
-  display: inline-block;
-  background: none;
-  border: 1px solid var(--cc-rule);
-  border-radius: 3px;
-  padding: 0.05rem 0.4rem;
-  margin: 0.2rem 0 0;
-  color: var(--cc-rule);
-  font-size: 0.65rem;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  cursor: pointer;
-}
-body .ui-dialog .tab-content .charsheet .cc-character .cc-track-clear:hover {
-  background: var(--cc-rule);
-  color: var(--cc-banner-text);
+  padding: 0;
+  margin: 0;
 }
 body .ui-dialog .tab-content .charsheet .cc-character .cc-vitals-fatigue {
   margin-top: 0.5rem;
@@ -1818,6 +1811,8 @@ body .ui-dialog .tab-content .charsheet .cc-character .cc-fatigue-track .fill-le
   width: 0.9rem;
   height: 0.9rem;
   border: 1px solid var(--cc-rule);
+  padding: 0;
+  margin: 0;
 }
 body .ui-dialog .tab-content .charsheet .cc-character .cc-fatigue-ignore {
   flex-direction: row;
@@ -2258,7 +2253,7 @@ body {
   opacity: 0.6;
 }
 .cc-character .cc-build-css::after {
-  content: "CSS build: 2026-10-01 19:13:49 UTC";
+  content: "CSS build: 2026-10-01 20:05:18 UTC";
 }
 .cc-character .cc-truths-scars-grid {
   display: grid;
@@ -2328,6 +2323,12 @@ body {
 .cc-character .cc-fill-left-zero {
   display: none;
 }
+.cc-character .cc-track-value-marker {
+  display: none;
+}
+.cc-character .cc-track-value-marker:checked ~ .fill-left__radio {
+  background-color: var(--fillLeftUnselectedColor);
+}
 .cc-character .cc-stress-track {
   display: grid;
   grid-template-columns: repeat(10, 1fr);
@@ -2339,6 +2340,8 @@ body {
   width: 0.9rem;
   height: 0.9rem;
   border: 1px solid var(--cc-rule);
+  padding: 0;
+  margin: 0;
 }
 .cc-character .cc-stress-track .cc-stress-max-marker {
   display: none;
@@ -2359,23 +2362,8 @@ body {
   width: 0.9rem;
   height: 0.9rem;
   border: 1px solid var(--cc-rule);
-}
-.cc-character .cc-track-clear {
-  display: inline-block;
-  background: none;
-  border: 1px solid var(--cc-rule);
-  border-radius: 3px;
-  padding: 0.05rem 0.4rem;
-  margin: 0.2rem 0 0;
-  color: var(--cc-rule);
-  font-size: 0.65rem;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  cursor: pointer;
-}
-.cc-character .cc-track-clear:hover {
-  background: var(--cc-rule);
-  color: var(--cc-banner-text);
+  padding: 0;
+  margin: 0;
 }
 .cc-character .cc-vitals-fatigue {
   margin-top: 0.5rem;
@@ -2393,6 +2381,8 @@ body {
   width: 0.9rem;
   height: 0.9rem;
   border: 1px solid var(--cc-rule);
+  padding: 0;
+  margin: 0;
 }
 .cc-character .cc-fatigue-ignore {
   flex-direction: row;
