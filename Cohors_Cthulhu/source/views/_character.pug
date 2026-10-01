@@ -116,7 +116,24 @@
     .cc-field-group
       .cc-field
         span Archetype
-        +text({name: 'archetype'})
+        +select({name: 'archetype'})
+          +option({value: ''})
+            | Select One
+          +option({value: 'Mystic'})
+            | Mystic
+          +option({value: 'Sage'})
+            | Sage
+          +option({value: 'Schemer'})
+            | Schemer
+          +option({value: 'Scoundrel'})
+            | Scoundrel
+          +option({value: 'Scout'})
+            | Scout
+          +option({value: 'Soldier'})
+            | Soldier
+      .cc-field
+        span Specialization
+        +text({name: 'specialization'})
       .cc-field
         span Background
         +text({name: 'background'})
@@ -186,6 +203,15 @@
         //- a genuine type="hidden" input can never match :checked at all
         //- (confirmed the hard way: that was the ORIGINAL value=0 marker
         //- here, and it never once griyed out anything, live or locally).
+        //- Losing the "click the current box again" path to clear also
+        //- meant there was NO way left to get back to the value=0 state
+        //- at all once any box was clicked once - the value=0 radio is
+        //- hidden on purpose (see above), so it was never reachable by
+        //- the player either, leaving 1 as a hard floor. The explicit
+        //- Clear button below (ccClearTrack) is the actual fix: it sets
+        //- the attribute straight to 0 in a sheet worker, which moves the
+        //- checked radio back to the hidden value=0 anchor exactly the
+        //- same way calcStressMax already does for stress_max_marker.
         .cc-stress-track
           +radio({name: 'stress', value: 0, checked: ''}).fill-left__radio.cc-fill-left-zero
           each value in Array.from({length: 20}, (_, i) => i + 1)
@@ -195,9 +221,57 @@
               value,
               trigger: {calculation: 'calcStressMax'}
             }).cc-stress-max-marker
+        +action({
+          name: 'clear stress',
+          class: 'cc-track-clear',
+          trigger: {triggeredFuncs: ['ccClearTrack']}
+        })
+          | Clear
         .cc-field.cc-stress-max
           span Max
           +number({name: 'stress max', readonly: true, trigger: {calculation: 'calcStressMax'}})
+        //- Fatigue (page 41): each point temporarily reduces Max Stress by
+        //- 1 (floored at 0 by calcStressMax - reaching 0 there means
+        //- Defeated per RAW, not something this sheet can detect/flag on
+        //- its own since "collapsing from exhaustion" isn't a distinct
+        //- tracked state anywhere else here). Same hand-expanded fill-left
+        //- track as Stress above, including its own Clear button fix -
+        //- see that block's comment for why a plain radio group needs one.
+        .cc-vitals-fatigue
+          .cc-banner Fatigue
+          .cc-fatigue-track
+            +radio({name: 'fatigue', value: 0, checked: ''}).fill-left__radio.cc-fill-left-zero
+            each value in Array.from({length: 20}, (_, i) => i + 1)
+              +radio({
+                name: 'fatigue',
+                value,
+                trigger: {affects: ['stress_max', 'stress_max_marker']}
+              }).fill-left__radio
+          +action({
+            name: 'clear fatigue',
+            class: 'cc-track-clear',
+            trigger: {triggeredFuncs: ['ccClearTrack'], affects: ['stress_max', 'stress_max_marker']}
+          })
+            | Clear
+          .cc-field.cc-fatigue-ignore
+            //- "Fatigue can also be temporarily ignored" - checking this
+            //- stops it from reducing Max Stress (see calcStressMax)
+            //- without discarding the tracked fatigue value itself, since
+            //- the fatigue hasn't actually been removed, just pushed
+            //- through for now.
+            +checkbox({
+              name: 'fatigue ignored',
+              value: 1,
+              id: 'cc-fatigue-ignored',
+              trigger: {affects: ['stress_max', 'stress_max_marker']}
+            })
+            label(for='cc-fatigue-ignored') Ignore Fatigue (temporarily)
+          +action({
+            name: 'fatigue resist',
+            class: 'cc-fatigue-resist roller',
+            trigger: {triggeredFuncs: ['initiateFatigueResistRoll'], affects: ['stress_max', 'stress_max_marker']}
+          })
+            | Resist Fatigue
       .cc-vitals-courage-fortune
         .cc-field
           span Courage
@@ -207,11 +281,18 @@
           //- Hand-expanded rather than using +fillLeft directly, same as
           //- .cc-stress-track above and for the same reason (a real radio
           //- group plus a proper, non-type=hidden value=0 anchor) - see
-          //- that block's comment for the full explanation.
+          //- that block's comment for the full explanation, including the
+          //- Clear button fix for the same "can't get back to 0" gap.
           .cc-fortune-track
             +radio({name: 'fortune', value: 0, checked: ''}).fill-left__radio.cc-fill-left-zero
             each value in [1, 2, 3, 4, 5]
               +radio({name: 'fortune', value}).fill-left__radio
+          +action({
+            name: 'clear fortune',
+            class: 'cc-track-clear',
+            trigger: {triggeredFuncs: ['ccClearTrack']}
+          })
+            | Clear
       .cc-vitals-armor
         .cc-field
           span Base Armour
@@ -667,6 +748,119 @@
       }
     }
 
+    // Small secondary action for the Stress/Fortune/Fatigue trackers (see
+    // the pug comment above .cc-stress-track for why a plain radio group
+    // needs an explicit way back to 0) - kept understated (text only, no
+    // fill) since it's a reset action sitting right next to the track it
+    // clears, not a primary button.
+    .cc-track-clear {
+      display: inline-block;
+      background: none;
+      border: 1px solid var(--cc-rule);
+      border-radius: 3px;
+      padding: 0.05rem 0.4rem;
+      margin: 0.2rem 0 0;
+      color: var(--cc-rule);
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      cursor: pointer;
+
+      &:hover {
+        background: var(--cc-rule);
+        color: var(--cc-banner-text);
+      }
+    }
+
+    .cc-vitals-fatigue {
+      margin-top: 0.5rem;
+      padding-top: 0.4rem;
+      border-top: 1px dashed var(--cc-rule-soft);
+    }
+
+    // Same construction as .cc-stress-track above (20 boxes, hidden
+    // value=0 anchor, fill-left coloring) - see that block's comment for
+    // the full explanation. Fatigue has no stress_max-style ceiling of its
+    // own to greyed-out past, so there's no marker-radio pairing here.
+    .cc-fatigue-track {
+      display: grid;
+      grid-template-columns: repeat(10, 1fr);
+      gap: 0.15rem;
+      --fillLeftSelectedColor: var(--cc-rule);
+      --fillLeftUnselectedColor: var(--cc-parchment);
+
+      .fill-left__radio {
+        width: 0.9rem;
+        height: 0.9rem;
+        border: 1px solid var(--cc-rule);
+      }
+    }
+
+    .cc-fatigue-ignore {
+      flex-direction: row;
+      align-items: center;
+      gap: 0.3rem;
+      margin-top: 0.3rem;
+
+      // .cc-field's generic "> input" rule (see that mixin's own styling
+      // further up) targets every direct-child input indiscriminately,
+      // including this one - meant for text/number fields, it strips a
+      // checkbox down to a flat bottom border with no box shape at all.
+      // Restore a plain, visible checkbox appearance instead of fighting
+      // that rule with appearance:none (unlike .cc-spell-collapse-toggle
+      // elsewhere, this one has no custom glyph of its own to draw).
+      > input[type='checkbox'] {
+        width: 0.9rem;
+        height: 0.9rem;
+        flex: 0 0 auto;
+        background: var(--cc-parchment);
+        border: 1px solid var(--cc-rule);
+        border-bottom: 1px solid var(--cc-rule);
+        padding: 0;
+      }
+
+      label {
+        font-size: 0.7rem;
+        text-transform: none;
+        letter-spacing: normal;
+        color: var(--cc-ink);
+      }
+    }
+
+    // Matches .repcontrol_add/.repcontrol_edit's maroon-chip treatment
+    // (the sheet's established "button sitting on a light panel"
+    // look), rather than the dark-background .cc-attribute-roll chip,
+    // which is designed to sit on top of a --cc-banner header row.
+    .cc-fatigue-resist {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      background: var(--cc-banner);
+      color: var(--cc-banner-text);
+      border: 1px solid var(--cc-rule);
+      border-radius: 4px;
+      padding: 0.15rem 0.5rem;
+      margin-top: 0.3rem;
+      font-family: var(--cc-body-font);
+      font-weight: bold;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      cursor: pointer;
+
+      &:hover {
+        background: var(--cc-parchment);
+        color: var(--cc-ink);
+      }
+
+      // '0' is the cleaner-looking d20 glyph in Roll20's own dicefontd20
+      // icon font - see the same override on .cc-attribute-roll above.
+      &:before {
+        content: '0';
+        font-size: 1.2em;
+      }
+    }
+
     .cc-injuries {
       display: flex;
       flex-direction: column;
@@ -1061,16 +1255,44 @@
   // are free text (a datalist, not a fixed dropdown - see the pug comment
   // above the Name field), so this matches case/whitespace-insensitively
   // the same way ccApplyTalentPreset's own lookup effectively does via the
-  // datalist's exact suggested spelling.
+  // datalist's exact suggested spelling. Fatigue (page 41) then
+  // temporarily reduces this by 1 per point suffered, floored at 0 - RAW
+  // says reaching 0 this way means Defeated, which this sheet has no
+  // separate tracked state to flag, so it's left as a Max Stress of 0 for
+  // the player/GM to notice and resolve narratively. "Ignore Fatigue"
+  // suppresses this reduction without discarding the tracked fatigue
+  // value, since the fatigue itself hasn't been removed, just pushed
+  // through for now (see the pug comment above the Fatigue tracker).
   const calcStressMax = ({attributes}) => {
     const resilience = Number(attributes.resilience_ranks) || 0;
     const brawn = Number(attributes.brawn_rating) || 0;
     const will = Number(attributes.will_rating) || 0;
     const talents = attributes.repeating_talent || [];
     const hasUnyielding = talents.some((row) => String(row.name || '').trim().toLowerCase() === 'unyielding');
-    return Math.max(brawn, will) + resilience + (hasUnyielding ? 3 : 0);
+    const base = Math.max(brawn, will) + resilience + (hasUnyielding ? 3 : 0);
+    const fatigue = attributes.fatigue_ignored ? 0 : (Number(attributes.fatigue) || 0);
+    return Math.max(0, base - fatigue);
   };
   k.registerFuncs({calcStressMax});
+
+  // Fixes the Stress/Fortune/Fatigue trackers' "can't get back to 0" gap
+  // (see the pug comment above .cc-stress-track) - a plain radio group has
+  // no way for the player to uncheck its own currently-checked box, so
+  // this sets the underlying attribute straight to 0 instead, the same
+  // way ccApplyTalentPreset writes to `attributes` directly to drive a
+  // field's displayed value from a sheet worker. Action-button trigger.name
+  // arrives dash-separated with no act_ prefix (e.g. 'clear-stress'), not
+  // the space-separated name the action was declared with - see
+  // ccNormalizeName's own comment further below for the same quirk.
+  const ccClearTrack = ({trigger, attributes}) => {
+    const trackAttr = {
+      'clear-stress': 'stress',
+      'clear-fortune': 'fortune',
+      'clear-fatigue': 'fatigue',
+    }[trigger.name];
+    if (trackAttr) { attributes[trackAttr] = 0; }
+  };
+  k.registerFuncs({ccClearTrack});
 
   const calcXpAvailable = ({attributes}) => {
     return (Number(attributes.xp_earned) || 0) - (Number(attributes.xp_spent) || 0);
@@ -1314,6 +1536,108 @@
     });
   };
   k.registerFuncs({initiateFocusRoll});
+
+  // Fatigue (page 41): "Brawn + Resilience, or Will + Resilience test with
+  // a difficulty of 1" to remove it, always the higher of Brawn/Will per
+  // RAW (same pairing calcStressMax already uses, so no attribute-choice
+  // query is needed here unlike the shared skill/focus rolls above).
+  // "Passing the test removes 1 point of fatigue, plus 1 more for each
+  // point of Momentum spent" - that's an input the player commits from the
+  // party's Momentum pool to boost the effect, not Momentum the roll
+  // itself generates, so it's wired the same way Extra Momentum works for
+  // spells (see initiateSpellRoll in views/_spells.pug): a query, counted
+  // as a cost against ccSendMomentumSignal, and only ever applied on a
+  // pass. This is a bespoke roll (not built on the shared runCcRoll core)
+  // because it needs that extra query plus a post-roll attributes write,
+  // neither of which runCcRoll supports - same reason initiateWeaponRoll/
+  // initiateSpellRoll each have their own rollString instead of sharing it.
+  const initiateFatigueResistRoll = async ({attributes}) => {
+    const brawnRating = Number(attributes.brawn_rating) || 0;
+    const willRating = Number(attributes.will_rating) || 0;
+    const resilienceRanks = Number(attributes.resilience_ranks) || 0;
+    const attributeRating = Math.max(brawnRating, willRating);
+
+    const difficultyQuery = '?{Difficulty|1}';
+    const complicationQuery = '?{Complication range (1-5)|1}';
+    const bonusDiceQuery = '?{Additional d20s bought (0-3)|0}';
+    const extraMomentumQuery = '?{Momentum spent to remove extra fatigue|0}';
+
+    const rollString = '&{template:ccskill} ' +
+      `{{character_name=@{character_name}}} ` +
+      `{{skill=Resist Fatigue}} ` +
+      `{{focus=Resilience}} ` +
+      `{{attribute_choice=[[0+${attributeRating}]]}} ` +
+      `{{difficulty=[[0+${difficultyQuery}]]}} ` +
+      `{{complication_range=[[0+${complicationQuery}]]}} ` +
+      `{{roll1=[[(2+${bonusDiceQuery})d20]]}} ` +
+      `{{extra_momentum=[[0+${extraMomentumQuery}]]}} ` +
+      `{{target_number=[[0]]}} ` +
+      `{{successes=[[0]]}} ` +
+      `{{dice_text=[[0]]}} ` +
+      `{{outcome=[[0]]}} ` +
+      `{{complications=[[0]]}} ` +
+      `{{bonus_momentum=[[0]]}} ` +
+      `{{momentum_spent=[[0]]}} ` +
+      `{{fatigue_removed=[[0]]}}`;
+
+    const roll = await startRoll(rollString);
+
+    try {
+      const difficulty = Number(roll.results.difficulty.result) || 1;
+      const complicationRange = Number(roll.results.complication_range.result) || 1;
+      const extraMomentum = Number(roll.results.extra_momentum.result) || 0;
+
+      const roll1 = roll.results.roll1;
+      const dice = Array.isArray(roll1.dice) ?
+        roll1.dice :
+        (roll1.rolls && roll1.rolls[0] && roll1.rolls[0].results || []).map((r) => r.v);
+
+      // Crit only on a natural 1 - this test has no Focus mechanic to
+      // widen that range the way a known Weapon Focus can.
+      const targetNumber = attributeRating + resilienceRanks;
+      const complicationThreshold = 21 - complicationRange;
+      const successCount = dice.filter((d) => d <= targetNumber).length +
+        dice.filter((d) => d <= 1).length;
+      const complicationCount = dice.filter((d) => d >= complicationThreshold).length;
+      const passed = successCount >= difficulty;
+      const bonusMomentum = passed ? Math.max(0, successCount - difficulty) : 0;
+      const bonusDiceBought = Math.max(0, dice.length - 2);
+
+      // "Passing the test removes 1 point of fatigue, plus 1 more for each
+      // point of Momentum spent" - applied straight to the attribute (same
+      // write-via-attributes pattern as ccApplyTalentPreset/ccClearTrack
+      // above), floored at 0 so it can't go negative.
+      const fatigueRemoved = passed ? 1 + extraMomentum : 0;
+      if (fatigueRemoved > 0) {
+        attributes.fatigue = Math.max(0, (Number(attributes.fatigue) || 0) - fatigueRemoved);
+      }
+
+      await ccSendMomentumSignal(bonusMomentum - bonusDiceBought - extraMomentum);
+      await ccSendThreatSignal(complicationCount);
+
+      finishRoll(roll.rollId, {
+        target_number: targetNumber,
+        successes: successCount,
+        dice_text: dice.join(', '),
+        outcome: passed ? 1 : 0,
+        bonus_momentum: bonusMomentum,
+        complications: complicationCount,
+        extra_momentum: extraMomentum,
+        momentum_spent: bonusDiceBought + extraMomentum,
+        fatigue_removed: fatigueRemoved,
+      });
+    } catch (err) {
+      finishRoll(roll.rollId, {
+        target_number: '?',
+        successes: '?',
+        dice_text: `error: ${err.message}`,
+        outcome: 0,
+        complications: 0,
+        fatigue_removed: 0,
+      });
+    }
+  };
+  k.registerFuncs({initiateFatigueResistRoll});
 
   // Weapon "Damage & Effects" fields are stored as free text like
   // "4, Piercing 1" or "3, Vicious" (see ccWeaponProfiles above) - first

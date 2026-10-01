@@ -71,6 +71,14 @@
       .cc-roll-row
         span Momentum Spent:
         span {{computed::momentum_spent}}
+    //- Exclusive to initiateFatigueResistRoll (views/_character.pug) -
+    //- never set by any other roll type, so always 0/absent and hidden
+    //- here otherwise, same "only show it if it triggered" treatment as
+    //- Momentum Spent above.
+    +rollGreater({values: 'computed::fatigue_removed 0'})
+      .cc-roll-row
+        span Fatigue Removed:
+        span {{computed::fatigue_removed}}
     +templateConditionalDisplay('is_weapon')
       .cc-roll-header.cc-roll-damage-header
         span.cc-roll-skill Damage
