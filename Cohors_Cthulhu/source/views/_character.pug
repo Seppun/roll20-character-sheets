@@ -274,10 +274,10 @@
             | Resist Fatigue
       .cc-vitals-courage-fortune
         .cc-field
-          span Courage
+          .cc-banner Courage
           +number({name: 'courage', readonly: true, trigger: {calculation: 'calcCourage'}})
         .cc-field
-          span Fortune
+          .cc-banner Fortune
           //- Hand-expanded rather than using +fillLeft directly, same as
           //- .cc-stress-track above and for the same reason (a real radio
           //- group plus a proper, non-type=hidden value=0 anchor) - see
@@ -295,10 +295,10 @@
             | Clear
       .cc-vitals-armor
         .cc-field
-          span Base Armour
+          .cc-banner Base Armour
           +number({name: 'base armour', readonly: true, trigger: {calculation: 'calcBaseArmour', affects: ['total_armor']}})
         .cc-field
-          span Total Armor
+          .cc-banner Total Armor
           +number({name: 'total armor', readonly: true, trigger: {calculation: 'calcTotalArmor'}})
       .cc-vitals-injuries
         .cc-banner Injuries
@@ -861,14 +861,28 @@
       }
     }
 
-    .cc-injuries {
+    // Was accidentally both written as ".cc-injuries" (the wrapper around
+    // the banner+textarea is actually .cc-vitals-injuries, not
+    // .cc-injuries) - the outer rule below was landing on the textarea
+    // itself instead of its wrapper, and the inner one required
+    // .cc-injuries nested inside another .cc-injuries, which never
+    // exists, so it never matched anything at all. Split into the two
+    // separate rules this was always meant to be, and added the same
+    // soft-border "edit box" look as Traits/History/Personal Agenda
+    // (views/_notes.pug) rather than the plain underline every other
+    // .cc-field textarea gets.
+    .cc-vitals-injuries {
       display: flex;
       flex-direction: column;
+    }
 
-      .cc-injuries {
-        flex: 1;
-        min-height: 4rem;
-      }
+    .cc-injuries {
+      width: 100%;
+      flex: 1;
+      min-height: 4rem;
+      background: transparent;
+      border: 1px solid var(--cc-rule-soft);
+      color: var(--cc-ink);
     }
 
     .cc-attributes-table {
@@ -1075,15 +1089,20 @@
       // .cc-skill-name-roll/.cc-focus-roll (see their comments) - a small
       // square chip rather than a wider pill, since this column is only
       // 1.6rem wide and carries no text, just the die icon itself.
+      // Background/border-radius match .cc-focus-roll exactly (was
+      // --cc-parchment-dark, the same color as .cc-panel's own background,
+      // same bug .cc-focus-roll's own comment already describes fixing
+      // for itself - the border was the only thing distinguishing this
+      // button from the section behind it).
       .cc-weapon-roll {
         display: inline-flex;
         align-items: center;
         justify-content: center;
         width: 1.4rem;
         height: 1.4rem;
-        background: var(--cc-parchment-dark);
+        background: var(--cc-parchment);
         border: 1px solid var(--cc-rule);
-        border-radius: 4px;
+        border-radius: 3px;
         color: var(--cc-ink);
         font-size: 1.1rem;
         cursor: pointer;

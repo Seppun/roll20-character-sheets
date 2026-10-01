@@ -1633,7 +1633,7 @@ body .ui-dialog .tab-content .charsheet .cc-character .cc-footer {
   opacity: 0.6;
 }
 body .ui-dialog .tab-content .charsheet .cc-character .cc-build-css::after {
-  content: "CSS build: 2026-10-01 03:14:53 UTC";
+  content: "CSS build: 2026-10-01 15:33:15 UTC";
 }
 body .ui-dialog .tab-content .charsheet .cc-character .cc-truths-scars-grid {
   display: grid;
@@ -1815,13 +1815,17 @@ body .ui-dialog .tab-content .charsheet .cc-character .cc-fatigue-resist:before 
   content: "0";
   font-size: 1.2em;
 }
-body .ui-dialog .tab-content .charsheet .cc-character .cc-injuries {
+body .ui-dialog .tab-content .charsheet .cc-character .cc-vitals-injuries {
   display: flex;
   flex-direction: column;
 }
-body .ui-dialog .tab-content .charsheet .cc-character .cc-injuries .cc-injuries {
+body .ui-dialog .tab-content .charsheet .cc-character .cc-injuries {
+  width: 100%;
   flex: 1;
   min-height: 4rem;
+  background: transparent;
+  border: 1px solid var(--cc-rule-soft);
+  color: var(--cc-ink);
 }
 body .ui-dialog .tab-content .charsheet .cc-character .cc-attributes-table th,
 body .ui-dialog .tab-content .charsheet .cc-character .cc-attributes-table td {
@@ -1970,9 +1974,9 @@ body .ui-dialog .tab-content .charsheet .cc-character .cc-rep-weapons .cc-weapon
   justify-content: center;
   width: 1.4rem;
   height: 1.4rem;
-  background: var(--cc-parchment-dark);
+  background: var(--cc-parchment);
   border: 1px solid var(--cc-rule);
-  border-radius: 4px;
+  border-radius: 3px;
   color: var(--cc-ink);
   font-size: 1.1rem;
   cursor: pointer;
@@ -2126,9 +2130,6 @@ body .ui-dialog .tab-content .charsheet .cc-notes textarea {
 body .ui-dialog .tab-content .charsheet .cc-notes .cc-journal textarea {
   min-height: 14rem;
 }
-body .ui-dialog .tab-content .charsheet .cc-notes .cc-belongings textarea {
-  border-color: var(--cc-rule);
-}
 body.sheet-darkmode {
   --cc-page-bg: #201d18;
   --cc-parchment: #2a2620;
@@ -2182,7 +2183,7 @@ body {
   opacity: 0.6;
 }
 .cc-character .cc-build-css::after {
-  content: "CSS build: 2026-10-01 03:14:53 UTC";
+  content: "CSS build: 2026-10-01 15:33:15 UTC";
 }
 .cc-character .cc-truths-scars-grid {
   display: grid;
@@ -2364,13 +2365,17 @@ body {
   content: "0";
   font-size: 1.2em;
 }
-.cc-character .cc-injuries {
+.cc-character .cc-vitals-injuries {
   display: flex;
   flex-direction: column;
 }
-.cc-character .cc-injuries .cc-injuries {
+.cc-character .cc-injuries {
+  width: 100%;
   flex: 1;
   min-height: 4rem;
+  background: transparent;
+  border: 1px solid var(--cc-rule-soft);
+  color: var(--cc-ink);
 }
 .cc-character .cc-attributes-table th,
 .cc-character .cc-attributes-table td {
@@ -2519,9 +2524,9 @@ body {
   justify-content: center;
   width: 1.4rem;
   height: 1.4rem;
-  background: var(--cc-parchment-dark);
+  background: var(--cc-parchment);
   border: 1px solid var(--cc-rule);
-  border-radius: 4px;
+  border-radius: 3px;
   color: var(--cc-ink);
   font-size: 1.1rem;
   cursor: pointer;
@@ -2676,9 +2681,6 @@ body {
 }
 .cc-notes .cc-journal textarea {
   min-height: 14rem;
-}
-.cc-notes .cc-belongings textarea {
-  border-color: var(--cc-rule);
 }
 
 /* Roll templates render inside Roll20's chat pane, which sanitizes their
