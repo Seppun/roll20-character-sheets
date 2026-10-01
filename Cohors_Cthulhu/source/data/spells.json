@@ -21,7 +21,7 @@
     "Curse of Loki": {
       "skill": "Persuasion",
       "difficulty": "2",
-      "cost": "5 Drain; in addition, each damage effect rolled on the cost generates 1 Threat",
+      "cost": "5 Drain",
       "duration": "Instant",
       "category": "Attack spell",
       "effect": "Inflicts power+2 mental damage with the Stun effect on all enemies within Close range.\n\nFlawed: affects all creatures within range, not only enemies.",

@@ -438,6 +438,20 @@
     'Scrying': 1,
   };
 
+  // Spells whose Cost roll generates Threat of its own, on top of the
+  // normal complications-generate-Threat rule every roll already follows -
+  // currently just Curse of Loki ("each damage effect rolled on the cost
+  // generates 1 Threat"). Kept as its own lookup (same reasoning as
+  // ccSpellMomentumCostDice above) rather than parsed out of the cost
+  // string itself: ccParseSpellCost splits on commas looking for damage-
+  // effect names like "Piercing 1" or "Vicious", and a free-text clause
+  // like this one doesn't fit that shape - leaving it in the data was
+  // getting misread as a literal (nonsense) effect name, which is also
+  // why the data's cost field no longer includes it.
+  const ccSpellCostThreatPerEffect = {
+    'Curse of Loki': 1,
+  };
+
   // Casting roll: a standard 2d20 skill test (Spellcasting Attribute + the
   // spell's own Skill, vs its Difficulty), with the spell's Cost rolled
   // alongside it in the same message - like a Weapon's attack+damage, but
@@ -504,7 +518,8 @@
       `{{cost_total=[[0]]}} ` +
       `{{cost_effect_count=[[0]]}} ` +
       `{{cost_dice_text=[[0]]}} ` +
-      `{{cost_effects_summary=[[0]]}}`;
+      `{{cost_effects_summary=[[0]]}} ` +
+      `{{cost_threat_generated=[[0]]}}`;
 
     const roll = await startRoll(rollString);
 
@@ -550,6 +565,7 @@
       const effectsSummary = effectCount > 0 ?
         `${effectCount}x Effect${costEffects.length ? ` - ${costEffects.join(', ')}` : ''}` :
         'No Effects triggered';
+      const costThreatGenerated = effectCount * (ccSpellCostThreatPerEffect[spellName] || 0);
 
       const spellBonusMomentum = passed ? Math.max(0, successCount - difficulty) : 0;
       const spellBonusDiceBought = Math.max(0, dice.length - 2);
@@ -558,7 +574,7 @@
       await ccSendMomentumSignal(spellBonusMomentum - spellBonusDiceBought - extraMomentum);
       // ccSendThreatSignal is defined in views/_character.pug's +module
       // block, alongside ccSendMomentumSignal - both end up in scope here.
-      await ccSendThreatSignal(complicationCount + dabblingPowerThreat);
+      await ccSendThreatSignal(complicationCount + dabblingPowerThreat + costThreatGenerated);
 
       finishRoll(roll.rollId, {
         target_number: targetNumber,
@@ -572,6 +588,7 @@
         dabbling_power_threat: dabblingPowerThreat,
         cost_total: totalCost,
         cost_effect_count: effectCount,
+        cost_threat_generated: costThreatGenerated,
         cost_dice_text: converted.map((c) => c.symbol).join(' '),
         cost_effects_summary: effectsSummary,
       });
