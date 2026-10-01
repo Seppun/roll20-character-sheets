@@ -102,9 +102,9 @@
               //-
               //- Options are written out individually rather than looped
               //- from ccSpellbooks, matching the same workaround already
-              //- used for the Weapons/Armor dropdowns - see the comment
-              //- above ccWeaponProfiles for why an `each` loop over
-              //- +option() silently breaks (a k-scaffold mixin bug).
+              //- used for the Weapons/Armor dropdowns (see
+              //- lessons_learned.md for the k-scaffold mixin bug this
+              //- avoids).
               .cc-spell-name-row
                 +action({
                   name: 'spell cast',
@@ -266,8 +266,8 @@
 
     // Same carved-stone-block look as the Focus/Weapon roll buttons (see
     // --cc-stone-* in scss/_variables.scss and .cc-weapon-roll in
-    // views/_character.pug, including the same square pitted-pore fleck
-    // pattern) instead of the old bare, backgroundless icon.
+    // views/panels/_weapons_panel.pug, including the same square
+    // pitted-pore fleck pattern) instead of a bare, backgroundless icon.
     .cc-spell-cast {
       display: inline-flex;
       align-items: center;
@@ -298,7 +298,8 @@
 
       // '0' is the cleaner-looking d20 glyph in Roll20's own dicefontd20
       // icon font (k-scaffold's roller mixin defaults to 'T') - see the
-      // same override on .cc-attribute-roll in views/_character.pug.
+      // same override on .cc-attribute-roll in
+      // views/panels/_attributes_panel.pug.
       &:before {
         content: '0';
         opacity: 1;
@@ -321,14 +322,8 @@
     // expanded; checked = collapsed, with the glyph rotating 180deg to
     // show which way it's currently "folded".
     //
-    // This was originally an eagle emoji (matching the sheet's Roman/SPQR
-    // theme), but that's an astral-plane character (outside the Basic
-    // Multilingual Plane) - Sass compiles a \1F985 escape straight into
-    // the literal 4-byte UTF-8 character in the output CSS, and Roll20's
-    // savesheetsettings endpoint 500s on custom sheet code containing one
-    // (confirmed: a fresh game with this pasted in came back blank with a
-    // 500 on save; reverting to the commit before this glyph existed
-    // worked fine). A plain triangle is BMP-safe and reads the same way.
+    // A plain triangle glyph (BMP-safe - see lessons_learned.md), not an
+    // emoji.
     .cc-spell-collapse-toggle {
       appearance: none;
       -webkit-appearance: none;
@@ -389,8 +384,7 @@
   k.registerFuncs({calcBasePower});
 
   // Power Rating = Base Power + ccAttributeBonus(casting attribute rating).
-  // ccAttributeBonus is defined in views/_character.pug's +module block -
-  // both end up in the same sheet-worker script scope.
+  // ccAttributeBonus is defined in views/_global_sheetworker.pug.
   const calcPowerRating = ({attributes}) => {
     const base = Number(attributes.base_power) || 0;
     const attr = (attributes.spellcasting_attribute || '').toLowerCase();
@@ -488,8 +482,7 @@
   // gated on nothing, since RAW says the cost "applies after the
   // spellcaster resolves the skill test... whether or not they
   // successfully cast it" (see Casting a Battlefield Spell, page 66).
-  // ccChallengeDieFromD6 is defined in views/_character.pug's +module
-  // block - both end up in the same sheet-worker script scope.
+  // ccChallengeDieFromD6 is defined in views/_global_sheetworker.pug.
   const initiateSpellRoll = async ({trigger, attributes}) => {
     const [section, rowID] = k.parseRepeatName(trigger.name);
     const prefix = `${section}_${rowID}_`;
@@ -599,11 +592,9 @@
 
       const spellBonusMomentum = passed ? Math.max(0, successCount - difficulty) : 0;
       const spellBonusDiceBought = Math.max(0, dice.length - 2);
-      // ccSendMomentumSignal is defined in views/_character.pug's +module
-      // block - both end up in the same sheet-worker script scope.
+      // ccSendMomentumSignal/ccSendThreatSignal are defined in
+      // views/_global_sheetworker.pug.
       await ccSendMomentumSignal(spellBonusMomentum - spellBonusDiceBought - extraMomentum);
-      // ccSendThreatSignal is defined in views/_character.pug's +module
-      // block, alongside ccSendMomentumSignal - both end up in scope here.
       await ccSendThreatSignal(complicationCount + dabblingPowerThreat + costThreatGenerated);
 
       finishRoll(roll.rollId, {

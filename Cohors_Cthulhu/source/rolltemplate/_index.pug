@@ -1,7 +1,9 @@
 //- rolltemplate/_index.pug
-//- Chat output for a 2d20 roll (see initiateAttributeRoll/initiateSkillRoll/
-//- initiateFocusRoll/initiateWeaponRoll in views/_character.pug, and
-//- initiateSpellRoll in views/_spells.pug). Shows the dice, target number,
+//- Chat output for a 2d20 roll (see initiateAttributeRoll in
+//- views/panels/_attributes_panel.pug, initiateSkillRoll/initiateFocusRoll
+//- in views/panels/_skills_panel.pug, initiateWeaponRoll in
+//- views/panels/_weapons_panel.pug, and initiateSpellRoll in
+//- views/_spells.pug). Shows the dice, target number,
 //- successes, complications (if any), and pass/fail with Momentum
 //- generated. Weapon rolls also set is_weapon, which reveals a Damage
 //- section rolled in the very same message - Cohors Cthulhu attack rolls
@@ -20,24 +22,14 @@
       +templateConditionalDisplay('focus')
         span.cc-roll-focus ({{focus}})
     .cc-roll-body
-      //- Fields we only ever set via finishRoll's overrides (never part of
-      //- the initial roll string's dice/query math) must be referenced here
-      //- as computed::fieldname - plain {{fieldname}} shows the ORIGINAL
-      //- value of the [[0]] placeholder from startRoll, ignoring the
-      //- override entirely. Confirmed against the proven pattern in this
-      //- repo's Achtung!_Cthulhu_2d20 sheet. difficulty is read from
-      //- roll.results but never overridden, so it stays plain.
-      //-
-      //- A plain {{#field}}/{{#computed::field}} section does NOT respect
-      //- finishRoll overrides either (same underlying quirk - the section's
-      //- truthiness is checked against the pre-override value), so
-      //- conditional display of an overridden field needs the rollTotal()/
-      //- rollGreater() helper functions instead, which do an exact
-      //- comparison against the computed value (again mirroring
-      //- Achtung!_Cthulhu_2d20's own {{#rollTotal() computed::outcome 1}}).
-      //- is_weapon is different: it's a plain literal set directly in the
-      //- initial roll string (never overridden), so a plain {{#is_weapon}}
-      //- conditional works fine for it.
+      //- Fields set via finishRoll's overrides must be referenced here as
+      //- computed::fieldname, and conditional sections on such a field use
+      //- the rollGreater()/rollTotal() helpers rather than a plain
+      //- {{#field}} check (see lessons_learned.md for why). difficulty is
+      //- read from roll.results but never overridden, so it stays plain.
+      //- is_weapon is a plain literal set directly in the initial roll
+      //- string (never overridden), so a plain {{#is_weapon}} conditional
+      //- works fine for it.
       .cc-roll-row
         span Dice:
         span {{computed::dice_text}}
@@ -64,15 +56,18 @@
     //- additional d20s bought (all roll types) plus, for spells only,
     //- Extra Momentum declared spent on one of the spell's own listed
     //- Momentum options (e.g. Cyclone of Cernunnos's extra damage, Horn of
-    //- Néit's extra Challenge Die) - see runCcRoll/initiateWeaponRoll in
-    //- views/_character.pug and initiateSpellRoll in views/_spells.pug.
-    //- Hidden when nothing was spent, same as complications above.
+    //- Néit's extra Challenge Die) - see runCcRoll in
+    //- views/_global_sheetworker.pug, initiateWeaponRoll in
+    //- views/panels/_weapons_panel.pug, and initiateSpellRoll in
+    //- views/_spells.pug. Hidden when nothing was spent, same as
+    //- complications above.
     +rollGreater({values: 'computed::momentum_spent 0'})
       .cc-roll-row
         span Momentum Spent:
         span {{computed::momentum_spent}}
-    //- Exclusive to initiateFatigueResistRoll (views/_character.pug) -
-    //- never set by any other roll type, so always 0/absent and hidden
+    //- Exclusive to initiateFatigueResistRoll
+    //- (views/panels/_vitals_panel.pug) - never set by any other roll
+    //- type, so always 0/absent and hidden
     //- here otherwise, same "only show it if it triggered" treatment as
     //- Momentum Spent above.
     +rollGreater({values: 'computed::fatigue_removed 0'})
@@ -135,58 +130,36 @@
             span {{computed::cost_threat_generated}} threat generated from this spell's cost effects
 
 //- A minimal, purpose-built roll template used only to carry the global
-//- Momentum pool signal (see ccSendMomentumSignal in views/_character.pug)
-//- to a companion Roll20 API script (api-scripts/ccmomentum.js) - never
-//- shown to anyone. Deliberately kept separate from ccskill above (rather
-//- than piggybacking on its own visible card) so restyling the actual
-//- gameplay roll card - already done several times - can never silently
-//- break the API script's parsing of this one. Sheet workers have no
-//- sendChat() of their own (confirmed live: it throws "sendChat is not
-//- defined"), so this rides startRoll/a real dice roll instead, which is
-//- the only way sheet-worker code can put anything into chat at all.
-//-
-//- Confirmed live: Roll20 strips the &{template:X} reference itself out
-//- of msg.content before the API ever sees it - true for EVERY roll, not
-//- just this one (a normal, finished ccskill weapon roll's msg.content
-//- has no "template:ccskill" in it either) - only the {{field=value}}
-//- pairs survive. So the API script can't detect "is this our signal" by
-//- template name at all; it looks for this field's own distinctive name
-//- instead (ccmomentumdelta, not just "delta", to keep it unlikely to
-//- collide with an unrelated field from anything else in the game).
+//- Momentum pool signal (see ccSendMomentumSignal in
+//- views/_global_sheetworker.pug) to a companion Roll20 API script
+//- (api-scripts/ccmomentum.js) - never shown to anyone. Deliberately kept
+//- separate from ccskill above (rather than piggybacking on its own
+//- visible card) so restyling the actual gameplay roll card can never
+//- silently break the API script's parsing of this one. The field name
+//- (ccmomentumdelta, not just "delta") is distinctive on purpose - see
+//- lessons_learned.md for why the API script can't instead detect this
+//- roll by its template name.
 +rolltemplate('ccmomentumsignal')
   span.cc-momentum-signal-delta {{ccmomentumdelta}}
 
 //- Same purpose as ccmomentumsignal above, but for the GM's Threat pool
-//- (see ccSendThreatSignal in views/_character.pug and its companion API
-//- script, api-scripts/ccthreat.js) - kept as its own template/hidden roll
-//- rather than piggybacking on ccmomentumsignal so this addition can never
-//- risk the already-working Momentum signal.
+//- (see ccSendThreatSignal in views/_global_sheetworker.pug and its
+//- companion API script, api-scripts/ccthreat.js) - kept as its own
+//- template/hidden roll rather than piggybacking on ccmomentumsignal so
+//- this addition can never risk the already-working Momentum signal.
 +rolltemplate('ccthreatsignal')
   span.cc-threat-signal-delta {{ccthreatdelta}}
 
 +scss('roll').
-  /* Roll templates render inside Roll20's chat pane, which sanitizes their
-     CSS through a stricter, older filter than the main sheet - CSS custom
-     properties (var()) are not on its allowlist and get the whole
-     declaration silently dropped. Plain hardcoded colors only in here.
-
-     Roll20 also auto-prepends "sheet-" to every class used INSIDE a roll
-     template at render time - confirmed by inspecting the live rendered
-     chat DOM, where our own class="cc-roll-header" came out as
-     class="sheet-cc-roll-header", class="character_name" (from the
-     characterLink mixin) came out as class="sheet-character_name", etc.
-     Every selector below other than the rolltemplate's own
-     sheet-rolltemplate-<name> wrapper (which we author with that prefix
-     ourselves - Roll20 doesn't add a second one) and .inlinerollresult
-     (Roll20's own built-in class, never prefixed) needs a matching
-     "sheet-" prefix or it silently never matches anything.
-
-     Critically: visual styling (background/border/font/padding) does NOT
-     reliably apply when placed directly on .sheet-rolltemplate-ccskill
-     itself - it needs to live on a child wrapper div instead. Confirmed
-     against an old hand-authored prototype of this same sheet that did
-     get roll template styling working, which put all of its visual rules
-     on a nested .sheet-template wrapper rather than the rolltemplate root. */
+  /* Plain hardcoded colors only in this block - roll-template CSS can't
+     use custom properties (var()), unlike the main sheet stylesheet (see
+     lessons_learned.md). Every class used inside a rolltemplate's markup
+     needs a matching "sheet-" prefix here (Roll20 adds it at render time
+     to everything except the rolltemplate's own sheet-rolltemplate-<name>
+     wrapper and the built-in .inlinerollresult), and visual styling lives
+     on the inner .sheet-cc-roll-card wrapper, not the
+     .sheet-rolltemplate-ccskill root itself - see lessons_learned.md for
+     both. */
   .sheet-rolltemplate-ccskill .sheet-cc-roll-card {
     font-family: Georgia, serif;
     background: #ece3cd;

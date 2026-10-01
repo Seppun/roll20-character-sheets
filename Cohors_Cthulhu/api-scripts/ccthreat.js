@@ -13,14 +13,12 @@
 // directorial moves), which happens in narration, not on this sheet - so
 // !threat-adjust (GM only) is the only way the pool goes down.
 //
-// The signal itself works exactly like ccmomentum.js's (see that file's
-// header comment for the full "why" - sheet workers have no sendChat(),
-// msg.content never carries the &{template:...} reference or the
-// rendered/resolved value, only msg.inlinerolls does) via a separate
-// hidden (display:none) roll template, ccthreatsignal
-// (rolltemplate/_index.pug), kept fully independent from ccmomentum.js's
-// own signal so this script can never risk the already-working Momentum
-// pool.
+// The signal itself works exactly like ccmomentum.js's (see
+// lessons_learned.md for the sendChat/msg.content mechanics both scripts
+// rely on) via a separate hidden (display:none) roll template,
+// ccthreatsignal (rolltemplate/_index.pug), kept fully independent from
+// ccmomentum.js's own signal so this script can never risk the
+// already-working Momentum pool.
 //
 // INSTALL: a separate piece from the character sheet's own Layout/Style/
 // Script boxes, and separate from ccmomentum.js too - both are ordinary

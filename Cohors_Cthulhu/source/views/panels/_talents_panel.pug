@@ -7,16 +7,11 @@
 //- talents. Too many to hand-write inline like Weapons'/Armor's own
 //- profile objects, so this loads from a JSON file instead
 //- (source/data/talents.json) via the `require` local that generate.js's
-//- pugOptions exposes to every template. An initial pass at this data
-//- (built from the PDF's text layer alone) silently mismatched several
-//- specialization/culture talents' names to the wrong descriptions,
-//- courtesy of the source PDF's two-column layout - the final data here
-//- was instead transcribed directly from the rendered page images to
-//- catch exactly that. A couple of pairs of talents across different
-//- specializations share the same name with different effects (e.g.
-//- "Scotopia" appears in both the Robber and Hunter specializations) -
-//- those are disambiguated as "NAME (SPECIALIZATION)" in this data/
-//- dropdown.
+//- pugOptions exposes to every template. A couple of pairs of talents
+//- across different specializations share the same name with different
+//- effects (e.g. "Scotopia" appears in both the Robber and Hunter
+//- specializations) - those are disambiguated as "NAME (SPECIALIZATION)"
+//- in this data/dropdown.
 -
   const ccTalentProfiles = require('./source/data/talents.json');
   const ccTalentNames = Object.keys(ccTalentProfiles).sort();
@@ -44,16 +39,10 @@
       //- entries matching what's typed so far, while still accepting
       //- any free-text value for talents not in the list. The
       //- datalist itself is declared once, below, and shared by every
-      //- row via the matching id.
-      //-
-      //- Unlike a real <select> (used for Weapons/Armor), picking a
-      //- suggestion from a <datalist> only fires the input's 'input'
-      //- event, not 'change' - and Roll20's sheet framework only
-      //- reacts to 'change', which a plain text input doesn't fire
-      //- until it loses focus. So the trigger on the Name field below
-      //- still works, but only once you click/tab elsewhere. This
-      //- apply button (a real click, always instant) is the reliable
-      //- alternative for right after picking a name from the list.
+      //- row via the matching id. This apply button is a reliable,
+      //- always-instant alternative to the Name field's own trigger
+      //- below, which only fires once the field loses focus (see
+      //- lessons_learned.md for why a <datalist> pick alone isn't enough).
       +action({
         name: 'talent apply',
         class: 'cc-talent-apply',

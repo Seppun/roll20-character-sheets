@@ -8,16 +8,8 @@
    direct @font-face rules (both weights point at the same file - Google
    now serves Inter as a single variable-font woff2, with font-weight here
    just selecting which instance of it applies) rather than a plain CSS
-   @import of the Google Fonts stylesheet endpoint. The @import approach
-   (same pattern Ars_Magica_5th already uses successfully in its own,
-   unrelated main-sheet CSS) turned out to break roll template rendering
-   in the chat pane - the fonts loaded fine for the sheet itself, but the
-   roll card's own hardcoded `font-family: Georgia, serif` stopped taking
-   effect. Roll20 sanitizes roll-template CSS through a separate, stricter
-   filter than the main sheet (see README's "hard-won lessons"), and an
-   @import at-rule anywhere in the pasted stylesheet apparently trips it
-   the same way a stray CSS comment or data: URI once did elsewhere in
-   this file's history - @font-face doesn't have that problem. */
+   @import of the Google Fonts stylesheet endpoint - see lessons_learned.md
+   for why @import breaks roll-template rendering. */
 @font-face {
   font-family: 'Inter';
   font-style: normal;

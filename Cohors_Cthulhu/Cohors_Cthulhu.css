@@ -4,16 +4,8 @@
    direct @font-face rules (both weights point at the same file - Google
    now serves Inter as a single variable-font woff2, with font-weight here
    just selecting which instance of it applies) rather than a plain CSS
-   @import of the Google Fonts stylesheet endpoint. The @import approach
-   (same pattern Ars_Magica_5th already uses successfully in its own,
-   unrelated main-sheet CSS) turned out to break roll template rendering
-   in the chat pane - the fonts loaded fine for the sheet itself, but the
-   roll card's own hardcoded `font-family: Georgia, serif` stopped taking
-   effect. Roll20 sanitizes roll-template CSS through a separate, stricter
-   filter than the main sheet (see README's "hard-won lessons"), and an
-   @import at-rule anywhere in the pasted stylesheet apparently trips it
-   the same way a stray CSS comment or data: URI once did elsewhere in
-   this file's history - @font-face doesn't have that problem. */
+   @import of the Google Fonts stylesheet endpoint - see lessons_learned.md
+   for why @import breaks roll-template rendering. */
 @font-face {
   font-family: "Inter";
   font-style: normal;
@@ -249,10 +241,8 @@ body {
      object without looking like a painted-on chip. Each button also
      layers a dozen or so small radial-gradient flecks (see .cc-focus-roll
      etc.) standing in for travertine's actual pitted pores - plain CSS
-     gradients, not an image file or data: URI, both of which are
-     confirmed (see README.md) to silently break Roll20 roll-template
-     chat styling for the whole sheet if they appear ANYWHERE in the
-     pasted stylesheet, not just inside the roll template itself. */
+     gradients, not an image file or data: URI (see lessons_learned.md for
+     why that matters on this sheet). */
   --cc-stone-light: #f2e4d3;
   --cc-stone-dark: #edd9c1;
   --cc-stone-bezel: #8a7252;
@@ -1307,19 +1297,10 @@ body .ui-dialog .tab-content .charsheet .cc-banner {
   /* Background is a PNG render of an original brush-stroke ribbon (not
      traced from the official sheet's art), hosted in this repo at
      images/banner-brush.png and loaded via a raw.githubusercontent.com
-     URL. This was originally an inline data: URI (first SVG, then PNG),
-     but Roll20's CSS pipeline treats ANY inline data: URI background
-     image as a security violation and discards ALL roll-template
-     styling for the whole pasted stylesheet when it finds one anywhere
-     in the file - confirmed directly via the console error "Potential
-     CSS security violation; character sheet template styling thrown
-     out" persisting even after switching formats, and by the fact that
-     neither of this repo's other, proven-working sheets (Achtung!_
-     Cthulhu_2d20, Ars_Magica_5th) uses a single inline data: URI image
-     anywhere in their CSS - both host every image externally instead.
-     No background-color here: the ribbon shape's transparent cutouts
-     must show whatever sits behind it (page/panel background), or the
-     rough silhouette disappears behind a solid rectangle. */
+     URL rather than inlined as a data: URI (see lessons_learned.md for
+     why). No background-color here: the ribbon shape's transparent
+     cutouts must show whatever sits behind it (page/panel background),
+     or the rough silhouette disappears behind a solid rectangle. */
   background: url("https://raw.githubusercontent.com/Seppun/roll20-character-sheets/Cohorscc/Cohors_Cthulhu/images/banner-brush.png") no-repeat center/100% 100%;
   color: var(--cc-banner-text);
   font-family: var(--cc-header-font);
@@ -1474,10 +1455,8 @@ body .ui-dialog .tab-content .charsheet {
      not something this sheet's markup renders itself, so they can only be
      restyled via CSS, not have their text/DOM changed. Same wording,
      dressed up to read as buttons matching the sheet's theme, with a small
-     eagle-icon background image (not a unicode glyph - an emoji here would
-     be the exact astral-plane-character mistake that once 500'd Roll20's
-     save endpoint, see the Effect-face symbol's history above) instead of
-     literal text.
+     eagle-icon background image (not an emoji glyph - see
+     lessons_learned.md for why) instead of literal text.
 
      Uses its own icon asset (images/eagle-icon.png) rather than reusing
      eagle-spqr.png (the page watermark): that PNG's opacity is baked very
@@ -1546,23 +1525,15 @@ body .ui-dialog .tab-content .charsheet .repcontrol_edit span {
 body .ui-dialog .tab-content .charsheet {
   /* Roll20's own "+Add Item" wording is verbose for how small this button
      now is - shortened to just "Add" without touching Roll20's own DOM
-     (which, per the comment above, this sheet has no access to): the
-     classic text-replacement trick of collapsing the real text node to
-     zero size and supplying replacement text via a pseudo-element
-     instead. font-size:0 (not display:none/visibility:hidden) is what
-     makes this work - those would remove the link's own clickable text
-     node from the layout instead of just shrinking it to nothing.
-
-     font-size:0 on the container itself, not just on a/span, because
-     Roll20 doesn't always wrap this text the same way: confirmed live
-     that once a repeating section already has one or more rows, the
-     "+Add Item" text renders as "+Add" directly inside .repcontrol_add
-     with no a/span wrapper at all, which the a/span-only rule never
-     zeroed - showing our own "Add" pseudo-element text right next to
-     Roll20's own real "+Add" text ("Add +Add"). Zeroing the container
-     itself covers both DOM shapes regardless of which one Roll20 picks;
-     :after's own explicit font-size still overrides back up from the
-     inherited 0, same as before. */
+     (which this sheet has no access to): the classic text-replacement
+     trick of collapsing the real text node to zero size (font-size:0,
+     not display:none/visibility:hidden, which would remove it from the
+     layout instead of just shrinking it) and supplying replacement text
+     via a pseudo-element instead. Zeroed on the container itself, not
+     just on a/span, since Roll20 renders this text in either shape
+     depending on whether the section already has rows (see
+     lessons_learned.md) - :after's own explicit font-size still overrides
+     back up from the inherited 0 either way. */
 }
 body .ui-dialog .tab-content .charsheet .repcontrol_add {
   font-size: 0;
@@ -1683,7 +1654,7 @@ body .ui-dialog .tab-content .charsheet .cc-character .cc-footer {
   opacity: 0.6;
 }
 body .ui-dialog .tab-content .charsheet .cc-character .cc-build-css::after {
-  content: "CSS build: 2026-10-01 20:56:09 UTC";
+  content: "CSS build: 2026-10-01 21:36:29 UTC";
 }
 body .ui-dialog .tab-content .charsheet .cc-character .cc-languages textarea {
   min-height: 4rem;
@@ -2263,7 +2234,7 @@ body {
   opacity: 0.6;
 }
 .cc-character .cc-build-css::after {
-  content: "CSS build: 2026-10-01 20:56:09 UTC";
+  content: "CSS build: 2026-10-01 21:36:29 UTC";
 }
 .cc-character .cc-languages textarea {
   min-height: 4rem;
@@ -2800,28 +2771,15 @@ body {
   min-height: 3rem;
 }
 
-/* Roll templates render inside Roll20's chat pane, which sanitizes their
-   CSS through a stricter, older filter than the main sheet - CSS custom
-   properties (var()) are not on its allowlist and get the whole
-   declaration silently dropped. Plain hardcoded colors only in here.
-
-   Roll20 also auto-prepends "sheet-" to every class used INSIDE a roll
-   template at render time - confirmed by inspecting the live rendered
-   chat DOM, where our own class="cc-roll-header" came out as
-   class="sheet-cc-roll-header", class="character_name" (from the
-   characterLink mixin) came out as class="sheet-character_name", etc.
-   Every selector below other than the rolltemplate's own
-   sheet-rolltemplate- wrapper (which we author with that prefix
-   ourselves - Roll20 doesn't add a second one) and .inlinerollresult
-   (Roll20's own built-in class, never prefixed) needs a matching
-   "sheet-" prefix or it silently never matches anything.
-
-   Critically: visual styling (background/border/font/padding) does NOT
-   reliably apply when placed directly on .sheet-rolltemplate-ccskill
-   itself - it needs to live on a child wrapper div instead. Confirmed
-   against an old hand-authored prototype of this same sheet that did
-   get roll template styling working, which put all of its visual rules
-   on a nested .sheet-template wrapper rather than the rolltemplate root. */
+/* Plain hardcoded colors only in this block - roll-template CSS can't
+   use custom properties (var()), unlike the main sheet stylesheet (see
+   lessons_learned.md). Every class used inside a rolltemplate's markup
+   needs a matching "sheet-" prefix here (Roll20 adds it at render time
+   to everything except the rolltemplate's own sheet-rolltemplate-
+   wrapper and the built-in .inlinerollresult), and visual styling lives
+   on the inner .sheet-cc-roll-card wrapper, not the
+   .sheet-rolltemplate-ccskill root itself - see lessons_learned.md for
+   both. */
 .sheet-rolltemplate-ccskill .sheet-cc-roll-card {
   font-family: Georgia, serif;
   background: #ece3cd;

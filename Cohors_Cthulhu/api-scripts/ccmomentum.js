@@ -8,8 +8,8 @@
 // maintains a single, game-wide Momentum pool in the API's own persistent
 // state instead, kept in sync automatically by a hidden signal the
 // character sheet itself sends on every roll (see ccSendMomentumSignal in
-// source/views/_character.pug) - not something a player ever needs to
-// type themselves.
+// source/views/_global_sheetworker.pug) - not something a player ever
+// needs to type themselves.
 //
 // +1 to the pool per point of Momentum a passed roll generates.
 // -1 per additional d20 bought (2d20 RAW: buying an extra d20 costs 1
@@ -22,16 +22,10 @@
 // GM's direct !momentum-set) all get it for free.
 //
 // The signal itself is a whispered, hidden (display:none) roll using a
-// dedicated template, ccmomentumsignal (rolltemplate/_index.pug) - sheet
-// workers turned out to have no sendChat() of their own (confirmed live:
-// calling it throws "sendChat is not defined"), so startRoll/a real dice
-// roll is the only way sheet-worker code can reach chat at all. This
-// script reads the delta from msg.inlinerolls[0].results.total - the API
-// never renders roll templates to HTML at all (that only happens
-// client-side, in a player's browser), so msg.content for a message
-// containing [[...]] just holds the raw template invocation with a
-// $[[0]] placeholder; the actually-computed value lives in the separate
-// inlinerolls array Roll20 attaches to the message instead.
+// dedicated template, ccmomentumsignal (rolltemplate/_index.pug), since
+// sheet workers have no sendChat() of their own (see lessons_learned.md).
+// This script reads the delta from msg.inlinerolls[0].results.total, not
+// msg.content - see lessons_learned.md for why.
 //
 // INSTALL: This is a separate piece from the character sheet's own
 // Layout/Style/Script boxes. In your Roll20 game: Game Settings > API
@@ -149,18 +143,11 @@ on('ready', () => {
   };
 
   // Pulls the numeric delta out of the hidden ccmomentumsignal roll.
-  // msg.content for a message with an inline roll ([[0+delta]] in the
-  // sheet worker) holds the RAW field list with a $[[0]] placeholder in
-  // place of the resolved value, not rendered HTML - the API never
-  // renders templates to HTML at all (that's a client-side/browser step).
-  // Confirmed live that Roll20 also strips the leading &{template:X}
-  // reference out of msg.content entirely before the API ever sees it -
-  // true of every roll, not just this one, so template name can't be
-  // used to identify our message. {{ccmomentumdelta=...}} (the field
-  // name itself) survives and is distinctive enough not to collide with
-  // anything else. The actual computed value lives in msg.inlinerolls, a
-  // separate array Roll20 populates for any message with [[...]] in it -
-  // this template has exactly one such expression, so it's always [0].
+  // Identifies the message by the {{ccmomentumdelta=...}} field name
+  // surviving in msg.content (template name does not - see
+  // lessons_learned.md), then reads the actual value from
+  // msg.inlinerolls[0] - this template has exactly one [[...]] expression,
+  // so it's always index 0.
   const extractMomentumSignalDelta = (msg) => {
     const content = String(msg.content || '');
     if (!content.includes('{{ccmomentumdelta=')) { return null; }
@@ -178,10 +165,9 @@ on('ready', () => {
   };
 
   const handleMessage = (msg) => {
-    // Temporary, unconditional diagnostic - logs every chat message this
-    // script sees (type, raw content, and any inlinerolls) while we
-    // confirm the hidden signal actually reaches this handler at all.
-    // Remove once the Momentum pool is confirmed working end to end.
+    // Unconditional diagnostic - logs every chat message this script
+    // sees (type, raw content, and any inlinerolls), same as
+    // ccthreat.js, kept in deliberately to make debugging easier.
     log(`[CCMomentum] chat:message type=${msg.type} content=${JSON.stringify(msg.content)} inlinerolls=${JSON.stringify(msg.inlinerolls)}`);
 
     const signalDelta = extractMomentumSignalDelta(msg);

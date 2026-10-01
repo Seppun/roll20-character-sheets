@@ -7,21 +7,10 @@ const kOpts = {
     testDestination: './__tests__',
     source: './source',
     pugOptions: { "require": require, "fs": fs },
-    // Previously compiled with style: 'compressed' to strip CSS comments,
-    // after an earlier debugging session found that a /* ... */ comment
-    // ANYWHERE in the pasted stylesheet (even k-scaffold's own harmless
-    // "/* Preferred icon size */" comment in its bundled materialIcons
-    // styles) silently broke roll-template styling in chat, while the
-    // sheet's own CSS kept working fine. Re-tested live in a scratch
-    // Roll20 sandbox campaign (a minimal custom sheet with a rolltemplate
-    // styled via a child-wrapper rule, preceded by that exact comment
-    // text) and the roll template rendered correctly - Roll20 no longer
-    // reproduces the bug. Switched back to 'expanded' so the shipped CSS
-    // stays human-readable with real comments, matching the .scss/.pug
-    // source. If roll-template styling ever silently breaks again, the
-    // CSS comments (not custom properties, which have their own separate,
-    // still-live restriction inside +scss('roll') - see that file) are
-    // the first thing to re-suspect.
+    // Compiles with real, readable CSS comments rather than a compressed/
+    // comment-stripped build - see lessons_learned.md if roll-template
+    // styling ever silently breaks again, since comments are one of a
+    // short list of past (and possibly still-live) triggers for that.
     scssOptions: { style: 'expanded' },
 };
 
@@ -34,11 +23,8 @@ const cssPath = './Cohors_Cthulhu.css';
 // k-scaffold's own default styles unconditionally bundle a modal component
 // (.kmodal__outer/.kmodal__inner) that we never use anywhere in this sheet
 // (no +modal/+collapsible in our source, and no kmodal-* elements in the
-// compiled HTML) - it ships with position:fixed, which Roll20's chat
-// pipeline treats as a security violation and, on detecting it ANYWHERE in
-// the pasted stylesheet, throws out ALL roll-template styling for the
-// whole file (confirmed directly via the console error "Potential CSS
-// security violation; character sheet template styling thrown out").
+// compiled HTML) - it ships with position:fixed, which breaks Roll20
+// roll-template styling sheet-wide if left in (see lessons_learned.md).
 // Since the modal is never rendered, swapping position:fixed for
 // position:absolute here is behaviorally invisible and safe.
 const patchCss = () => {

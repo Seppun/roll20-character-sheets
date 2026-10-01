@@ -1020,7 +1020,7 @@
         </div>
       </div>
     </div>
-    <div class="cc-footer"><span class="cc-build-html">HTML build: 2026-10-01 20:56:09 UTC</span></div>
+    <div class="cc-footer"><span class="cc-build-html">HTML build: 2026-10-01 21:36:29 UTC</span></div>
   </div>
       </article>
       <article class="tabs__container tabs--cohors-cthulhu__container tabs--cohors-cthulhu__container--spells" data-container-tab="cohors-cthulhu" data-tab="spells">
@@ -2857,14 +2857,32 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
   
   const ccCapitalize = (s) => s.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
   
-  // Action-button trigger.name is normalized with dashes (e.g.
-  // "academia-focus-finance-roll"), not the underscores used everywhere
-  // else on this sheet (attribute/calculation trigger names) - confirmed
-  // by inspecting the compiled sheet's own cascade data. Normalize before
-  // matching so the regexes in Attributes'/Skills' own roll initiators
-  // (written against underscore form) work. Shared between those two
-  // panel files' roll initiators - see ccNormalizeName's own comment
-  // further below for the same quirk (referring to this one).
+  // Cohors Cthulhu damage/cost is rolled with special 6-sided Challenge
+  // Dice. This sheet has no access to physical Challenge Dice, so it
+  // rolls plain d6s and converts them face-by-face using the rulebook's
+  // own "If you don't have Challenge Dice" fallback table: 1->1 pip (a
+  // dagger face), 2->2 pips (a crossed-daggers face), 3/4->blank, 5/6->1
+  // pip plus an Effect (skull and crossbones - a plain BMP character, not
+  // an emoji, see lessons_learned.md). Symbols mirror that table's own
+  // iconography rather than a generic pip count, so the roll template
+  // reads the same way the physical dice would. Used by Weapons' own
+  // damage roll (views/panels/_weapons_panel.pug) and Spells' spell Cost
+  // roll (views/_spells.pug).
+  const ccChallengeDieFromD6 = (d6) => {
+    switch (Number(d6)) {
+      case 1: return {pips: 1, effect: false, symbol: '†'};
+      case 2: return {pips: 2, effect: false, symbol: '‡'};
+      case 5: return {pips: 1, effect: true, symbol: '☠'};
+      case 6: return {pips: 1, effect: true, symbol: '☠'};
+      default: return {pips: 0, effect: false, symbol: '–'};
+    }
+  };
+  
+  // An action button's trigger.name arrives dash-separated (e.g.
+  // "academia-focus-finance-roll"), not the underscore form used
+  // elsewhere on this sheet - normalize before matching against
+  // underscore-form regexes. Shared by Attributes'/Skills' roll
+  // initiators (see lessons_learned.md for why the dash form shows up).
   const ccNormalizeName = (name) => name.replace(/-/g, '_');
   
   // Momentum in Cohors Cthulhu (as in the wider 2d20 System) is a shared
@@ -2879,27 +2897,17 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
   // Fatigue resist roll, Weapons' weapon roll, and Spells' spell roll
   // (views/_spells.pug) - five different call sites across panels/tabs.
   //
-  // Originally tried calling sendChat() directly - confirmed live in a
-  // real game that sheet workers have no such function at all ("sendChat
-  // is not defined"), unlike the API sandbox's own sendChat. The only way
-  // sheet-worker code can put anything into chat is a real dice roll via
-  // startRoll, so this rides a dedicated, hidden roll template
-  // (ccmomentumsignal, in rolltemplate/_index.pug) instead - whispered to
-  // the GM and display:none besides, so nobody at the table ever sees it,
-  // but its rendered HTML still reaches the API's chat:message handler
-  // for parsing. Harmless with no such script installed - Roll20 still
-  // renders (and immediately hides) a card nobody looks at.
+  // Sheet workers have no sendChat() of their own, so this rides a
+  // dedicated, hidden roll template (ccmomentumsignal, in
+  // rolltemplate/_index.pug) instead - whispered to the GM and
+  // display:none besides, so nobody at the table ever sees it, but its
+  // rendered HTML still reaches the API script's chat:message handler for
+  // parsing (see lessons_learned.md). Harmless with no such script
+  // installed - Roll20 still renders (and immediately hides) a card
+  // nobody looks at.
   const ccSendMomentumSignal = async (delta) => {
     if (!delta) { return; }
     try {
-      // Confirmed live: a startRoll() a sheet worker never finishRoll()s
-      // doesn't post its real template content at all - Roll20 replaces
-      // it with a generic "A roll was initiated by a character sheet,
-      // but it was not finished: {{delta=$[[0]]}}" placeholder message
-      // instead (missing the &{template:...} reference entirely, though
-      // the actual computed inline-roll value is still present and
-      // correct). finishRoll with no overrides completes the roll
-      // properly since delta needs no override to begin with.
       const roll = await startRoll(`/w gm &{template:ccmomentumsignal} {{ccmomentumdelta=[[0+${delta}]]}}`);
       finishRoll(roll.rollId, {});
     } catch (err) {
@@ -2942,13 +2950,8 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
     const complicationQuery = '?{Complication range (1-5)|1}';
     const bonusDiceQuery = '?{Additional d20s bought (0-3)|0}';
   
-    // Every field we plan to set via finishRoll must already exist in the
-    // original roll string as a [[0]] placeholder - Roll20's finishRoll can
-    // only update fields that were part of the initial message, it cannot
-    // inject brand new field names. (Confirmed the hard way: character_name/
-    // skill/difficulty, which WERE declared upfront, rendered fine; target_
-    // number/successes/etc, which were only ever set via finishRoll's second
-    // argument, never appeared at all.)
+    // Every field finishRoll will later override must already exist here
+    // as a [[0]] placeholder (see lessons_learned.md).
     const rollString = '&{template:ccskill} ' +
       `{{character_name=@{character_name}}} ` +
       `{{skill=${skillLabel}}} ` +
@@ -3067,8 +3070,7 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
   k.registerFuncs({calcBasePower});
   
   // Power Rating = Base Power + ccAttributeBonus(casting attribute rating).
-  // ccAttributeBonus is defined in views/_character.pug's +module block -
-  // both end up in the same sheet-worker script scope.
+  // ccAttributeBonus is defined in views/_global_sheetworker.pug.
   const calcPowerRating = ({attributes}) => {
     const base = Number(attributes.base_power) || 0;
     const attr = (attributes.spellcasting_attribute || '').toLowerCase();
@@ -3166,8 +3168,7 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
   // gated on nothing, since RAW says the cost "applies after the
   // spellcaster resolves the skill test... whether or not they
   // successfully cast it" (see Casting a Battlefield Spell, page 66).
-  // ccChallengeDieFromD6 is defined in views/_character.pug's +module
-  // block - both end up in the same sheet-worker script scope.
+  // ccChallengeDieFromD6 is defined in views/_global_sheetworker.pug.
   const initiateSpellRoll = async ({trigger, attributes}) => {
     const [section, rowID] = k.parseRepeatName(trigger.name);
     const prefix = `${section}_${rowID}_`;
@@ -3277,11 +3278,9 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
   
       const spellBonusMomentum = passed ? Math.max(0, successCount - difficulty) : 0;
       const spellBonusDiceBought = Math.max(0, dice.length - 2);
-      // ccSendMomentumSignal is defined in views/_character.pug's +module
-      // block - both end up in the same sheet-worker script scope.
+      // ccSendMomentumSignal/ccSendThreatSignal are defined in
+      // views/_global_sheetworker.pug.
       await ccSendMomentumSignal(spellBonusMomentum - spellBonusDiceBought - extraMomentum);
-      // ccSendThreatSignal is defined in views/_character.pug's +module
-      // block, alongside ccSendMomentumSignal - both end up in scope here.
       await ccSendThreatSignal(complicationCount + dabblingPowerThreat + costThreatGenerated);
   
       finishRoll(roll.rollId, {
@@ -3369,24 +3368,13 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
   };
   k.registerFuncs({calcStressMax});
   
-  // Backs every box in the Stress/Fortune/Fatigue trackers (see the pug
-  // comment above .cc-stress-track for the full rationale) - each box is
-  // an action button rather than a radio specifically so this runs on
-  // every click, including a re-click of the currently topmost box, which
-  // a native radio can't ever report at all (clicking an already-checked
-  // radio is a silent no-op, no event fires). Clicking a box jumps the
-  // track straight to that box's value, the same "fill up to / clear down
-  // to" behavior a radio group gives for free - except clicking box 1
-  // while it's the ONLY box filled clears the whole track to 0 instead of
-  // re-selecting 1, since that's the one value a real radio group could
-  // never leave once reached. That one case replaces the old separate
-  // Clear button entirely. Writes straight to `attributes`, the same
-  // write-via-attributes pattern ccApplyTalentPreset (panels/
-  // _talents_panel.pug) uses to drive a field's displayed value from a
-  // sheet worker. Action-button trigger.name arrives dash-separated with
-  // no act_ prefix (e.g. 'stress-box-5'), not the space-separated name the
-  // action was declared with - see ccNormalizeName's own comment (in
-  // views/_global_sheetworker.pug) for the same quirk.
+  // Backs every box in the Stress/Fortune/Fatigue trackers. Clicking a
+  // box jumps the track straight to that box's value (fill up to /
+  // clear down to), except clicking box 1 while it's the only box filled
+  // clears the whole track to 0 instead of re-selecting 1 - see
+  // lessons_learned.md for why that's the one case a plain radio group
+  // can't handle, and why trigger.name arrives dash-separated
+  // ('stress-box-5') rather than matching the action's declared name.
   const ccTrackBoxClick = ({trigger, attributes}) => {
     const match = /^(stress|fortune|fatigue)-box-(\d+)$/.exec(trigger.name);
     if (!match) { return; }
@@ -3612,41 +3600,11 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
     };
   };
   
-  // Cohors Cthulhu damage is rolled with special 6-sided Challenge Dice.
-  // This sheet has no access to physical Challenge Dice, so damage is
-  // rolled as plain d6s and converted face-by-face using the rulebook's
-  // own "If you don't have Challenge Dice" fallback table: 1->1 pip (a
-  // dagger face), 2->2 pips (a crossed-daggers face), 3/4->blank, 5/6->1
-  // pip plus an Effect (the Cthulhu-face symbol). Symbols here mirror
-  // that table's own iconography (dagger/crossed daggers/dash/Cthulhu
-  // face) rather than a generic pip count, so the roll template reads the
-  // same way the physical dice would.
-  //
-  // The Effect face was originally the octopus emoji (an astral-plane
-  // character, outside the Basic Multilingual Plane), which Roll20's
-  // savesheetsettings endpoint rejected with a 500 the first time this
-  // HTML was pasted into a fresh game - a known failure mode on Roll20's
-  // backend for any 4-byte-UTF-8 character in custom sheet code. Skull
-  // and crossbones reads the same way (a distinct "something happened"
-  // face) and is a plain BMP character, so it saves without issue.
-  const ccChallengeDieFromD6 = (d6) => {
-    switch (Number(d6)) {
-      case 1: return {pips: 1, effect: false, symbol: '†'};
-      case 2: return {pips: 2, effect: false, symbol: '‡'};
-      case 5: return {pips: 1, effect: true, symbol: '☠'};
-      case 6: return {pips: 1, effect: true, symbol: '☠'};
-      default: return {pips: 0, effect: false, symbol: '–'};
-    }
-  };
-  
   // Weapon roll: attack and damage rolled together in a single message,
   // since a Cohors Cthulhu attack is an opposed test - there's no static
   // Difficulty to pass/fail against (the GM's opposing roll decides that),
   // so damage is rolled unconditionally alongside the attack rather than
-  // as a separate, gated follow-up roll. This also sidesteps having two
-  // separate roll templates in play, since the second one, despite being
-  // built the same way as the proven ccskill template, was showing up in
-  // chat unstyled.
+  // as a separate, gated follow-up roll.
   //
   // Unlike a generic Skill/Focus roll, an attack roll always has
   // Difficulty 1 (no query) and doesn't ask which Attribute to pair -

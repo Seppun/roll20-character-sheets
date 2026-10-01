@@ -104,11 +104,8 @@
       font-size: 0.8rem;
       white-space: nowrap;
 
-      // k-scaffold's default checkbox border relies on a mistyped custom
-      // property upstream (--checkboxBorderColor falls back to an
-      // undefined --checkboxBorderColor variable), which drops the whole
-      // border declaration - so checkboxes render invisible unless we
-      // set it explicitly here.
+      // k-scaffold's default checkbox border never applies (see
+      // lessons_learned.md) - set explicitly here instead.
       .cc-focus-checkbox {
         margin: 0;
         width: 0.8rem !important;
@@ -120,17 +117,13 @@
       }
 
       // Carved-stone-block look (see --cc-stone-* in scss/_variables.scss)
-      // instead of the old flat --cc-parchment ("limestone") chip - a
-      // compact pill rather than .cc-skill-name-roll's bigger one, since
-      // many of these wrap per skill row and need to stay small. The
-      // small dark flecks are plain radial-gradient dots (no image file,
-      // no data: URI - both of those are confirmed to silently break
-      // Roll20 roll-template styling sheet-wide, see README.md) standing
-      // in for travertine's actual pitted pores, replacing an earlier
-      // meandering "crack line" SVG that didn't read as real stone. The
-      // border/box-shadow pair is deliberately thin and single-layer (vs.
-      // an earlier, heavier 2px/triple-shadow version) so the bevel reads
-      // as worn stone rather than a thick picture frame.
+      // - a compact pill rather than .cc-skill-name-roll's bigger one,
+      // since many of these wrap per skill row and need to stay small.
+      // The small dark flecks are plain radial-gradient dots (no image
+      // file or data: URI - see lessons_learned.md for why that matters
+      // on this sheet) standing in for travertine's actual pitted pores.
+      // The border/box-shadow pair is thin and single-layer so the bevel
+      // reads as worn stone rather than a thick picture frame.
       .cc-focus-roll {
         display: inline-flex;
         align-items: center;

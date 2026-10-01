@@ -42,10 +42,8 @@
      object without looking like a painted-on chip. Each button also
      layers a dozen or so small radial-gradient flecks (see .cc-focus-roll
      etc.) standing in for travertine's actual pitted pores - plain CSS
-     gradients, not an image file or data: URI, both of which are
-     confirmed (see README.md) to silently break Roll20 roll-template
-     chat styling for the whole sheet if they appear ANYWHERE in the
-     pasted stylesheet, not just inside the roll template itself. */
+     gradients, not an image file or data: URI (see lessons_learned.md for
+     why that matters on this sheet). */
   --cc-stone-light: #f2e4d3;
   --cc-stone-dark: #edd9c1;
   --cc-stone-bezel: #8a7252;

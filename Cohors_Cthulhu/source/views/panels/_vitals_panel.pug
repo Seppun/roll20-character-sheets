@@ -11,58 +11,31 @@
 .cc-panel.cc-vitals
   .cc-vitals-stress
     .cc-banner Stress
-    //- Hand-expanded from +fillLeft (see the SCSS comment on
-    //- .cc-stress-track below for how its "selected/unselected" fill
-    //- coloring works). Each visible box is an +action button, not an
-    //- +radio/+checkbox - +fillLeft's own two widget choices both have
-    //- a dead end a plain HTML input can't get out of on its own:
-    //- checkboxes let a double-click net out to "nothing in the whole
-    //- group is checked", and with nothing checked the CSS below has
-    //- no :checked anchor to peel any box's coloring off the shared
-    //- default - which is "selected"/filled, not "unselected"/empty -
-    //- so every box renders filled; radios avoid that (clicking a
-    //- different one always atomically (un)checks exactly one radio,
-    //- so some box always stays checked), but then clicking the
-    //- ALREADY-checked radio is a native no-op - no event fires at
-    //- all, so there's no way to click the current box to clear it,
-    //- which is exactly the interaction wanted here. An action button
-    //- has neither problem: it has no checked state of its own to get
-    //- stuck in, so every click is a real, inspectable event, and
-    //- ccTrackBoxClick below (a sheet worker, not CSS) decides what it
-    //- means - including the one case a real radio group could never
-    //- reach on its own: clicking box 1 while it's the only box filled
-    //- clears the whole track to 0, which is also why there's no
-    //- separate Clear button on this track anymore.
+    //- Hand-expanded from +fillLeft (see .cc-stress-track below for the
+    //- fill coloring). Each visible box is an +action button rather than
+    //- a radio/checkbox, so every click is a real sheet-worker event -
+    //- ccTrackBoxClick below decides what it means, including clearing
+    //- the whole track to 0 when box 1 is clicked while it's the only box
+    //- filled (there's no separate Clear button for that reason). See
+    //- lessons_learned.md for why a plain radio/checkbox group can't do
+    //- this on its own.
     //-
-    //- The actual "which boxes are colored" job moves to a second,
-    //- hidden radio group - one radio per box, named the same as the
-    //- tracked attribute itself ('stress') so Roll20 keeps the
-    //- correct one checked automatically whenever ccTrackBoxClick
-    //- writes a new value, no different than it already did when a
-    //- real radio was clicked directly. Interleaving each hidden
-    //- radio right after its box puts it in the same sibling chain
-    //- fillLeft's CSS trick depends on: `:checked ~ .fill-left__radio`
-    //- can't compare two numbers, but it CAN compare checked states,
-    //- so the one hidden radio matching the current value greys out
-    //- (via .cc-track-value-marker's own rule below) every VISIBLE box
-    //- after it, while leaving the current box and everything before
-    //- it on the shared default "selected"/filled color - same
-    //- mechanism .cc-stress-max-marker already uses just below for the
-    //- max-value boundary, just keyed to the live value instead.
-    //- The value=0 radio (checked by default, below) is what makes
-    //- the "nothing taken yet" all-empty look reachable at all - same
-    //- display:none treatment as the other hidden radios here, not a
-    //- literal +hidden() input, since a genuine type="hidden" input
-    //- can never match :checked at all (confirmed the hard way: that
-    //- was the ORIGINAL value=0 marker here, and it never once greyed
-    //- out anything, live or locally).
+    //- The fill coloring itself comes from a second, hidden radio group -
+    //- one radio per box, named the same as the tracked attribute
+    //- ('stress') so Roll20 keeps the correct one checked whenever
+    //- ccTrackBoxClick writes a new value. Each hidden radio sits right
+    //- after its box so `:checked ~ .fill-left__radio` (see
+    //- .cc-track-value-marker's rule below) greys out every box after the
+    //- current value, the same mechanism .cc-stress-max-marker uses below
+    //- for the max-value boundary. The value=0 radio makes the "nothing
+    //- taken yet" all-empty look reachable, and must be a real (hidden)
+    //- radio, not a literal +hidden() input - a genuine type="hidden"
+    //- input can never match :checked.
     .cc-stress-track
       +radio({name: 'stress', value: 0, checked: ''}).fill-left__radio.cc-fill-left-zero
-      //- A value=0 member of its own, same reason .cc-fill-left-zero
-      //- exists above - without one, a brand-new character (every
-      //- rating still 0, so calcStressMax returns 0) would have NO
-      //- radio in this group matching the calculated value, so NOTHING
-      //- would ever be :checked and every stress box would stay
+      //- A value=0 member of its own - without one, a brand-new
+      //- character (calcStressMax = 0) has no radio in this group
+      //- matching the calculated value, so every stress box stays
       //- enabled despite a Max Stress of 0.
       +radio({name: 'stress max marker', value: 0, trigger: {calculation: 'calcStressMax'}}).cc-stress-max-marker
       each value in Array.from({length: 20}, (_, i) => i + 1)
@@ -109,12 +82,8 @@
       .cc-banner Fatigue
       .cc-fatigue-track
         +radio({name: 'fatigue', value: 0, checked: ''}).fill-left__radio.cc-fill-left-zero
-        //- A value=0 member of its own, same reason the value=0
-        //- .cc-stress-max-marker above exists - without one, a
-        //- character with no raw Max Stress at all (calcStressMaxBase
-        //- returns 0) would have NO radio in this group matching the
-        //- calculated value, so every Fatigue box would stay enabled
-        //- despite there being no Stress capacity to cap it against.
+        //- A value=0 member of its own, same reason as the Stress
+        //- track's own value=0 marker above.
         +radio({name: 'fatigue max marker', value: 0, trigger: {calculation: 'calcStressMaxBase'}}).cc-fatigue-max-marker
         each value in Array.from({length: 20}, (_, i) => i + 1)
           +action({
@@ -353,14 +322,10 @@
       gap: 0.3rem;
       margin-top: 0.3rem;
 
-      // .cc-field's generic "> input" rule (see that mixin's own styling
-      // in scss/_index.scss) targets every direct-child input
-      // indiscriminately, including this one - meant for text/number
-      // fields, it strips a checkbox down to a flat bottom border with no
-      // box shape at all. Restore a plain, visible checkbox appearance
-      // instead of fighting that rule with appearance:none (unlike
-      // .cc-spell-collapse-toggle in views/_spells.pug, this one has no
-      // custom glyph of its own to draw).
+      // Restores a plain, visible checkbox appearance overridden by
+      // .cc-field's generic input styling (see lessons_learned.md) -
+      // unlike .cc-spell-collapse-toggle in views/_spells.pug, this one
+      // has no custom glyph of its own to draw.
       > input[type='checkbox'] {
         width: 0.9rem;
         height: 0.9rem;
@@ -414,15 +379,8 @@
       }
     }
 
-    // Was accidentally both written as ".cc-injuries" (the wrapper around
-    // the banner+textarea is actually .cc-vitals-injuries, not
-    // .cc-injuries) - the outer rule below was landing on the textarea
-    // itself instead of its wrapper, and the inner one required
-    // .cc-injuries nested inside another .cc-injuries, which never
-    // exists, so it never matched anything at all. Split into the two
-    // separate rules this was always meant to be, and added the same
-    // soft-border "edit box" look as Traits/History/Personal Agenda
-    // (views/_notes.pug) rather than the plain underline every other
+    // Same soft-border "edit box" look as Traits/History/Personal Agenda
+    // (views/_notes.pug), rather than the plain underline every other
     // .cc-field textarea gets.
     .cc-vitals-injuries {
       display: flex;
@@ -492,24 +450,13 @@
   };
   k.registerFuncs({calcStressMax});
 
-  // Backs every box in the Stress/Fortune/Fatigue trackers (see the pug
-  // comment above .cc-stress-track for the full rationale) - each box is
-  // an action button rather than a radio specifically so this runs on
-  // every click, including a re-click of the currently topmost box, which
-  // a native radio can't ever report at all (clicking an already-checked
-  // radio is a silent no-op, no event fires). Clicking a box jumps the
-  // track straight to that box's value, the same "fill up to / clear down
-  // to" behavior a radio group gives for free - except clicking box 1
-  // while it's the ONLY box filled clears the whole track to 0 instead of
-  // re-selecting 1, since that's the one value a real radio group could
-  // never leave once reached. That one case replaces the old separate
-  // Clear button entirely. Writes straight to `attributes`, the same
-  // write-via-attributes pattern ccApplyTalentPreset (panels/
-  // _talents_panel.pug) uses to drive a field's displayed value from a
-  // sheet worker. Action-button trigger.name arrives dash-separated with
-  // no act_ prefix (e.g. 'stress-box-5'), not the space-separated name the
-  // action was declared with - see ccNormalizeName's own comment (in
-  // views/_global_sheetworker.pug) for the same quirk.
+  // Backs every box in the Stress/Fortune/Fatigue trackers. Clicking a
+  // box jumps the track straight to that box's value (fill up to /
+  // clear down to), except clicking box 1 while it's the only box filled
+  // clears the whole track to 0 instead of re-selecting 1 - see
+  // lessons_learned.md for why that's the one case a plain radio group
+  // can't handle, and why trigger.name arrives dash-separated
+  // ('stress-box-5') rather than matching the action's declared name.
   const ccTrackBoxClick = ({trigger, attributes}) => {
     const match = /^(stress|fortune|fatigue)-box-(\d+)$/.exec(trigger.name);
     if (!match) { return; }

@@ -63,19 +63,10 @@
     /* Background is a PNG render of an original brush-stroke ribbon (not
        traced from the official sheet's art), hosted in this repo at
        images/banner-brush.png and loaded via a raw.githubusercontent.com
-       URL. This was originally an inline data: URI (first SVG, then PNG),
-       but Roll20's CSS pipeline treats ANY inline data: URI background
-       image as a security violation and discards ALL roll-template
-       styling for the whole pasted stylesheet when it finds one anywhere
-       in the file - confirmed directly via the console error "Potential
-       CSS security violation; character sheet template styling thrown
-       out" persisting even after switching formats, and by the fact that
-       neither of this repo's other, proven-working sheets (Achtung!_
-       Cthulhu_2d20, Ars_Magica_5th) uses a single inline data: URI image
-       anywhere in their CSS - both host every image externally instead.
-       No background-color here: the ribbon shape's transparent cutouts
-       must show whatever sits behind it (page/panel background), or the
-       rough silhouette disappears behind a solid rectangle. */
+       URL rather than inlined as a data: URI (see lessons_learned.md for
+       why). No background-color here: the ribbon shape's transparent
+       cutouts must show whatever sits behind it (page/panel background),
+       or the rough silhouette disappears behind a solid rectangle. */
     background: url('https://raw.githubusercontent.com/Seppun/roll20-character-sheets/Cohorscc/Cohors_Cthulhu/images/banner-brush.png') no-repeat center / 100% 100%;
     color: var(--cc-banner-text);
     font-family: var(--cc-header-font);
@@ -258,10 +249,8 @@
      not something this sheet's markup renders itself, so they can only be
      restyled via CSS, not have their text/DOM changed. Same wording,
      dressed up to read as buttons matching the sheet's theme, with a small
-     eagle-icon background image (not a unicode glyph - an emoji here would
-     be the exact astral-plane-character mistake that once 500'd Roll20's
-     save endpoint, see the Effect-face symbol's history above) instead of
-     literal text.
+     eagle-icon background image (not an emoji glyph - see
+     lessons_learned.md for why) instead of literal text.
 
      Uses its own icon asset (images/eagle-icon.png) rather than reusing
      eagle-spqr.png (the page watermark): that PNG's opacity is baked very
@@ -325,23 +314,15 @@
 
   /* Roll20's own "+Add Item" wording is verbose for how small this button
      now is - shortened to just "Add" without touching Roll20's own DOM
-     (which, per the comment above, this sheet has no access to): the
-     classic text-replacement trick of collapsing the real text node to
-     zero size and supplying replacement text via a pseudo-element
-     instead. font-size:0 (not display:none/visibility:hidden) is what
-     makes this work - those would remove the link's own clickable text
-     node from the layout instead of just shrinking it to nothing.
-
-     font-size:0 on the container itself, not just on a/span, because
-     Roll20 doesn't always wrap this text the same way: confirmed live
-     that once a repeating section already has one or more rows, the
-     "+Add Item" text renders as "+Add" directly inside .repcontrol_add
-     with no a/span wrapper at all, which the a/span-only rule never
-     zeroed - showing our own "Add" pseudo-element text right next to
-     Roll20's own real "+Add" text ("Add +Add"). Zeroing the container
-     itself covers both DOM shapes regardless of which one Roll20 picks;
-     :after's own explicit font-size still overrides back up from the
-     inherited 0, same as before. */
+     (which this sheet has no access to): the classic text-replacement
+     trick of collapsing the real text node to zero size (font-size:0,
+     not display:none/visibility:hidden, which would remove it from the
+     layout instead of just shrinking it) and supplying replacement text
+     via a pseudo-element instead. Zeroed on the container itself, not
+     just on a/span, since Roll20 renders this text in either shape
+     depending on whether the section already has rows (see
+     lessons_learned.md) - :after's own explicit font-size still overrides
+     back up from the inherited 0 either way. */
   .repcontrol_add {
     font-size: 0;
 
