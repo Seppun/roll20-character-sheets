@@ -103,6 +103,16 @@
         padding: 0.15rem 0.3rem;
       }
 
+      // The padding shorthand above resets padding-right at the same
+      // specificity as (and before) the sheet-wide input[list] chevron
+      // rule's own padding-right (scss/_index.scss) - restated here,
+      // after it, to win and keep room for the Name field's dropdown
+      // arrow (see the pug comment above that field for why it's an
+      // input[list] combobox rather than a plain +select).
+      input[list] {
+        padding-right: 1.3rem;
+      }
+
       // Keywords/Requirements/Description hold short reference text, not
       // something a player types much of - a smaller font keeps rows
       // compact given how many there can be, while the Name field stays

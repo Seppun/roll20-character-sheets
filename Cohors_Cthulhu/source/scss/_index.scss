@@ -103,7 +103,11 @@
     > input,
     > textarea,
     > select {
-      background: transparent;
+      // background-color rather than the background shorthand, so a
+      // <select>'s own chevron background-image (see the sheet-wide
+      // select/input[list] rule below) survives this rule and the
+      // :read-write one right after it.
+      background-color: transparent;
       border: none;
       border-bottom: 1px solid var(--cc-rule);
       font-family: var(--cc-body-font);
@@ -123,8 +127,40 @@
     > input:read-write,
     > textarea:read-write,
     > select {
-      background: var(--cc-editable-fill);
+      background-color: var(--cc-editable-fill);
     }
+
+    // The padding shorthand above resets padding-right to 0.1rem at the
+    // same specificity as (and before) the sheet-wide select/input[list]
+    // chevron rule's own padding-right, which would otherwise crowd the
+    // arrow against the select's text - restated here, after it, to win.
+    > select {
+      padding-right: 1.3rem;
+    }
+  }
+
+  // Custom dropdown-arrow chevron for every <select> on the sheet, plus
+  // Talents' text+datalist combobox (input[list] - see
+  // panels/_talents_panel.pug) so it reads as a real dropdown too despite
+  // being a text input underneath. appearance: none strips each browser's
+  // own (inconsistent, sometimes invisible against this sheet's theme)
+  // native arrow/list-button first so this one's the only indicator shown.
+  // Drawn as two small rotated gradient edges (a classic CSS-only chevron)
+  // rather than an image file - see the AI-art-policy note on
+  // --cc-stone-light in scss/_variables.scss for why this sheet avoids
+  // image assets where plain CSS can do the job.
+  select,
+  input[list] {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image:
+      linear-gradient(45deg, transparent 50%, var(--cc-ink) 50%),
+      linear-gradient(135deg, var(--cc-ink) 50%, transparent 50%);
+    background-position: calc(100% - 13px) 55%, calc(100% - 8px) 55%;
+    background-size: 5px 5px, 5px 5px;
+    background-repeat: no-repeat;
+    padding-right: 1.3rem;
   }
 
   .cc-panel {
@@ -197,7 +233,9 @@
     textarea,
     select {
       width: 100%;
-      background: transparent;
+      // background-color, not the background shorthand - see the sheet-
+      // wide select/input[list] chevron rule above for why.
+      background-color: transparent;
       border: 1px solid var(--cc-rule);
       color: var(--cc-ink);
       border-radius: 2px;
@@ -209,7 +247,7 @@
     input:read-write,
     textarea:read-write,
     select {
-      background: var(--cc-editable-fill);
+      background-color: var(--cc-editable-fill);
     }
   }
 

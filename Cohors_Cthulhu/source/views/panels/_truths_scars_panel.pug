@@ -33,7 +33,10 @@
       .cc-truth,
       .cc-scar {
         width: 100%;
-        background: transparent;
+        // Same light editable-field fill as .cc-field's own :read-write
+        // inputs (scss/_index.scss) - these aren't wrapped in a .cc-field
+        // so they don't inherit that rule automatically.
+        background: var(--cc-editable-fill);
         border: none;
         border-bottom: 1px solid var(--cc-rule);
         color: var(--cc-ink);

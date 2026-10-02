@@ -259,8 +259,16 @@
       align-items: center;
       gap: 0.3rem;
 
+      // Not wrapped in a .cc-field (the cast button sits alongside it in
+      // this row instead), so it misses .cc-field's own boxed/editable-
+      // fill look (scss/_index.scss) - matched explicitly here instead.
       select {
         flex: 1 1 auto;
+        background-color: var(--cc-editable-fill);
+        border: 1px solid var(--cc-rule);
+        border-radius: 2px;
+        color: var(--cc-ink);
+        font-family: var(--cc-body-font);
       }
     }
 

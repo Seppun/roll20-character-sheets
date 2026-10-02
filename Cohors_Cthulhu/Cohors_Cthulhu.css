@@ -1334,7 +1334,7 @@ body .ui-dialog .tab-content .charsheet .cc-field > span {
 body .ui-dialog .tab-content .charsheet .cc-field > input,
 body .ui-dialog .tab-content .charsheet .cc-field > textarea,
 body .ui-dialog .tab-content .charsheet .cc-field > select {
-  background: transparent;
+  background-color: transparent;
   border: none;
   border-bottom: 1px solid var(--cc-rule);
   font-family: var(--cc-body-font);
@@ -1344,7 +1344,21 @@ body .ui-dialog .tab-content .charsheet .cc-field > select {
 body .ui-dialog .tab-content .charsheet .cc-field > input:read-write,
 body .ui-dialog .tab-content .charsheet .cc-field > textarea:read-write,
 body .ui-dialog .tab-content .charsheet .cc-field > select {
-  background: var(--cc-editable-fill);
+  background-color: var(--cc-editable-fill);
+}
+body .ui-dialog .tab-content .charsheet .cc-field > select {
+  padding-right: 1.3rem;
+}
+body .ui-dialog .tab-content .charsheet select,
+body .ui-dialog .tab-content .charsheet input[list] {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, var(--cc-ink) 50%), linear-gradient(135deg, var(--cc-ink) 50%, transparent 50%);
+  background-position: calc(100% - 13px) 55%, calc(100% - 8px) 55%;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+  padding-right: 1.3rem;
 }
 body .ui-dialog .tab-content .charsheet .cc-panel {
   border: 1px solid var(--cc-rule);
@@ -1412,7 +1426,7 @@ body .ui-dialog .tab-content .charsheet .cc-rep-table input,
 body .ui-dialog .tab-content .charsheet .cc-rep-table textarea,
 body .ui-dialog .tab-content .charsheet .cc-rep-table select {
   width: 100%;
-  background: transparent;
+  background-color: transparent;
   border: 1px solid var(--cc-rule);
   color: var(--cc-ink);
   border-radius: 2px;
@@ -1420,7 +1434,7 @@ body .ui-dialog .tab-content .charsheet .cc-rep-table select {
 body .ui-dialog .tab-content .charsheet .cc-rep-table input:read-write,
 body .ui-dialog .tab-content .charsheet .cc-rep-table textarea:read-write,
 body .ui-dialog .tab-content .charsheet .cc-rep-table select {
-  background: var(--cc-editable-fill);
+  background-color: var(--cc-editable-fill);
 }
 body .ui-dialog .tab-content .charsheet .cc-table {
   width: 100%;
@@ -1654,7 +1668,7 @@ body .ui-dialog .tab-content .charsheet .cc-character .cc-footer {
   opacity: 0.6;
 }
 body .ui-dialog .tab-content .charsheet .cc-character .cc-build-css::after {
-  content: "CSS build: 2026-10-02 05:56:05 UTC";
+  content: "CSS build: 2026-10-02 06:07:43 UTC";
 }
 body .ui-dialog .tab-content .charsheet .cc-character .cc-languages textarea {
   min-height: 4rem;
@@ -1695,6 +1709,11 @@ body .ui-dialog .tab-content .charsheet .cc-spells .cc-spell-name-row {
 }
 body .ui-dialog .tab-content .charsheet .cc-spells .cc-spell-name-row select {
   flex: 1 1 auto;
+  background-color: var(--cc-editable-fill);
+  border: 1px solid var(--cc-rule);
+  border-radius: 2px;
+  color: var(--cc-ink);
+  font-family: var(--cc-body-font);
 }
 body .ui-dialog .tab-content .charsheet .cc-spells .cc-spell-cast {
   display: inline-flex;
@@ -1764,7 +1783,7 @@ body .ui-dialog .tab-content .charsheet .cc-notes .cc-history-agenda {
 body .ui-dialog .tab-content .charsheet .cc-notes textarea {
   width: 100%;
   min-height: 6rem;
-  background: transparent;
+  background: var(--cc-editable-fill);
   border: 1px solid var(--cc-rule-soft);
   color: var(--cc-ink);
 }
@@ -1779,7 +1798,7 @@ body .ui-dialog .tab-content .charsheet .cc-character .cc-truths-scars-grid {
 body .ui-dialog .tab-content .charsheet .cc-character .cc-truths-scars-grid .cc-truth,
 body .ui-dialog .tab-content .charsheet .cc-character .cc-truths-scars-grid .cc-scar {
   width: 100%;
-  background: transparent;
+  background: var(--cc-editable-fill);
   border: none;
   border-bottom: 1px solid var(--cc-rule);
   color: var(--cc-ink);
@@ -1973,7 +1992,7 @@ body .ui-dialog .tab-content .charsheet .cc-character .cc-injuries {
   width: 100%;
   flex: 1;
   min-height: 4rem;
-  background: transparent;
+  background: var(--cc-editable-fill);
   border: 1px solid var(--cc-rule-soft);
   color: var(--cc-ink);
 }
@@ -2182,6 +2201,9 @@ body .ui-dialog .tab-content .charsheet .cc-character .cc-rep-talents textarea {
   line-height: 1.2;
   padding: 0.15rem 0.3rem;
 }
+body .ui-dialog .tab-content .charsheet .cc-character .cc-rep-talents input[list] {
+  padding-right: 1.3rem;
+}
 body .ui-dialog .tab-content .charsheet .cc-character .cc-rep-talents .cc-talent-keywords,
 body .ui-dialog .tab-content .charsheet .cc-character .cc-rep-talents .cc-talent-requirements,
 body .ui-dialog .tab-content .charsheet .cc-character .cc-rep-talents .cc-talent-description {
@@ -2243,7 +2265,7 @@ body {
   opacity: 0.6;
 }
 .cc-character .cc-build-css::after {
-  content: "CSS build: 2026-10-02 05:56:05 UTC";
+  content: "CSS build: 2026-10-02 06:07:43 UTC";
 }
 .cc-character .cc-languages textarea {
   min-height: 4rem;
@@ -2285,6 +2307,11 @@ body {
 }
 .cc-spells .cc-spell-name-row select {
   flex: 1 1 auto;
+  background-color: var(--cc-editable-fill);
+  border: 1px solid var(--cc-rule);
+  border-radius: 2px;
+  color: var(--cc-ink);
+  font-family: var(--cc-body-font);
 }
 .cc-spells .cc-spell-cast {
   display: inline-flex;
@@ -2355,7 +2382,7 @@ body {
 .cc-notes textarea {
   width: 100%;
   min-height: 6rem;
-  background: transparent;
+  background: var(--cc-editable-fill);
   border: 1px solid var(--cc-rule-soft);
   color: var(--cc-ink);
 }
@@ -2371,7 +2398,7 @@ body {
 .cc-character .cc-truths-scars-grid .cc-truth,
 .cc-character .cc-truths-scars-grid .cc-scar {
   width: 100%;
-  background: transparent;
+  background: var(--cc-editable-fill);
   border: none;
   border-bottom: 1px solid var(--cc-rule);
   color: var(--cc-ink);
@@ -2566,7 +2593,7 @@ body {
   width: 100%;
   flex: 1;
   min-height: 4rem;
-  background: transparent;
+  background: var(--cc-editable-fill);
   border: 1px solid var(--cc-rule-soft);
   color: var(--cc-ink);
 }
@@ -2779,6 +2806,9 @@ body {
 .cc-character .cc-rep-talents textarea {
   line-height: 1.2;
   padding: 0.15rem 0.3rem;
+}
+.cc-character .cc-rep-talents input[list] {
+  padding-right: 1.3rem;
 }
 .cc-character .cc-rep-talents .cc-talent-keywords,
 .cc-character .cc-rep-talents .cc-talent-requirements,

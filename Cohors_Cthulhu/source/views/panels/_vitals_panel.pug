@@ -413,7 +413,10 @@
       width: 100%;
       flex: 1;
       min-height: 4rem;
-      background: transparent;
+      // Same light editable-field fill as .cc-field's own :read-write
+      // inputs (scss/_index.scss) - this textarea isn't wrapped in a
+      // .cc-field so it doesn't inherit that rule automatically.
+      background: var(--cc-editable-fill);
       border: 1px solid var(--cc-rule-soft);
       color: var(--cc-ink);
     }

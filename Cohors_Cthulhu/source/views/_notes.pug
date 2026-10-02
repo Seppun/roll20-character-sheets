@@ -44,8 +44,11 @@
       // underline) at full strength (--cc-rule) - every field here now
       // gets the same box, fainter (--cc-rule-soft, the same softened
       // tone used for repeating-row dividers), Belongings included, for a
-      // consistent look across the whole page.
-      background: transparent;
+      // consistent look across the whole page. background matches the
+      // same light editable-field fill as .cc-field's own :read-write
+      // inputs (scss/_index.scss) - these textareas aren't wrapped in a
+      // .cc-field so they don't inherit that rule automatically.
+      background: var(--cc-editable-fill);
       border: 1px solid var(--cc-rule-soft);
       color: var(--cc-ink);
     }
