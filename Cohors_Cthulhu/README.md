@@ -175,11 +175,14 @@ play Roll20 character:
    !ccimport handout|<Handout Name>
    ```
    You'll get a whispered summary naming every NPC created and anything
-   worth a second look - most commonly a Talent given by name only, whose
-   Keywords/Requirements/Description need one visit to the Talents panel to
-   populate (see `ccimport.js`'s own top comment for why, and give
-   `description` directly in the JSON to skip that step for an NPC-only
-   ability).
+   worth a second look. The first time you actually **open** an imported
+   character's sheet in Roll20, it also self-corrects: Base Armour/Total
+   Armor/Courage/Max Stress recompute for real (rather than the script's own
+   best-effort copy made at import time), and any Talent given by name only
+   gets its Keywords/Requirements/Description filled in automatically - see
+   `ccRecomputeOnOpen` in `source/views/_global_sheetworker.pug` for the
+   mechanism. Give `description` directly in the JSON for an NPC-only
+   ability not on this game's talent list.
 
 Importing today creates a full PC-style character - Stress/Fatigue/Fortune
 trackers just sit at their given or default values, since this sheet

@@ -2128,6 +2128,54 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
     }
   };
   
+  // Recomputes this sheet's own calculated fields (calcBaseArmour/
+  // calcCourage/calcTotalArmor/calcStressMaxBase/calcStressMax, all defined
+  // in views/panels/_vitals_panel.pug, included after this file) and
+  // backfills Keywords/Requirements/Description for any Talent row whose
+  // Name matches a known talent (ccTalentProfiles, views/panels/
+  // _talents_panel.pug, included later still) but whose Description is
+  // still empty. Registered below with {type: ['opener']}, which k-scaffold
+  // runs unconditionally on EVERY sheet open - see node_modules/@kurohyou/
+  // k-scaffold/lib/scripts/accessSheet.js's updateSheet/openHandlers -
+  // unlike a change-triggered calculation, which only ever fires for a real
+  // edit made through this sheet's own UI. That gap is exactly what let a
+  // character built by api-scripts/ccimport.js (which computes its own
+  // best-effort copy of these same formulas at import time, since the API
+  // sandbox can't call into this file at all) carry stale or missing
+  // derived values until now - this opener is what reconciles that copy
+  // against the real formulas the first time a GM actually opens the
+  // imported character's sheet. It also catches a bulk attribute edit made
+  // from Roll20's own character-sheet-adjacent tools, for the same reason.
+  //
+  // Referencing calcBaseArmour/calcTotalArmor/calcCourage/
+  // calcStressMaxBase/calcStressMax/ccTalentProfiles here, even though
+  // they're all declared later in the final concatenated script (this file
+  // is included first), is safe: this function's BODY doesn't run until
+  // k-scaffold actually calls it on a real sheet-open event, by which point
+  // every module-level function and constant in the whole sheet has already
+  // been declared once, top to bottom, at script load.
+  const ccRecomputeOnOpen = ({attributes, sections}) => {
+    attributes.base_armour = calcBaseArmour({attributes});
+    attributes.total_armor = calcTotalArmor({attributes});
+    attributes.courage = calcCourage({attributes});
+    attributes.stress_max_base = calcStressMaxBase({attributes});
+    attributes.stress_max = calcStressMax({attributes});
+  
+    (sections.repeating_talent || []).forEach((rowId) => {
+      const prefix = `repeating_talent_${rowId}_`;
+      const profile = ccTalentProfiles[attributes[`${prefix}name`]];
+      // Only fills in a row that looks unresolved (no Description yet) -
+      // never overwrites a Description a player/GM already customized,
+      // same "don't clobber an existing value" caution as
+      // ccApplyTalentPreset's own blank-"Custom / Other"-value check.
+      if (!profile || attributes[`${prefix}description`]) { return; }
+      Object.keys(profile).forEach((field) => {
+        attributes[`${prefix}${field}`] = profile[field];
+      });
+    });
+  };
+  k.registerFuncs({ccRecomputeOnOpen}, {type: ['opener']});
+  
   
   // Traditional casters use Insight, Research casters use Reason,
   // Dabblers use Will - fixed by spellcasting type, not a free choice.

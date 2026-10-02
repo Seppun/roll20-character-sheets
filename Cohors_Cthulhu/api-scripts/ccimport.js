@@ -30,25 +30,23 @@
 // _vitals_panel.pug) run as `on('change:<attr>', ...)` listeners, which
 // Roll20 only fires for a REAL change to an EXISTING attribute - never for
 // `createObj('attribute', ...)`, which has no "previous value" to change
-// from. Confirmed for this sheet specifically: k-scaffold's own
-// `sheet:opened` handler (node_modules/@kurohyou/k-scaffold/lib/scripts/
-// accessSheet.js) only replays registered initial-setup/open-handler hooks,
-// and this sheet registers none, so simply opening a freshly-imported
-// character's sheet in the Roll20 UI won't recompute these either. Each
-// formula below is duplicated from its sheet-worker original by hand - if
-// those formulas ever change, update both places.
+// from. This script's own copy is still the right thing to compute at
+// import time (nothing else will, before the sheet is ever opened), but
+// the sheet itself now reconciles it: views/_global_sheetworker.pug
+// registers ccRecomputeOnOpen as a k-scaffold "opener" (runs
+// unconditionally on every sheet open, including the first time a GM opens
+// a freshly-imported NPC), which recalculates these same fields for real
+// and also backfills a by-name Talent's Keywords/Requirements/Description
+// (see that function's own comment for the full mechanism). The copy here
+// is a same-sandbox best-effort stand-in until that happens, not the only
+// place these get computed - if those formulas ever change, update both
+// places.
 //
-// KNOWN LIMITATION - Talents referenced by name only (no `description` in
-// the JSON) get just their Name field filled in. This sheet's own
-// `ccApplyTalentPreset` (source/views/panels/_talents_panel.pug) is what
-// fills in Keywords/Requirements/Description from a known talent name, and
-// it has the same "only fires on a real UI change" limitation as the calc
-// functions above - but unlike those, its ~159-entry lookup table
-// (source/data/talents.json) is too large to duplicate here by hand without
-// real risk of drifting out of sync. Re-selecting that talent's Name field
-// on the sheet once (same datalist as a PC sheet) fills in the rest: no
-// mechanics are missing, just reference text. Give `description` directly
-// in the JSON to skip this entirely for an NPC-only ability.
+// Talents referenced by name only (no `description` in the JSON) get just
+// their Name field filled in here - Keywords/Requirements/Description
+// populate automatically the next time the sheet is opened (via
+// ccRecomputeOnOpen above), no manual step needed. Give `description`
+// directly in the JSON instead for an NPC-only ability not in that list.
 //
 // Archetype is free text here (see FORMAT.md) but the PC sheet's own
 // Archetype field is a fixed <select> - a value that isn't one of its six
@@ -202,9 +200,11 @@ on('ready', () => {
       const fields = {name: talent.name};
       if (talent.description) {
         fields.description = talent.description;
-      } else {
-        warnings.push(`talent "${talent.name}" - Keywords/Requirements/Description need a UI touch (see this script's top comment) or a "description" in the JSON`);
       }
+      // If description is omitted, Keywords/Requirements/Description
+      // auto-fill the next time this character's sheet is opened (see
+      // ccRecomputeOnOpen in views/_global_sheetworker.pug) - no warning
+      // needed, this is the normal path for a known talent name.
       createRepeatingRow(id, 'talent', fields);
     });
 
