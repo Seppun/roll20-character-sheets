@@ -140,15 +140,30 @@
   }
 
   // Custom dropdown-arrow chevron for every <select> on the sheet, plus
-  // Talents' text+datalist combobox (input[list] - see
-  // panels/_talents_panel.pug) so it reads as a real dropdown too despite
-  // being a text input underneath. appearance: none strips each browser's
-  // own (inconsistent, sometimes invisible against this sheet's theme)
-  // native arrow/list-button first so this one's the only indicator shown.
-  // Drawn as two small rotated gradient edges (a classic CSS-only chevron)
-  // rather than an image file - see the AI-art-policy note on
-  // --cc-stone-light in scss/_variables.scss for why this sheet avoids
-  // image assets where plain CSS can do the job.
+  // every text+datalist combobox (input[list] - Talents/Weapons/Armor's
+  // Name fields) so it reads as a real dropdown too despite being a text
+  // input underneath. Drawn as two small rotated gradient edges (a classic
+  // CSS-only chevron) rather than an image file - see the AI-art-policy
+  // note on --cc-stone-light in scss/_variables.scss for why this sheet
+  // avoids image assets where plain CSS can do the job.
+  //
+  // Getting a single clean chevron (no browser-native arrow alongside it)
+  // took two different fixes for the two element types, found by testing
+  // each property in isolation directly against this sheet's compiled
+  // output (an input[list]'s native arrow doesn't behave like a <select>'s
+  // - see lessons_learned.md if this ever needs revisiting):
+  //  - <select>: appearance: none strips Chromium's native arrow, leaving
+  //    this chevron as the only one shown.
+  //  - input[list]: appearance: none here does NOT remove any native
+  //    chrome (a plain text input has none to remove), but a datalist-
+  //    backed text input still gets its own separate native "show
+  //    suggestions" arrow, drawn via the ::-webkit-calendar-picker-
+  //    indicator pseudo-element (the same one behind a <input type=date>'s
+  //    icon) rather than controlled by `appearance` at all - only
+  //    explicitly hiding that pseudo-element removes it, and it takes
+  //    !important to do so: Chromium applies that pseudo-element's own
+  //    `display` from a shadow-tree UA style that otherwise wins over an
+  //    author rule of equal specificity regardless of source order.
   select,
   input[list] {
     appearance: none;
@@ -161,6 +176,10 @@
     background-size: 5px 5px, 5px 5px;
     background-repeat: no-repeat;
     padding-right: 1.3rem;
+  }
+
+  input[list]::-webkit-calendar-picker-indicator {
+    display: none !important;
   }
 
   .cc-panel {

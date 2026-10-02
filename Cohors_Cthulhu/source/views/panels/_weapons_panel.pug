@@ -53,6 +53,7 @@
   .cc-rep-table.cc-rep-weapons
     .cc-rep-header
       span
+      span
       span Name
       span Focus
       span Reach or Range
@@ -68,71 +69,60 @@
         class: 'cc-weapon-roll roller',
         trigger: {triggeredFuncs: ['initiateWeaponRoll']}
       })
-      //- Options are written out individually rather than generated
-      //- from ccWeaponProfiles via an `each` loop - see the comment
-      //- above that object for why (a k-scaffold +select/+option
-      //- mixin bug breaks per-iteration option text in a loop).
-      +select({
-        name: 'name',
+      //- A text input paired with a <datalist>, not a fixed +select -
+      //- NPCs often carry a weapon that isn't on this rulebook list at all
+      //- (claws, horns, an improvised object) but still uses these same
+      //- mechanical fields, so the Name field needs to accept free text
+      //- too. Same combobox pattern as Talents' own Name field (see
+      //- _talents_panel.pug's comment for the full explanation, including
+      //- why a separate apply button exists alongside the field's own
+      //- blur-triggered preset-fill) - the datalist itself is declared
+      //- once, below, shared by every row. Options are listed individually
+      //- rather than generated from ccWeaponProfiles via an `each` loop -
+      //- see the comment above that object for why (a k-scaffold mixin bug
+      //- breaks per-iteration option text in a loop); the same caveat
+      //- applies to datalist option text, so this stays consistent with it.
+      +action({
+        name: 'weapon apply',
+        class: 'cc-weapon-apply',
         trigger: {triggeredFuncs: ['ccApplyWeaponPreset']}
       })
-        +option({value: ''})
-          | Custom / Other
-        +option({value: 'Axe (Melee)'})
-          | Axe (Melee)
-        +option({value: 'Club'})
-          | Club
-        +option({value: 'Cudgel'})
-          | Cudgel
-        +option({value: 'Dagger'})
-          | Dagger
-        +option({value: 'Dolabra'})
-          | Dolabra
-        +option({value: 'Javelin (Melee)'})
-          | Javelin (Melee)
-        +option({value: 'Spear'})
-          | Spear
-        +option({value: 'Staff'})
-          | Staff
-        +option({value: 'Sword'})
-          | Sword
-        +option({value: 'Sword, Falx'})
-          | Sword, Falx
-        +option({value: 'Sword, Gladius'})
-          | Sword, Gladius
-        +option({value: 'Sword, Long'})
-          | Sword, Long
-        +option({value: 'Sword, Long, Spatha'})
-          | Sword, Long, Spatha
-        +option({value: 'Unarmed Strike'})
-          | Unarmed Strike
-        +option({value: 'War Axe'})
-          | War Axe
-        +option({value: 'Small Shield'})
-          | Small Shield
-        +option({value: 'Large Shield'})
-          | Large Shield
-        +option({value: 'Arcuballista'})
-          | Arcuballista
-        +option({value: 'Axe (Thrown)'})
-          | Axe (Thrown)
-        +option({value: 'Bow'})
-          | Bow
-        +option({value: 'Bow, Recurve'})
-          | Bow, Recurve
-        +option({value: 'Javelin (Thrown)'})
-          | Javelin (Thrown)
-        +option({value: 'Pilum'})
-          | Pilum
-        +option({value: 'Plumbata'})
-          | Plumbata
-        +option({value: 'Sling'})
-          | Sling
+      +text({
+        name: 'name',
+        list: 'cc-weapon-options',
+        trigger: {triggeredFuncs: ['ccApplyWeaponPreset']}
+      })
       +text({name: 'focus'})
       +text({name: 'reach range'})
       +text({name: 'damage effects'})
       +text({name: 'size'})
       +text({name: 'qualities'})
+  datalist#cc-weapon-options
+    option(value='Axe (Melee)')
+    option(value='Club')
+    option(value='Cudgel')
+    option(value='Dagger')
+    option(value='Dolabra')
+    option(value='Javelin (Melee)')
+    option(value='Spear')
+    option(value='Staff')
+    option(value='Sword')
+    option(value='Sword, Falx')
+    option(value='Sword, Gladius')
+    option(value='Sword, Long')
+    option(value='Sword, Long, Spatha')
+    option(value='Unarmed Strike')
+    option(value='War Axe')
+    option(value='Small Shield')
+    option(value='Large Shield')
+    option(value='Arcuballista')
+    option(value='Axe (Thrown)')
+    option(value='Bow')
+    option(value='Bow, Recurve')
+    option(value='Javelin (Thrown)')
+    option(value='Pilum')
+    option(value='Plumbata')
+    option(value='Sling')
 
 +scss.
   .cc-character {
@@ -140,8 +130,30 @@
       .cc-rep-header,
       fieldset,
       .repcontainer .repitem {
-        grid-template-columns: 1.6rem 1fr 1fr 1fr 2fr 0.6fr 1.4fr;
+        grid-template-columns: 1.6rem 1.6rem 1fr 1fr 1fr 2fr 0.6fr 1.4fr;
         align-items: center;
+      }
+
+      // Same plain-icon-button look as .cc-talent-apply
+      // (_talents_panel.pug) - see its own comment for why this exists
+      // alongside the Name field's own blur-triggered preset-fill.
+      .cc-weapon-apply {
+        background: none;
+        border: none;
+        padding: 0;
+        color: inherit;
+        font-size: 1rem;
+        cursor: pointer;
+        justify-self: center;
+
+        &:before {
+          content: '\21BB';
+          opacity: 0.8;
+        }
+
+        &:hover:before {
+          opacity: 1;
+        }
       }
 
       // Same carved-stone-block look as .cc-focus-roll (see --cc-stone-*

@@ -163,6 +163,19 @@ on('ready', () => {
     // field sets for a character created through the Roll20 UI.
     setAttr(id, 'sheet_version', '0.1.0');
 
+    // Drives the Character tab's Cannon Fodder/NPC panel show-hide (see
+    // source/views/_character.pug) - anything other than the one
+    // recognized value falls back to "npc" (the full sheet), same default
+    // the schema itself documents, rather than failing the import or
+    // leaving the attribute unset (an unset character_type also renders as
+    // the full sheet, since the toggle's "pc" radio is the only one with
+    // `checked` by default, but setting it explicitly here keeps an
+    // imported NPC's stored value self-documenting).
+    if (npc.character_type !== undefined && npc.character_type !== 'cannon_fodder' && npc.character_type !== 'npc') {
+      warnings.push(`unknown character_type "${npc.character_type}" - defaulted to "npc"`);
+    }
+    setAttr(id, 'character_type', npc.character_type === 'cannon_fodder' ? 'cannon_fodder' : 'npc');
+
     ['archetype', 'culture', 'caste', 'wealth', 'specialization', 'background', 'characteristic', 'injuries', 'traits'].forEach((field) => {
       setAttr(id, field, npc[field]);
     });

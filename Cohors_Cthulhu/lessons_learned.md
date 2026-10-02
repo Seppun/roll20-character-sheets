@@ -459,6 +459,42 @@ suggestion - add an explicit "apply" button (a real click, which always
 fires immediately) as the instant-feedback alternative, rather than
 relying on the field's own trigger alone.
 
+## `<select>` vs. `<input list>` need different chevron-suppression CSS
+
+Both render a dropdown-style field with the sheet's own CSS chevron
+(`_index.scss`'s `select, input[list] { background-image: ... }` gradient
+trick), but Chromium strips their *native* chrome differently, and
+treating them the same produces a double-chevron (the sheet's drawn one
+plus a native one underneath):
+
+- `<select>` needs `appearance: none` to remove its native arrow - without
+  it, two chevrons overlap.
+- `<input list>` (the text+datalist combobox pattern, see the event-quirks
+  entry above) has no native arrow of its own to strip via `appearance` -
+  its "show suggestions" affordance is a separate pseudo-element,
+  `::-webkit-calendar-picker-indicator` (the same one `<input type=date>`
+  uses). `appearance: none` on an `input[list]` does nothing to it; it has
+  to be hidden explicitly with its own rule, **and that rule needs
+  `!important`**
+  (`input[list]::-webkit-calendar-picker-indicator { display: none !important; }`) -
+  without it, the indicator stayed visible (confirmed via
+  `getComputedStyle(el, '::-webkit-calendar-picker-indicator')` reporting
+  `display: block` even with the plain, non-`!important` rule compiled
+  and present in the stylesheet). Chromium applies this pseudo-element's
+  `display` from a shadow-tree user-agent style that wins over an
+  equal-specificity author rule regardless of source order - normal CSS
+  cascade/specificity reasoning about "my rule comes later, so it should
+  win" does not apply to it.
+
+Both rules are needed together - `appearance: none` still belongs on
+`input[list]` too (it suppresses other native text-input chrome), it's
+just not sufficient by itself. This was confirmed by injecting CSS at
+runtime against the actual compiled sheet (`page.addStyleTag()` in a
+Playwright script) rather than an isolated test page - a simplified
+standalone `<input list>` test page gave misleading results, likely
+because it didn't reproduce the real field's box-model/width/border
+context closely enough.
+
 ## Native HTML radios vs. Roll20's own attribute-group binding
 
 A named radio group bound to one attribute (the standard way Roll20

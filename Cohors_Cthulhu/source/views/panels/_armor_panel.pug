@@ -16,6 +16,7 @@
   .cc-banner Armor
   .cc-rep-table.cc-rep-armor
     .cc-rep-header
+      span
       span Name
       span Resistance
       span Qualities
@@ -30,25 +31,32 @@
     //- deleting the row it came from left the old total in place until
     //- something else changed.
     +fieldset({name: 'armor', trigger: {affects: ['total_armor']}})
-      //- Options written out individually, not via an `each` loop -
-      //- see the comment above ccWeaponProfiles (views/panels/
-      //- _weapons_panel.pug) for why.
-      +select({
-        name: 'name',
+      //- A text input paired with a <datalist>, not a fixed +select - see
+      //- the matching comment in views/panels/_weapons_panel.pug for why
+      //- (NPCs often have armor - natural hide, chitin plating - that
+      //- isn't on this rulebook list but still uses these same fields).
+      //- The apply button exists for the same reason Talents'/Weapons'
+      //- does: a datalist pick alone doesn't reliably fire the field's own
+      //- blur-triggered preset-fill. Options written out individually, not
+      //- via an `each` loop - see the comment above ccWeaponProfiles
+      //- (_weapons_panel.pug) for why.
+      +action({
+        name: 'armor apply',
+        class: 'cc-armor-apply',
         trigger: {triggeredFuncs: ['ccApplyArmorPreset']}
       })
-        +option({value: ''})
-          | Custom / Other
-        +option({value: 'Chainmail / Lorica Hamata'})
-          | Chainmail / Lorica Hamata
-        +option({value: 'Leather Armor'})
-          | Leather Armor
-        +option({value: 'Lorica Segmentata'})
-          | Lorica Segmentata
-        +option({value: 'Lorica Squamata'})
-          | Lorica Squamata
+      +text({
+        name: 'name',
+        list: 'cc-armor-options',
+        trigger: {triggeredFuncs: ['ccApplyArmorPreset']}
+      })
       +number({name: 'resistance', trigger: {affects: ['total_armor']}})
       +text({name: 'qualities'})
+  datalist#cc-armor-options
+    option(value='Chainmail / Lorica Hamata')
+    option(value='Leather Armor')
+    option(value='Lorica Segmentata')
+    option(value='Lorica Squamata')
 
 +scss.
   .cc-character {
@@ -56,7 +64,30 @@
       .cc-rep-header,
       fieldset,
       .repcontainer .repitem {
-        grid-template-columns: 1.5fr 1fr 2.5fr;
+        grid-template-columns: 1.6rem 1.5fr 1fr 2.5fr;
+        align-items: center;
+      }
+
+      // Same plain-icon-button look as .cc-talent-apply
+      // (_talents_panel.pug) - see its own comment for why this exists
+      // alongside the Name field's own blur-triggered preset-fill.
+      .cc-armor-apply {
+        background: none;
+        border: none;
+        padding: 0;
+        color: inherit;
+        font-size: 1rem;
+        cursor: pointer;
+        justify-self: center;
+
+        &:before {
+          content: '\21BB';
+          opacity: 0.8;
+        }
+
+        &:hover:before {
+          opacity: 1;
+        }
       }
     }
   }

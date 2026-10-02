@@ -29,10 +29,41 @@ include ./_global_sheetworker.pug
   .cc-page.cc-character
 
     .cc-banner Cohors Cthulhu
-    .cc-field-group
+    //- Lets a GM render this same sheet as a lean combat-only NPC instead
+    //- of the full character layout below, without a second sheet (Roll20
+    //- only supports one Custom Sheet HTML/CSS pair per game). No stored
+    //- value (every character that already exists) behaves exactly like
+    //- "pc" - every panel below shows - so this is fully backward
+    //- compatible. "npc" (a recurring/important NPC) is intentionally
+    //- identical to "pc": it exists so api-scripts/ccimport.js and a GM
+    //- glancing at the sheet both know which kind of character this is,
+    //- not because anything renders differently for it today. Only
+    //- "cannon_fodder" actually hides anything - see the cc-identity-extra/
+    //- cc-identity-flavor/cc-truths-scars/cc-languages/cc-experience rules
+    //- in this file's own +scss. block below. Same hidden-radio-plus-
+    //- styled-label pattern as .cc-fatigue-ignore-toggle (panels/
+    //- _vitals_panel.pug) and .cc-truths-scars-toggle (panels/
+    //- _truths_scars_panel.pug), just a 3-way radio group here instead of
+    //- a single checkbox. The radios themselves are direct children of
+    //- .cc-page.cc-character (NOT nested inside .cc-character-type below) -
+    //- they have to be true siblings of .cc-identity-extra/.cc-truths-scars/
+    //- etc. for the general sibling selector in the +scss. block to reach
+    //- them at all; only their labels live inside .cc-character-type, for
+    //- the segmented-control layout.
+    +radio({name: 'character_type', value: 'pc', checked: ''}).cc-character-type-input#cc-character-type-pc
+    +radio({name: 'character_type', value: 'cannon_fodder'}).cc-character-type-input#cc-character-type-fodder
+    +radio({name: 'character_type', value: 'npc'}).cc-character-type-input#cc-character-type-npc
+    .cc-character-type
+      label.cc-character-type-label(for='cc-character-type-pc') Player Character
+      label.cc-character-type-label(for='cc-character-type-fodder') Cannon Fodder
+      label.cc-character-type-label(for='cc-character-type-npc') NPC
+    .cc-field-group.cc-identity-core
       .cc-field
         span Name & Pronoun
         +text({name: 'name pronoun'})
+    //- Cut for Cannon Fodder (see the +scss. block below) - combat extras
+    //- don't need a Culture/Caste/Wealth line, just a name.
+    .cc-field-group.cc-identity-extra
       .cc-field
         span Culture
         +text({name: 'culture'})
@@ -42,7 +73,9 @@ include ./_global_sheetworker.pug
       .cc-field
         span Wealth
         +text({name: 'wealth'})
-    .cc-field-group
+    //- Also cut for Cannon Fodder - this whole row is background/flavor,
+    //- not combat mechanics.
+    .cc-field-group.cc-identity-flavor
       .cc-field
         span Archetype
         +select({name: 'archetype'})
@@ -111,5 +144,81 @@ include ./_global_sheetworker.pug
 
     .cc-languages textarea {
       min-height: 4rem;
+    }
+
+    .cc-character-type {
+      display: flex;
+      margin-bottom: 0.4rem;
+    }
+
+    // Hidden the same way as .cc-stress-max-marker/.cc-truths-scars-
+    // checkbox elsewhere on this sheet - still real, toggleable radios (so
+    // Roll20 keeps their value in sync normally), just never seen directly.
+    // The labels right after them are the only thing a GM actually sees
+    // and clicks.
+    .cc-character-type-input {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .cc-character-type-label {
+      flex: 1 1 auto;
+      text-align: center;
+      background: var(--cc-editable-fill);
+      color: var(--cc-ink);
+      border: 1px solid var(--cc-rule);
+      padding: 0.2rem 0.5rem;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      cursor: pointer;
+
+      // Segmented-control look - shared borders between adjacent labels
+      // instead of each one fully boxed, rounded corners only on the two
+      // outer ends.
+      & + & {
+        border-left: none;
+      }
+
+      &:first-of-type {
+        border-radius: 4px 0 0 4px;
+      }
+
+      &:last-of-type {
+        border-radius: 0 4px 4px 0;
+      }
+    }
+
+    // Reaches each label the same way the panel-hiding rules below reach
+    // .cc-languages/.cc-experience - the label isn't a direct sibling of
+    // its radio (it's nested inside .cc-character-type), so this needs the
+    // sibling-then-descendant form, not a bare sibling selector.
+    #cc-character-type-pc:checked ~ .cc-character-type label[for='cc-character-type-pc'],
+    #cc-character-type-fodder:checked ~ .cc-character-type label[for='cc-character-type-fodder'],
+    #cc-character-type-npc:checked ~ .cc-character-type label[for='cc-character-type-npc'] {
+      background: var(--cc-banner);
+      color: var(--cc-banner-text);
+      border-color: var(--cc-banner);
+    }
+
+    // Cannon Fodder trims this page down to combat essentials (Vitals/
+    // Attributes/Skills/Weapons/Armor/Talents stay) - everything here is
+    // background/flavor/progression a disposable combat extra doesn't
+    // need. .cc-truths-scars/.cc-languages/.cc-experience already carry
+    // their own distinguishing classes (used elsewhere for their own
+    // styling) - .cc-identity-extra/.cc-identity-flavor are new, added
+    // purely so this rule has something to target. Reaches .cc-languages/
+    // .cc-experience via their shared .cc-field-group parent since neither
+    // is a direct sibling of the radio (both are nested inside that one
+    // group) - the general sibling selector still works for a descendant
+    // of a later sibling, just not for the sibling itself.
+    #cc-character-type-fodder:checked ~ .cc-identity-extra,
+    #cc-character-type-fodder:checked ~ .cc-identity-flavor,
+    #cc-character-type-fodder:checked ~ .cc-truths-scars,
+    #cc-character-type-fodder:checked ~ .cc-field-group .cc-languages,
+    #cc-character-type-fodder:checked ~ .cc-field-group .cc-experience {
+      display: none;
     }
   }

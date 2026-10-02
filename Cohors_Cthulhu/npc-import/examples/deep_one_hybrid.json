@@ -1,5 +1,6 @@
 {
   "name": "Deep One Hybrid",
+  "character_type": "npc",
   "archetype": "Mythos creature",
   "attributes": {"agility": 9, "brawn": 12, "coordination": 9, "gravitas": 7, "insight": 8, "reason": 6, "will": 10},
   "skills": {
@@ -14,10 +15,10 @@
     }
   ],
   "weapons": [
-    {"name": "Unarmed Strike", "damage_effects": "3, Vicious", "qualities": "Subtle"}
+    {"name": "Claws", "damage_effects": "3, Vicious", "qualities": "Subtle"}
   ],
   "armor": [
-    {"name": "", "resistance": 1, "qualities": "Innate hide, not worn"}
+    {"name": "Webbed Hide", "resistance": 1, "qualities": "Innate hide, not worn"}
   ],
   "traits": "Bulging eyes, webbed clawed hands, a faint fishy reek that lingers in any room it's stood in.",
   "notes": "Toughened-tier. Vulnerable to fire; will not willingly fight far from open water."

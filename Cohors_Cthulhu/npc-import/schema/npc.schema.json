@@ -12,6 +12,12 @@
       "minLength": 1,
       "description": "The NPC's name - becomes the Roll20 character's name."
     },
+    "character_type": {
+      "type": "string",
+      "enum": ["cannon_fodder", "npc"],
+      "default": "npc",
+      "description": "Which of the sheet's two NPC modes this is. \"cannon_fodder\" is for disposable combat extras (ghouls, legionaries, a robber) - the sheet shows only Name, Vitals, Attributes, Skills, Weapons, Armor and Talents, hiding Culture/Caste/Wealth, Archetype/Specialization/Background/Characteristic, Truths & Scars, Languages and Experience. \"npc\" (the default when this field is omitted) is a recurring/important character and gets the full sheet, identical to a PC. Spellcasting and Notes stay available either way."
+    },
     "archetype": {"type": "string", "description": "Free text, matches the PC sheet's own Archetype field - an NPC's archetype rarely matches the fixed PC dropdown list exactly, so this is plain text here."},
     "culture": {"type": "string"},
     "caste": {"type": "string"},

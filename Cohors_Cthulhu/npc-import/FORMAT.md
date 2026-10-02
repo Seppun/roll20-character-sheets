@@ -31,6 +31,24 @@ else defaults to empty/zero. See `examples/` for fuller NPCs.
 
 ## Fields
 
+### Character type (optional, default `"npc"`)
+
+```json
+"character_type": "cannon_fodder"
+```
+
+Which of the sheet's two NPC modes this is. `"cannon_fodder"` is for
+disposable combat extras (ghouls, legionaries, a robber, a cult priest) -
+the sheet shows only Name, Vitals, Attributes, Skills, Weapons, Armor and
+Talents, hiding Culture/Caste/Wealth, Archetype/Specialization/Background/
+Characteristic, Truths & Scars, Languages and Experience (Spellcasting and
+Notes stay available either way, for a caster like the cult priest).
+`"npc"` (the default when this field is omitted) is a recurring/important
+character and gets the full sheet, identical to a PC. Importing never
+leaves fields blank just because they're hidden in a mode - fill in
+whatever the NPC actually has; the mode only controls what the sheet
+*shows*.
+
 ### Identity
 
 `archetype`, `culture`, `caste`, `wealth`, `specialization`, `background`,
@@ -108,15 +126,16 @@ signature power).
 "armor": [{"name": "Leather Armor"}]
 ```
 
-A `name` matching this sheet's own Weapons/Armor dropdowns
-(`source/views/panels/_weapons_panel.pug`, `_armor_panel.pug`) auto-fills
-the rest of that row, same as picking it on a PC sheet - override any field
-alongside `name` for a house-ruled variant, or give a name that isn't in
-those lists plus every field by hand for something fully custom. An empty
-`"name": ""` (the PC sheet's own "Custom / Other" option) plus hand-set
-fields works well for an innate attack or natural armor that isn't really a
-named "weapon" (see `deep_one_hybrid.json`'s unarmed-strike-as-claws and
-innate-hide-as-armor for an example of both). Known names:
+A `name` matching this sheet's own Weapons/Armor Name fields
+(`source/views/panels/_weapons_panel.pug`, `_armor_panel.pug` - a free-text
+field with a known-names suggestion list, not a fixed dropdown) auto-fills
+the rest of that row, same as picking it from the suggestion list on a PC
+sheet - override any field alongside `name` for a house-ruled variant. Any
+other `name` (Claws, Horns, Improvised Club) is just a label on a fully
+custom weapon or armor - fill in every other field by hand. This is the
+normal way to give an NPC an innate attack or natural armor that isn't
+really a named "weapon" from the rulebook list (see `deep_one_hybrid.json`'s
+claws and natural hide for an example of both). Known names:
 
 - **Weapons (melee)**: Axe (Melee), Club, Cudgel, Dagger, Dolabra,
   Javelin (Melee), Spear, Staff, Sword, Sword (Falx), Sword (Gladius),
@@ -139,9 +158,7 @@ matching fields on the sheet.
 
 ## What's deliberately not here yet
 
-No `tier` (Minion/Toughened/Nemesis) field - the sheet doesn't have a
-condensed NPC layout to key off of yet (see the project's NPC-mode plan).
-Importing today just populates the full PC-style sheet; Stress/Fatigue/
-Fortune trackers sit at their given/default values whether or not they'd
-mechanically apply to this NPC's tier. Revisit this format once that layout
-exists.
+No `tier` (Minion/Toughened/Nemesis) field - that's a GM-facing difficulty
+label from the rulebook, not something the sheet renders differently
+(unlike `character_type`, which does change what the sheet shows). Put it
+in `notes` if it's worth recording, as the examples here do.
