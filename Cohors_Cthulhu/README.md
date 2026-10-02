@@ -45,7 +45,9 @@ Belongings).
   roll prompts for Difficulty, Complication range, and how many
   additional d20s to buy, then posts a single chat card with the dice,
   target number, successes, and (for Weapons/Spells) damage or cost
-  rolled in the same message.
+  rolled in the same message. A Weapon's damage is always rolled
+  alongside its attack, but only shown on the card if the attack
+  actually hit - a miss just shows the attack roll.
 - **Stress, Fatigue, and Fortune trackers**: click a box to fill the
   track up to and including it, or click an already-filled box to clear
   the track back down to that box. Click box 1 while it's the only box
@@ -80,14 +82,21 @@ such pool, kept in sync automatically by every roll made from this sheet
 (Attribute/Skill/Focus/Weapon/Spell):
 
 - **Momentum** increases by the Momentum a passed roll generates, and
-  decreases by additional d20s bought (all roll types) or, for spells,
-  Extra Momentum declared spent. Capped at 6 in either direction (2d20
-  RAW: the Momentum pool can never exceed 6), and announcements always
-  report the amount the pool actually changed by, not the amount
-  requested, in case the cap silently absorbed part or all of it.
+  decreases by Extra Momentum declared spent on a spell. Capped at 6 in
+  either direction (2d20 RAW: the Momentum pool can never exceed 6), and
+  announcements always report the amount the pool actually changed by,
+  not the amount requested, in case the cap silently absorbed part or all
+  of it.
+- **Buying additional d20s** (any roll type, up to 2 extra dice) costs 1
+  Momentum for the first one and 3 for the second. If the pool can't
+  cover the full cost, buying the dice is still allowed - whatever the
+  pool comes up short generates an equal amount of Threat instead, since
+  only the API script (not the character sheet) knows the pool's current
+  value at the time the dice are bought.
 - **Threat** increases by the Complications a roll generates (2d20 RAW:
-  each Complication generates 1 point of Threat for the GM). There's no
-  automatic decrease - RAW never has a player spend Threat from their own
+  each Complication generates 1 point of Threat for the GM), plus any
+  shortfall from buying additional d20s above. There's no automatic
+  decrease otherwise - RAW never has a player spend Threat from their own
   sheet, only the GM spends it (buying NPCs extra d20s, directorial
   effects), which happens in narration rather than on this sheet, so
   `!threat-adjust` (GM only) is the only way the pool goes down.
