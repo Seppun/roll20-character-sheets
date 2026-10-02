@@ -1,0 +1,34 @@
+{
+  "name": "Centurion Marcus Aquilinus",
+  "archetype": "Veteran officer",
+  "culture": "Roman",
+  "caste": "Equestrian",
+  "wealth": "Comfortable",
+  "background": "Twenty years in the legions, half of them spent putting down things no official report ever named correctly.",
+  "characteristic": "Unshakeable, quietly superstitious",
+  "attributes": {"agility": 9, "brawn": 11, "coordination": 10, "gravitas": 11, "insight": 9, "reason": 9, "will": 12},
+  "skills": {
+    "fighting": {"ranks": 3, "focuses": ["Melee Weapons", "Unarmed"]},
+    "tactics": {"ranks": 3, "focuses": ["Infantry", "Leadership"]},
+    "observation": {"ranks": 2, "focuses": ["Instincts"]},
+    "resilience": {"ranks": 2, "focuses": ["Discipline"]}
+  },
+  "talents": [
+    {"name": "Unyielding"},
+    {
+      "name": "Seen Worse",
+      "description": "Once per scene, when confronted with a Mythos horror, Centurion Aquilinus may spend 1 Momentum to treat the encounter as a Difficulty 1 Fear test instead of whatever the GM would otherwise set."
+    }
+  ],
+  "weapons": [
+    {"name": "Sword, Gladius"},
+    {"name": "Pilum"}
+  ],
+  "armor": [
+    {"name": "Lorica Segmentata"}
+  ],
+  "fatigue": 0,
+  "stress": 0,
+  "traits": "Speaks in clipped orders even off duty. Touches the amulet under his armor before every fight.",
+  "notes": "Nemesis-tier. Commands a squad of 4-6 Legionary Thug minions (see cultist_thug.json for the minion stat-block shape) in most encounters."
+}

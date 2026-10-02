@@ -1,0 +1,15 @@
+{
+  "name": "Cultist Thug",
+  "archetype": "Minor antagonist",
+  "culture": "Provincial",
+  "attributes": {"agility": 8, "brawn": 10, "coordination": 8, "gravitas": 8, "insight": 7, "reason": 7, "will": 9},
+  "skills": {
+    "fighting": {"ranks": 2, "focuses": ["Melee Weapons"]},
+    "observation": {"ranks": 1}
+  },
+  "weapons": [
+    {"name": "Dagger"}
+  ],
+  "traits": "Jumpy, quick to flee once outnumbered.",
+  "notes": "Minion-tier - use in groups, no individual Stress tracking needed in play."
+}

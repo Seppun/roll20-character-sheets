@@ -137,6 +137,54 @@ Chat commands once installed:
 Both scripts also log every chat message they see to the API console, to
 make debugging from there easier if a pool ever seems out of sync.
 
+## Importing NPCs
+
+Hand-typing a full stat block for every NPC gets old fast, so `npc-import/`
+holds a small pipeline for turning a sourcebook stat block into a ready-to-
+play Roll20 character:
+
+1. **Get the NPC into this game's interchange format** - a JSON object (or
+   array of several) described in full in
+   [`npc-import/FORMAT.md`](./npc-import/FORMAT.md), with worked examples in
+   `npc-import/examples/`. Write it by hand, or pull it out of a sourcebook
+   PDF with either:
+   - **`.claude/skills/import-npc`** - a Claude Code skill. Inside a Claude
+     Code session in this repo, ask it to extract an NPC from a PDF (give it
+     the file and a page range or a name to find) and it writes validated
+     JSON for you to review.
+   - **`npc-import/pdf_to_npc.py`** - a standalone script for batch
+     conversion outside a chat session:
+     ```bash
+     cd Cohors_Cthulhu/npc-import
+     pip install -r requirements.txt
+     export ANTHROPIC_API_KEY=sk-ant-...
+     python pdf_to_npc.py sourcebook.pdf --pages 40-55 --out ./npcs/
+     ```
+   Both read the exact same extraction rules and schema (`npc-import/
+   prompt.md`, `npc-import/schema/npc.schema.json`), so they never disagree
+   on the format - use whichever fits how you're working. Either way, the
+   output is a **draft**: skim it (and the run log /skill summary noting any
+   judgment calls) before importing.
+2. **Install `api-scripts/ccimport.js`** - same install steps as
+   `ccmomentum.js`/`ccthreat.js` above (**Game Settings** > **API Scripts**
+   > **New Script**, paste the whole file in). Independent of those two -
+   runs fine with neither, either, or both also installed.
+3. **Import it**: paste the NPC JSON (one object, or a JSON array for
+   several at once) into a Handout's **GM Notes**, then in chat run:
+   ```
+   !ccimport handout|<Handout Name>
+   ```
+   You'll get a whispered summary naming every NPC created and anything
+   worth a second look - most commonly a Talent given by name only, whose
+   Keywords/Requirements/Description need one visit to the Talents panel to
+   populate (see `ccimport.js`'s own top comment for why, and give
+   `description` directly in the JSON to skip that step for an NPC-only
+   ability).
+
+Importing today creates a full PC-style character - Stress/Fatigue/Fortune
+trackers just sit at their given or default values, since this sheet
+doesn't have a condensed Minion/Toughened/Nemesis layout yet.
+
 ## Building from source
 
 This sheet is built with [k-scaffold](https://kurohyou-studios.github.io/k-scaffold/),

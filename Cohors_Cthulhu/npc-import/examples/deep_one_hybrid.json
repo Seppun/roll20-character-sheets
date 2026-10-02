@@ -1,0 +1,24 @@
+{
+  "name": "Deep One Hybrid",
+  "archetype": "Mythos creature",
+  "attributes": {"agility": 9, "brawn": 12, "coordination": 9, "gravitas": 7, "insight": 8, "reason": 6, "will": 10},
+  "skills": {
+    "athletics": {"ranks": 2, "focuses": ["Swimming"]},
+    "fighting": {"ranks": 3, "focuses": ["Unarmed"]},
+    "resilience": {"ranks": 2, "focuses": ["Fortitude"]}
+  },
+  "talents": [
+    {
+      "name": "Amphibious Hide",
+      "description": "Ignores the Uncomfortable quality of being fully submerged, and treats water as flat ground for movement purposes."
+    }
+  ],
+  "weapons": [
+    {"name": "Unarmed Strike", "damage_effects": "3, Vicious", "qualities": "Subtle"}
+  ],
+  "armor": [
+    {"name": "", "resistance": 1, "qualities": "Innate hide, not worn"}
+  ],
+  "traits": "Bulging eyes, webbed clawed hands, a faint fishy reek that lingers in any room it's stood in.",
+  "notes": "Toughened-tier. Vulnerable to fire; will not willingly fight far from open water."
+}

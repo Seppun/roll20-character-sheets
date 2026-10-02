@@ -1,0 +1,117 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/Seppun/roll20-character-sheets/Cohors_Cthulhu/npc-import/schema/npc.schema.json",
+  "title": "Cohors Cthulhu NPC",
+  "description": "One NPC, ready for import into the Cohors Cthulhu Roll20 sheet via api-scripts/ccimport.js. See ../FORMAT.md for a full walkthrough. A file may contain either a single object matching this schema, or a JSON array of them for a batch of NPCs.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["name", "attributes"],
+  "properties": {
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The NPC's name - becomes the Roll20 character's name."
+    },
+    "archetype": {"type": "string", "description": "Free text, matches the PC sheet's own Archetype field - an NPC's archetype rarely matches the fixed PC dropdown list exactly, so this is plain text here."},
+    "culture": {"type": "string"},
+    "caste": {"type": "string"},
+    "wealth": {"type": "string"},
+    "specialization": {"type": "string"},
+    "background": {"type": "string"},
+    "characteristic": {"type": "string"},
+    "attributes": {
+      "type": "object",
+      "description": "Ratings for all seven Attributes (rulebook scale, typically 6-16). Required even if some are left at a default - this sheet's own derived fields (Base Armour, Courage, Max Stress) are computed from these during import.",
+      "additionalProperties": false,
+      "required": ["agility", "brawn", "coordination", "gravitas", "insight", "reason", "will"],
+      "properties": {
+        "agility": {"type": "integer"},
+        "brawn": {"type": "integer"},
+        "coordination": {"type": "integer"},
+        "gravitas": {"type": "integer"},
+        "insight": {"type": "integer"},
+        "reason": {"type": "integer"},
+        "will": {"type": "integer"}
+      }
+    },
+    "skills": {
+      "type": "object",
+      "description": "Only list skills this NPC actually has ranks in - most NPCs (especially Minions/Toughened) only need a couple. Keys must be one of this game's twelve skill names.",
+      "additionalProperties": false,
+      "properties": {
+        "academia": {"$ref": "#/definitions/skill"},
+        "athletics": {"$ref": "#/definitions/skill"},
+        "crafting": {"$ref": "#/definitions/skill"},
+        "engineering": {"$ref": "#/definitions/skill"},
+        "fighting": {"$ref": "#/definitions/skill"},
+        "medicine": {"$ref": "#/definitions/skill"},
+        "observation": {"$ref": "#/definitions/skill"},
+        "persuasion": {"$ref": "#/definitions/skill"},
+        "resilience": {"$ref": "#/definitions/skill"},
+        "stealth": {"$ref": "#/definitions/skill"},
+        "survival": {"$ref": "#/definitions/skill"},
+        "tactics": {"$ref": "#/definitions/skill"}
+      }
+    },
+    "talents": {
+      "type": "array",
+      "description": "Either a name matching this game's talent list (source/data/talents.json) - the importer fills in Keywords/Requirements/Description automatically, same as picking it from the dropdown on a PC sheet - or a custom {name, description} pair for an NPC-only special ability not in that list.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name"],
+        "properties": {
+          "name": {"type": "string", "minLength": 1},
+          "description": {"type": "string", "description": "Omit to resolve name against the known talent list; include to define a custom ability instead."}
+        }
+      }
+    },
+    "weapons": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {"type": "string", "description": "Matching a name in this sheet's Weapons dropdown (see source/views/panels/_weapons_panel.pug) auto-fills focus/reach_range/damage_effects/size/qualities below unless overridden; any other name is just a label on a fully custom weapon."},
+          "focus": {"type": "string"},
+          "reach_range": {"type": "string"},
+          "damage_effects": {"type": "string", "description": "e.g. \"3, Vicious\" - base damage rating followed by comma-separated Damage Effects."},
+          "size": {"type": "string"},
+          "qualities": {"type": "string"}
+        }
+      }
+    },
+    "armor": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {"type": "string", "description": "Matching a name in this sheet's Armor dropdown (see source/views/panels/_armor_panel.pug) auto-fills resistance/qualities below unless overridden."},
+          "resistance": {"type": ["integer", "string"]},
+          "qualities": {"type": "string"}
+        }
+      }
+    },
+    "fatigue": {"type": "integer", "minimum": 0, "default": 0},
+    "stress": {"type": "integer", "minimum": 0, "default": 0, "description": "Current Stress marked, if this NPC should start partway hurt. Max Stress is always computed from attributes/skills/talents, not set here."},
+    "injuries": {"type": "string"},
+    "traits": {"type": "string"},
+    "notes": {"type": "string"}
+  },
+  "definitions": {
+    "skill": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ranks"],
+      "properties": {
+        "ranks": {"type": "integer", "minimum": 0},
+        "focuses": {
+          "type": "array",
+          "description": "Focus names this NPC knows for this skill, exactly as spelled in that skill's Focus list (see source/views/panels/_skills_panel.pug) - e.g. [\"Melee Weapons\"] for fighting.",
+          "items": {"type": "string"}
+        }
+      }
+    }
+  }
+}
