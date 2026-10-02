@@ -54,13 +54,13 @@
     //- Fatigue. "Current Max" is that same value less current Fatigue
     //- (calcStressMax, floored at 0) - the actual ceiling the Stress
     //- track itself is limited to right now (see .cc-stress-max-marker
-    //- below). Two separate attributes/fields rather than one
-    //- relabeled field so a player can always see both the character's
-    //- innate maximum and how much Fatigue is currently eating into it.
+    //- below). Two separate attributes/fields rather than one relabeled
+    //- field so a player can always see both the character's innate
+    //- maximum and how much Fatigue is currently eating into it - both
+    //- on one shared line to keep the panel compact.
     .cc-field.cc-stress-max
       span Max
       +number({name: 'stress max base', readonly: true, trigger: {calculation: 'calcStressMaxBase'}})
-    .cc-field.cc-stress-max
       span Current Max
       +number({name: 'stress max', readonly: true, trigger: {calculation: 'calcStressMax'}})
     //- Fatigue (page 41): each point temporarily reduces Max Stress by
@@ -115,10 +115,20 @@
         trigger: {triggeredFuncs: ['initiateFatigueResistRoll'], affects: ['stress_max', 'stress_max_marker']}
       })
         | Resist Fatigue
-  .cc-vitals-courage-fortune
+  .cc-vitals-courage-armor
     .cc-field
       .cc-banner Courage
       +number({name: 'courage', readonly: true, trigger: {calculation: 'calcCourage'}})
+    .cc-field
+      .cc-banner Base Armour
+      +number({name: 'base armour', readonly: true, trigger: {calculation: 'calcBaseArmour', affects: ['total_armor']}})
+    .cc-field
+      .cc-banner Total Armor
+      +number({name: 'total armor', readonly: true, trigger: {calculation: 'calcTotalArmor'}})
+  .cc-vitals-injuries-fortune
+    .cc-vitals-injuries
+      .cc-banner Injuries
+      +textarea({name: 'injuries'}).cc-injuries
     .cc-field
       .cc-banner Fortune
       //- Hand-expanded rather than using +fillLeft directly, same as
@@ -133,49 +143,31 @@
             trigger: {triggeredFuncs: ['ccTrackBoxClick']}
           }).fill-left__radio
           +radio({name: 'fortune', value}).cc-track-value-marker
-  .cc-vitals-armor
-    .cc-field
-      .cc-banner Base Armour
-      +number({name: 'base armour', readonly: true, trigger: {calculation: 'calcBaseArmour', affects: ['total_armor']}})
-    .cc-field
-      .cc-banner Total Armor
-      +number({name: 'total armor', readonly: true, trigger: {calculation: 'calcTotalArmor'}})
-  .cc-vitals-injuries
-    .cc-banner Injuries
-    +textarea({name: 'injuries'}).cc-injuries
 
 +scss.
   .cc-character {
     .cc-vitals {
       display: grid;
-      grid-template-columns: 1.6fr 1fr 1fr 1.4fr;
+      grid-template-columns: 1.8fr 1fr 1.3fr;
       gap: 0.75rem;
       align-items: start;
     }
 
-    .cc-vitals-courage-fortune,
-    .cc-vitals-armor {
+    .cc-vitals-courage-armor,
+    .cc-vitals-injuries-fortune {
       display: flex;
       flex-direction: column;
       gap: 0.4rem;
     }
 
     // Overrides the generic .cc-field column layout (label above value) to
-    // put each value on the same line as its label instead, since a
-    // standalone "MAX" heading with a boxed number underneath wastes
-    // vertical space this field doesn't need - it sits below the already
-    // full-width stress track, not beside other stacked fields. Two of
-    // these stack now (Max, Current Max) - .cc-field has no margin-bottom
-    // of its own for the second one to collapse against, so give it a
-    // small top margin directly instead.
+    // put Max and Current Max on one shared line instead of a standalone
+    // "MAX" heading with a boxed number underneath - it sits below the
+    // already full-width stress track, not beside other stacked fields.
     .cc-stress-max {
       flex-direction: row;
       align-items: baseline;
       gap: 0.4rem;
-
-      + .cc-stress-max {
-        margin-top: 0.15rem;
-      }
     }
 
     // The value=0 anchor radio in .cc-stress-track/.cc-fortune-track/
@@ -381,10 +373,13 @@
 
     // Same soft-border "edit box" look as Traits/History/Personal Agenda
     // (views/_notes.pug), rather than the plain underline every other
-    // .cc-field textarea gets.
+    // .cc-field textarea gets. flex: 1 lets it grow to fill the column
+    // above Fortune (see .cc-vitals-injuries-fortune above) instead of
+    // collapsing to its min-height.
     .cc-vitals-injuries {
       display: flex;
       flex-direction: column;
+      flex: 1;
     }
 
     .cc-injuries {
