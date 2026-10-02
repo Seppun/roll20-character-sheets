@@ -339,7 +339,8 @@
       const weaponBonusMomentum = passed ? Math.max(0, successCount - 1) : 0;
       const weaponBonusDiceCount = Math.max(0, dice.length - 2);
       const weaponBonusDiceCost = ccBonusDiceCost(weaponBonusDiceCount);
-      await ccSendMomentumSignal(weaponBonusMomentum - weaponBonusDiceCost);
+      await ccSendMomentumSignal(weaponBonusMomentum);
+      await ccSendMomentumSpendSignal(weaponBonusDiceCost);
       await ccSendThreatSignal(complicationCount);
 
       finishRoll(roll.rollId, {

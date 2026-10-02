@@ -12,14 +12,22 @@
 // needs to type themselves.
 //
 // +1 to the pool per point of Momentum a passed roll generates.
-// -1 per additional d20 bought (2d20 RAW: buying an extra d20 costs 1
-//    Momentum each, whether or not the roll then succeeds).
 // -1 per point of Extra Momentum a spellcaster declares spending (see the
 //    Cast button's "Extra Momentum spent" prompt on the Spells tab).
 // Capped at 6 in either direction (2d20 RAW: the Momentum pool can never
 // exceed 6, nor drop below 0) - enforced in setPool below, so every path
 // that changes the pool (the automatic signal, the manual commands, and a
 // GM's direct !momentum-set) all get it for free.
+//
+// Buying additional d20s (1st extra die costs 1 Momentum, 2nd costs 3 -
+// see ccBonusDiceCost in source/views/_global_sheetworker.pug) is handled
+// separately from the plain +/- delta above: the character sheet has no
+// way to know this pool's live value, so it can't tell in advance whether
+// the party can actually afford the dice it's buying. Per request, buying
+// them is still allowed either way - whatever this pool can't cover
+// becomes Threat instead, point for point, decided here (the one place
+// that actually knows the pool's current value) rather than on the sheet.
+// See handleMomentumSpend below for the mechanics.
 //
 // The signal itself is a whispered, hidden (display:none) roll using a
 // dedicated template, ccmomentumsignal (rolltemplate/_index.pug), since
@@ -164,6 +172,46 @@ on('ready', () => {
     return total;
   };
 
+  // Same mechanics as extractMomentumSignalDelta above, for the separate
+  // "buying extra d20s" signal (ccmomentumspendsignal, rolltemplate/
+  // _index.pug) - a positive cost rather than a signed delta, since only
+  // this script (not the sheet) knows whether the pool can cover it.
+  const extractMomentumSpendAmount = (msg) => {
+    const content = String(msg.content || '');
+    if (!content.includes('{{ccmomentumspend=')) { return null; }
+    const rolls = Array.isArray(msg.inlinerolls) ? msg.inlinerolls : [];
+    if (!rolls.length) {
+      log(`[CCMomentum] ccmomentumspend message with no inlinerolls - raw msg: ${JSON.stringify(msg)}`);
+      return null;
+    }
+    const total = rolls[0] && rolls[0].results && rolls[0].results.total;
+    if (!Number.isFinite(total)) {
+      log(`[CCMomentum] ccmomentumspend inlinerolls[0] had no usable .results.total - raw msg: ${JSON.stringify(msg)}`);
+      return null;
+    }
+    return total;
+  };
+
+  // Spends as much of cost as the pool actually has, then converts
+  // whatever's left into Threat - reusing ccthreatsignal (rolltemplate/
+  // _index.pug) exactly as the sheet itself would, via the same sendChat/
+  // chat:message round trip. ccthreat.js can't tell this apart from a
+  // sheet-sent signal, so no changes are needed there at all.
+  const handleMomentumSpend = (cost) => {
+    const pool = getPool();
+    const spend = Math.min(cost, pool);
+    const shortfall = cost - spend;
+    if (spend > 0) {
+      const actualDelta = applyDelta(-spend);
+      if (actualDelta !== 0) {
+        announce(`${formatDelta(actualDelta)}, extra d20s bought`);
+      }
+    }
+    if (shortfall > 0) {
+      sendChat('API', `/w gm &{template:ccthreatsignal} {{ccthreatdelta=[[0+${shortfall}]]}}`);
+    }
+  };
+
   const handleMessage = (msg) => {
     // Unconditional diagnostic - logs every chat message this script
     // sees (type, raw content, and any inlinerolls), same as
@@ -177,6 +225,14 @@ on('ready', () => {
         if (actualDelta !== 0) {
           announce(formatDelta(actualDelta));
         }
+      }
+      return;
+    }
+
+    const spendAmount = extractMomentumSpendAmount(msg);
+    if (spendAmount !== null) {
+      if (Number.isFinite(spendAmount) && spendAmount > 0) {
+        handleMomentumSpend(spendAmount);
       }
       return;
     }
@@ -196,6 +252,17 @@ on('ready', () => {
       if (actualDelta !== 0) {
         announce(formatDelta(actualDelta));
       }
+      return;
+    }
+
+    // Manual/legacy alias for the ccmomentumspendsignal handling above
+    // (e.g. `!ccmomentum-spend 4`) - lets the pool-can't-cover-it/Threat
+    // conversion be tested from chat directly without buying dice on an
+    // actual character sheet.
+    if (command === '!ccmomentum-spend') {
+      const cost = Number(args[0]);
+      if (!Number.isFinite(cost) || cost <= 0) { return; }
+      handleMomentumSpend(cost);
       return;
     }
 

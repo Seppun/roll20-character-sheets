@@ -74,23 +74,34 @@
       .cc-roll-row
         span Fatigue Removed:
         span {{computed::fatigue_removed}}
+    //- Damage is still rolled unconditionally alongside the attack (see
+    //- initiateWeaponRoll in views/panels/_weapons_panel.pug) - only
+    //- whether this section DISPLAYS is gated on the attack having passed
+    //- (computed::outcome 1), via the same rollTotal()/rollGreater()
+    //- helpers already used elsewhere in this template for computed
+    //- fields (see lessons_learned.md for why a plain {{#field}} check
+    //- doesn't work on a finishRoll override). Rolling both dice sets
+    //- unconditionally and only hiding the display keeps this out of the
+    //- "conditional rolls in roll templates" trouble documented there,
+    //- while still reading as "no damage" on a miss.
     +templateConditionalDisplay('is_weapon')
-      .cc-roll-header.cc-roll-damage-header
-        span.cc-roll-skill Damage
-      .cc-roll-body
-        .cc-roll-row
-          span Challenge Dice:
-          span.cc-roll-dice-result {{computed::damage_dice_text}}
-        .cc-roll-row
-          span Total Damage:
-          span {{computed::total_damage}}
-        //- Only shown when an Effect face actually came up on the dice
-        //- (rollGreater gates on effect_count > 0) - a separate always-on
-        //- "Weapon Effects: ..." line was removed since it just repeated
-        //- the same effect names regardless of whether they triggered.
-        +rollGreater({values: 'computed::effect_count 0'})
-          .cc-roll-row.cc-roll-complication
-            span {{computed::effects_summary}}
+      +rollTotal({values: 'computed::outcome 1'})
+        .cc-roll-header.cc-roll-damage-header
+          span.cc-roll-skill Damage
+        .cc-roll-body
+          .cc-roll-row
+            span Challenge Dice:
+            span.cc-roll-dice-result {{computed::damage_dice_text}}
+          .cc-roll-row
+            span Total Damage:
+            span {{computed::total_damage}}
+          //- Only shown when an Effect face actually came up on the dice
+          //- (rollGreater gates on effect_count > 0) - a separate always-on
+          //- "Weapon Effects: ..." line was removed since it just repeated
+          //- the same effect names regardless of whether they triggered.
+          +rollGreater({values: 'computed::effect_count 0'})
+            .cc-roll-row.cc-roll-complication
+              span {{computed::effects_summary}}
     //- Spell Cost is rolled unconditionally alongside the casting test -
     //- RAW pays it "whether or not [the caster] successfully cast it"
     //- (see Casting a Battlefield Spell, page 66) - so it's always shown,
@@ -149,6 +160,22 @@
 //- this addition can never risk the already-working Momentum signal.
 +rolltemplate('ccthreatsignal')
   span.cc-threat-signal-delta {{ccthreatdelta}}
+
+//- Buying additional d20s (see ccSendMomentumSpendSignal in
+//- views/_global_sheetworker.pug) is a genuine "spend" that the sheet
+//- can't just net into a plain signed delta like ccmomentumsignal above -
+//- the sheet has no visibility into the live pool, so it can't know
+//- whether that pool can actually cover the cost. This carries the
+//- nominal cost as a positive amount instead, and ccmomentum.js decides
+//- how much of it the pool can cover, converting any shortfall straight
+//- into a Threat signal of its own (reusing ccthreatsignal above
+//- unmodified - ccthreat.js's own listener can't tell a script-generated
+//- signal from a sheet-sent one). Kept as its own template/field name
+//- (ccmomentumspend, not reusing ccmomentumdelta) for the same reason
+//- ccthreatsignal stays separate from ccmomentumsignal - this addition
+//- can never risk the already-working plain delta signal.
++rolltemplate('ccmomentumspendsignal')
+  span.cc-momentum-spend-signal-amount {{ccmomentumspend}}
 
 +scss('roll').
   /* Plain hardcoded colors only in this block - roll-template CSS can't
@@ -253,6 +280,7 @@
      the chat message payload the API scripts read, regardless of
      display:none) matters. */
   .sheet-rolltemplate-ccmomentumsignal,
-  .sheet-rolltemplate-ccthreatsignal {
+  .sheet-rolltemplate-ccthreatsignal,
+  .sheet-rolltemplate-ccmomentumspendsignal {
     display: none;
   }

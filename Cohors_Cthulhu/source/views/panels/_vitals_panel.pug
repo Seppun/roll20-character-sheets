@@ -607,7 +607,8 @@
         attributes.fatigue = Math.max(0, (Number(attributes.fatigue) || 0) - fatigueRemoved);
       }
 
-      await ccSendMomentumSignal(bonusMomentum - bonusDiceCost - extraMomentum);
+      await ccSendMomentumSignal(bonusMomentum - extraMomentum);
+      await ccSendMomentumSpendSignal(bonusDiceCost);
       await ccSendThreatSignal(complicationCount);
 
       finishRoll(roll.rollId, {

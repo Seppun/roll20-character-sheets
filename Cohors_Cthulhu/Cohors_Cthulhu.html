@@ -1018,7 +1018,7 @@
         </div>
       </div>
     </div>
-    <div class="cc-footer"><span class="cc-build-html">HTML build: 2026-10-02 15:11:11 UTC</span></div>
+    <div class="cc-footer"><span class="cc-build-html">HTML build: 2026-10-02 15:27:17 UTC</span></div>
   </div>
       </article>
       <article class="tabs__container tabs--cohors-cthulhu__container tabs--cohors-cthulhu__container--spells" data-container-tab="cohors-cthulhu" data-tab="spells">
@@ -1202,13 +1202,13 @@
     <div class="cc-roll-outcome cc-roll-pass"><span>Passed - Momentum: {{computed::bonus_momentum}}</span></div>{{/rollTotal() computed::outcome 1}}{{#rollTotal() computed::outcome 0}}
     <div class="cc-roll-outcome cc-roll-fail"><span>Failed</span></div>{{/rollTotal() computed::outcome 0}}{{#rollGreater() computed::momentum_spent 0}}
     <div class="cc-roll-row"><span>Momentum Spent:</span><span>{{computed::momentum_spent}}</span></div>{{/rollGreater() computed::momentum_spent 0}}{{#rollGreater() computed::fatigue_removed 0}}
-    <div class="cc-roll-row"><span>Fatigue Removed:</span><span>{{computed::fatigue_removed}}</span></div>{{/rollGreater() computed::fatigue_removed 0}}{{#is_weapon}}
+    <div class="cc-roll-row"><span>Fatigue Removed:</span><span>{{computed::fatigue_removed}}</span></div>{{/rollGreater() computed::fatigue_removed 0}}{{#is_weapon}}{{#rollTotal() computed::outcome 1}}
     <div class="cc-roll-header cc-roll-damage-header"><span class="cc-roll-skill">Damage</span></div>
     <div class="cc-roll-body">
       <div class="cc-roll-row"><span>Challenge Dice:</span><span class="cc-roll-dice-result">{{computed::damage_dice_text}}</span></div>
       <div class="cc-roll-row"><span>Total Damage:</span><span>{{computed::total_damage}}</span></div>{{#rollGreater() computed::effect_count 0}}
       <div class="cc-roll-row cc-roll-complication"><span>{{computed::effects_summary}}</span></div>{{/rollGreater() computed::effect_count 0}}
-    </div>{{/is_weapon}}{{#is_spell}}{{#rollGreater() computed::dabbling_power_threat 0}}
+    </div>{{/rollTotal() computed::outcome 1}}{{/is_weapon}}{{#is_spell}}{{#rollGreater() computed::dabbling_power_threat 0}}
     <div class="cc-roll-row cc-roll-complication"><span>{{computed::dabbling_power_threat}} threat generated as a result of increasing your spellcasting power</span></div>{{/rollGreater() computed::dabbling_power_threat 0}}
     <div class="cc-roll-header cc-roll-damage-header"><span class="cc-roll-skill">Cost (paid regardless of outcome)</span></div>
     <div class="cc-roll-body">
@@ -1222,6 +1222,8 @@
 <rolltemplate class="sheet-rolltemplate-ccmomentumsignal"><span class="cc-momentum-signal-delta">{{ccmomentumdelta}}</span>
 </rolltemplate>
 <rolltemplate class="sheet-rolltemplate-ccthreatsignal"><span class="cc-threat-signal-delta">{{ccthreatdelta}}</span>
+</rolltemplate>
+<rolltemplate class="sheet-rolltemplate-ccmomentumspendsignal"><span class="cc-momentum-spend-signal-amount">{{ccmomentumspend}}</span>
 </rolltemplate>
 <script type="text/worker">const k = (function(){
   const kFuncs = {};
@@ -2903,11 +2905,13 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
   // hidden signal here for a companion Roll20 API script
   // (api-scripts/ccmomentum.js in this repo) to keep a single game-wide
   // pool in sync and display it to the table. delta is net: positive for
-  // Momentum a passed roll generates, negative for Momentum spent (buying
-  // additional d20s, or - for spells - declaring Extra Momentum spent).
-  // Called from Attributes/Skills' shared runCcRoll below, Vitals' own
-  // Fatigue resist roll, Weapons' weapon roll, and Spells' spell roll
-  // (views/_spells.pug) - five different call sites across panels/tabs.
+  // Momentum a passed roll generates, negative for Momentum spent (for
+  // spells, declaring Extra Momentum spent - buying additional d20s goes
+  // through ccSendMomentumSpendSignal below instead, since that spend
+  // needs different handling when the pool can't cover it). Called from
+  // Attributes/Skills' shared runCcRoll below, Vitals' own Fatigue resist
+  // roll, Weapons' weapon roll, and Spells' spell roll (views/_spells.pug)
+  // - five different call sites across panels/tabs.
   //
   // Sheet workers have no sendChat() of their own, so this rides a
   // dedicated, hidden roll template (ccmomentumsignal, in
@@ -2924,6 +2928,28 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
       finishRoll(roll.rollId, {});
     } catch (err) {
       console.log('[CC] Momentum pool signal failed:', err.message);
+    }
+  };
+  
+  // Buying additional d20s (see ccBonusDiceCost above) is routed through
+  // this separate signal rather than folded into ccSendMomentumSignal's
+  // plain net delta above, because it needs different handling when the
+  // party can't actually afford it: the sheet has no visibility into the
+  // live pool (see ccSendMomentumSignal's own comment for why), so it
+  // can't know in advance whether cost Momentum is available. Per
+  // request, buying the dice anyway is still allowed - whatever the pool
+  // can't cover converts straight into Threat instead, 1-for-1, which
+  // only the API script (the pool's actual source of truth) can decide.
+  // cost is always a positive amount here (never a signed delta like
+  // ccSendMomentumSignal takes) - see ccmomentumspendsignal's own comment
+  // in rolltemplate/_index.pug for the full mechanism.
+  const ccSendMomentumSpendSignal = async (cost) => {
+    if (!cost) { return; }
+    try {
+      const roll = await startRoll(`/w gm &{template:ccmomentumspendsignal} {{ccmomentumspend=[[0+${cost}]]}}`);
+      finishRoll(roll.rollId, {});
+    } catch (err) {
+      console.log('[CC] Momentum spend signal failed:', err.message);
     }
   };
   
@@ -3022,7 +3048,8 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
       // 1 Momentum, 2nd costs 3, win or lose per 2d20 RAW).
       const bonusDiceCount = Math.max(0, dice.length - 2);
       const bonusDiceCost = ccBonusDiceCost(bonusDiceCount);
-      await ccSendMomentumSignal(bonusMomentum - bonusDiceCost);
+      await ccSendMomentumSignal(bonusMomentum);
+      await ccSendMomentumSpendSignal(bonusDiceCost);
       await ccSendThreatSignal(complicationCount);
   
       // outcome is a plain 0/1 flag (rather than separate passed/failed
@@ -3291,10 +3318,11 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
   
       const spellBonusMomentum = passed ? Math.max(0, successCount - difficulty) : 0;
       const spellBonusDiceCount = Math.max(0, dice.length - 2);
-      // ccSendMomentumSignal/ccSendThreatSignal/ccBonusDiceCost are
-      // defined in views/_global_sheetworker.pug.
+      // ccSendMomentumSignal/ccSendMomentumSpendSignal/ccSendThreatSignal/
+      // ccBonusDiceCost are defined in views/_global_sheetworker.pug.
       const spellBonusDiceCost = ccBonusDiceCost(spellBonusDiceCount);
-      await ccSendMomentumSignal(spellBonusMomentum - spellBonusDiceCost - extraMomentum);
+      await ccSendMomentumSignal(spellBonusMomentum - extraMomentum);
+      await ccSendMomentumSpendSignal(spellBonusDiceCost);
       await ccSendThreatSignal(complicationCount + dabblingPowerThreat + costThreatGenerated);
   
       finishRoll(roll.rollId, {
@@ -3479,7 +3507,8 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
         attributes.fatigue = Math.max(0, (Number(attributes.fatigue) || 0) - fatigueRemoved);
       }
   
-      await ccSendMomentumSignal(bonusMomentum - bonusDiceCost - extraMomentum);
+      await ccSendMomentumSignal(bonusMomentum - extraMomentum);
+      await ccSendMomentumSpendSignal(bonusDiceCost);
       await ccSendThreatSignal(complicationCount);
   
       finishRoll(roll.rollId, {
@@ -3723,7 +3752,8 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
       const weaponBonusMomentum = passed ? Math.max(0, successCount - 1) : 0;
       const weaponBonusDiceCount = Math.max(0, dice.length - 2);
       const weaponBonusDiceCost = ccBonusDiceCost(weaponBonusDiceCount);
-      await ccSendMomentumSignal(weaponBonusMomentum - weaponBonusDiceCost);
+      await ccSendMomentumSignal(weaponBonusMomentum);
+      await ccSendMomentumSpendSignal(weaponBonusDiceCost);
       await ccSendThreatSignal(complicationCount);
   
       finishRoll(roll.rollId, {

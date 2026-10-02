@@ -600,10 +600,11 @@
 
       const spellBonusMomentum = passed ? Math.max(0, successCount - difficulty) : 0;
       const spellBonusDiceCount = Math.max(0, dice.length - 2);
-      // ccSendMomentumSignal/ccSendThreatSignal/ccBonusDiceCost are
-      // defined in views/_global_sheetworker.pug.
+      // ccSendMomentumSignal/ccSendMomentumSpendSignal/ccSendThreatSignal/
+      // ccBonusDiceCost are defined in views/_global_sheetworker.pug.
       const spellBonusDiceCost = ccBonusDiceCost(spellBonusDiceCount);
-      await ccSendMomentumSignal(spellBonusMomentum - spellBonusDiceCost - extraMomentum);
+      await ccSendMomentumSignal(spellBonusMomentum - extraMomentum);
+      await ccSendMomentumSpendSignal(spellBonusDiceCost);
       await ccSendThreatSignal(complicationCount + dabblingPowerThreat + costThreatGenerated);
 
       finishRoll(roll.rollId, {
