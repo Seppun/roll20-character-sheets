@@ -101,20 +101,29 @@
         //- stops it from reducing Max Stress (see calcStressMax)
         //- without discarding the tracked fatigue value itself, since
         //- the fatigue hasn't actually been removed, just pushed
-        //- through for now.
+        //- through for now. Styled as a sticky push-button rather than a
+        //- plain checkbox (still the same real attribute-backed checkbox
+        //- underneath, just visually hidden) - same "hidden input + CSS
+        //- general sibling selector" trick as the Stress Max marker and
+        //- the Truths & Scars expand toggle, with the label itself
+        //- standing in as the clickable button face. Its text and color
+        //- both flip on :checked so pushed/unpushed is unambiguous at a
+        //- glance, not just a color change.
         +checkbox({
           name: 'fatigue ignored',
           value: 1,
           id: 'cc-fatigue-ignored',
           trigger: {affects: ['stress_max', 'stress_max_marker']}
-        })
-        label(for='cc-fatigue-ignored') Ignore Fatigue (temporarily)
+        }).cc-fatigue-ignore-checkbox
+        label.cc-fatigue-ignore-toggle(for='cc-fatigue-ignored')
+          span.cc-fatigue-ignore-off Ignore Fatigue
+          span.cc-fatigue-ignore-on Fatigue Ignored
       +action({
         name: 'fatigue resist',
         class: 'cc-fatigue-resist roller',
         trigger: {triggeredFuncs: ['initiateFatigueResistRoll'], affects: ['stress_max', 'stress_max_marker']}
       })
-        | Resist Fatigue
+        | Resist
   .cc-vitals-courage-armor
     .cc-field
       .cc-banner Courage
@@ -153,7 +162,7 @@
     // 1/3/5, skipping the spacer tracks.
     .cc-vitals {
       display: grid;
-      grid-template-columns: 1.5fr 0.4fr 1fr 0.4fr 1.6fr;
+      grid-template-columns: 1.5fr 0.4fr 1.4fr 0.4fr 1.2fr;
       align-items: start;
     }
 
@@ -336,30 +345,56 @@
     }
 
     .cc-fatigue-ignore {
-      flex-direction: row;
-      align-items: center;
-      gap: 0.3rem;
       margin-top: 0.3rem;
+    }
 
-      // Restores a plain, visible checkbox appearance overridden by
-      // .cc-field's generic input styling (see lessons_learned.md) -
-      // unlike .cc-spell-collapse-toggle in views/_spells.pug, this one
-      // has no custom glyph of its own to draw.
-      > input[type='checkbox'] {
-        width: 0.9rem;
-        height: 0.9rem;
-        flex: 0 0 auto;
-        background: var(--cc-parchment);
-        border: 1px solid var(--cc-rule);
-        border-bottom: 1px solid var(--cc-rule);
-        padding: 0;
+    // Hidden the same way as .cc-stress-max-marker/.cc-truths-scars-
+    // checkbox - still a real, toggleable checkbox (so Roll20 still fires
+    // its own trigger normally), just never seen directly. The label
+    // right after it (.cc-fatigue-ignore-toggle below) is the only thing
+    // the player actually sees and clicks.
+    .cc-fatigue-ignore-checkbox {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    // A sticky push-button face for the checkbox above, not a plain
+    // checkbox + label pair - same light-fill "unpushed" look as other
+    // boxed controls on this sheet, switching to a solid --cc-banner fill
+    // plus an inset shadow (a pressed-in look, not just a color swap) once
+    // checked, so "pushed" reads clearly even at a glance.
+    .cc-fatigue-ignore-toggle {
+      display: inline-flex;
+      align-items: center;
+      background: var(--cc-editable-fill);
+      color: var(--cc-ink);
+      border: 1px solid var(--cc-rule);
+      border-radius: 4px;
+      padding: 0.15rem 0.5rem;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      cursor: pointer;
+
+      .cc-fatigue-ignore-on {
+        display: none;
+      }
+    }
+
+    .cc-fatigue-ignore-checkbox:checked ~ .cc-fatigue-ignore-toggle {
+      background: var(--cc-banner);
+      color: var(--cc-banner-text);
+      border-color: var(--cc-banner);
+      box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.4);
+
+      .cc-fatigue-ignore-off {
+        display: none;
       }
 
-      label {
-        font-size: 0.7rem;
-        text-transform: none;
-        letter-spacing: normal;
-        color: var(--cc-ink);
+      .cc-fatigue-ignore-on {
+        display: inline;
       }
     }
 
@@ -517,7 +552,7 @@
 
     const difficultyQuery = '?{Difficulty|1}';
     const complicationQuery = '?{Complication range (1-5)|1}';
-    const bonusDiceQuery = '?{Additional d20s bought (0-3)|0}';
+    const bonusDiceQuery = '?{Additional d20s bought (0-2)|0}';
     const extraMomentumQuery = '?{Momentum spent to remove extra fatigue|0}';
 
     const rollString = '&{template:ccskill} ' +
@@ -559,7 +594,9 @@
       const complicationCount = dice.filter((d) => d >= complicationThreshold).length;
       const passed = successCount >= difficulty;
       const bonusMomentum = passed ? Math.max(0, successCount - difficulty) : 0;
-      const bonusDiceBought = Math.max(0, dice.length - 2);
+      const bonusDiceCount = Math.max(0, dice.length - 2);
+      // ccBonusDiceCost is defined in views/_global_sheetworker.pug.
+      const bonusDiceCost = ccBonusDiceCost(bonusDiceCount);
 
       // "Passing the test removes 1 point of fatigue, plus 1 more for each
       // point of Momentum spent" - applied straight to the attribute (same
@@ -570,7 +607,7 @@
         attributes.fatigue = Math.max(0, (Number(attributes.fatigue) || 0) - fatigueRemoved);
       }
 
-      await ccSendMomentumSignal(bonusMomentum - bonusDiceBought - extraMomentum);
+      await ccSendMomentumSignal(bonusMomentum - bonusDiceCost - extraMomentum);
       await ccSendThreatSignal(complicationCount);
 
       finishRoll(roll.rollId, {
@@ -581,7 +618,7 @@
         bonus_momentum: bonusMomentum,
         complications: complicationCount,
         extra_momentum: extraMomentum,
-        momentum_spent: bonusDiceBought + extraMomentum,
+        momentum_spent: bonusDiceCost + extraMomentum,
         fatigue_removed: fatigueRemoved,
       });
     } catch (err) {

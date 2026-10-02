@@ -1925,6 +1925,20 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
   // initiators (see lessons_learned.md for why the dash form shows up).
   const ccNormalizeName = (name) => name.replace(/-/g, '_');
   
+  // Buying additional d20s costs increasing Momentum per die rather than a
+  // flat rate - the first extra die costs 1 Momentum, the second costs 3
+  // (2 extra dice is the cap, per request - not RAW's own escalating
+  // 1/2/3 three-die table). Shared by runCcRoll below, Weapons' own attack
+  // roll, Spells' casting roll (views/_spells.pug), and Vitals' Fatigue
+  // resist roll (views/panels/_vitals_panel.pug) - four call sites, each
+  // with its own bonusDiceQuery ('?{Additional d20s bought (0-2)|0}') and
+  // its own dice.length-2 count fed into this.
+  const ccBonusDiceCost = (count) => {
+    if (count >= 2) { return 4; }
+    if (count === 1) { return 1; }
+    return 0;
+  };
+  
   // Momentum in Cohors Cthulhu (as in the wider 2d20 System) is a shared
   // party resource, not a per-character stat, so it isn't tracked on this
   // sheet at all - instead every roll that generates or spends it sends a
@@ -1988,7 +2002,7 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
   const runCcRoll = async ({skillLabel, focusLabel, attributeExpr, skillRanks, critMax}) => {
     const difficultyQuery = '?{Difficulty|1}';
     const complicationQuery = '?{Complication range (1-5)|1}';
-    const bonusDiceQuery = '?{Additional d20s bought (0-3)|0}';
+    const bonusDiceQuery = '?{Additional d20s bought (0-2)|0}';
   
     // Every field finishRoll will later override must already exist here
     // as a [[0]] placeholder (see lessons_learned.md).
@@ -2044,12 +2058,13 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
       const passed = successCount >= difficulty;
       const bonusMomentum = passed ? Math.max(0, successCount - difficulty) : 0;
   
-      // Buying additional d20s costs 1 Momentum each, win or lose (2d20
-      // RAW) - dice.length is 2 plus however many were bought via
-      // bonusDiceQuery above, so this recovers that count without needing
-      // its own roll-string field.
-      const bonusDiceBought = Math.max(0, dice.length - 2);
-      await ccSendMomentumSignal(bonusMomentum - bonusDiceBought);
+      // dice.length is 2 plus however many were bought via bonusDiceQuery
+      // above, so this recovers that count without needing its own roll-
+      // string field - ccBonusDiceCost then prices it (1st extra die costs
+      // 1 Momentum, 2nd costs 3, win or lose per 2d20 RAW).
+      const bonusDiceCount = Math.max(0, dice.length - 2);
+      const bonusDiceCost = ccBonusDiceCost(bonusDiceCount);
+      await ccSendMomentumSignal(bonusMomentum - bonusDiceCost);
       await ccSendThreatSignal(complicationCount);
   
       // outcome is a plain 0/1 flag (rather than separate passed/failed
@@ -2065,7 +2080,7 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
         outcome: passed ? 1 : 0,
         bonus_momentum: bonusMomentum,
         complications: complicationCount,
-        momentum_spent: bonusDiceBought,
+        momentum_spent: bonusDiceCost,
       };
   
       console.log(`[CC] ${skillLabel} outcome:`, {
@@ -2236,7 +2251,7 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
   
     const difficultyQuery = `?{Difficulty|${difficultyDefault}}`;
     const complicationQuery = '?{Complication range (1-5)|1}';
-    const bonusDiceQuery = '?{Additional d20s bought (0-3)|0}';
+    const bonusDiceQuery = '?{Additional d20s bought (0-2)|0}';
     // Reused verbatim (identical query text) in both extra_momentum and
     // cost_dice below - Roll20 only prompts once per unique query per
     // roll and substitutes that same answer everywhere it appears, the
@@ -2317,10 +2332,11 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
       const costThreatGenerated = effectCount * (ccSpellCostThreatPerEffect[spellName] || 0);
   
       const spellBonusMomentum = passed ? Math.max(0, successCount - difficulty) : 0;
-      const spellBonusDiceBought = Math.max(0, dice.length - 2);
-      // ccSendMomentumSignal/ccSendThreatSignal are defined in
-      // views/_global_sheetworker.pug.
-      await ccSendMomentumSignal(spellBonusMomentum - spellBonusDiceBought - extraMomentum);
+      const spellBonusDiceCount = Math.max(0, dice.length - 2);
+      // ccSendMomentumSignal/ccSendThreatSignal/ccBonusDiceCost are
+      // defined in views/_global_sheetworker.pug.
+      const spellBonusDiceCost = ccBonusDiceCost(spellBonusDiceCount);
+      await ccSendMomentumSignal(spellBonusMomentum - spellBonusDiceCost - extraMomentum);
       await ccSendThreatSignal(complicationCount + dabblingPowerThreat + costThreatGenerated);
   
       finishRoll(roll.rollId, {
@@ -2331,7 +2347,7 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
         bonus_momentum: spellBonusMomentum,
         complications: complicationCount,
         extra_momentum: extraMomentum,
-        momentum_spent: spellBonusDiceBought + extraMomentum,
+        momentum_spent: spellBonusDiceCost + extraMomentum,
         dabbling_power_threat: dabblingPowerThreat,
         cost_total: totalCost,
         cost_effect_count: effectCount,
@@ -2450,7 +2466,7 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
   
     const difficultyQuery = '?{Difficulty|1}';
     const complicationQuery = '?{Complication range (1-5)|1}';
-    const bonusDiceQuery = '?{Additional d20s bought (0-3)|0}';
+    const bonusDiceQuery = '?{Additional d20s bought (0-2)|0}';
     const extraMomentumQuery = '?{Momentum spent to remove extra fatigue|0}';
   
     const rollString = '&{template:ccskill} ' +
@@ -2492,7 +2508,9 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
       const complicationCount = dice.filter((d) => d >= complicationThreshold).length;
       const passed = successCount >= difficulty;
       const bonusMomentum = passed ? Math.max(0, successCount - difficulty) : 0;
-      const bonusDiceBought = Math.max(0, dice.length - 2);
+      const bonusDiceCount = Math.max(0, dice.length - 2);
+      // ccBonusDiceCost is defined in views/_global_sheetworker.pug.
+      const bonusDiceCost = ccBonusDiceCost(bonusDiceCount);
   
       // "Passing the test removes 1 point of fatigue, plus 1 more for each
       // point of Momentum spent" - applied straight to the attribute (same
@@ -2503,7 +2521,7 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
         attributes.fatigue = Math.max(0, (Number(attributes.fatigue) || 0) - fatigueRemoved);
       }
   
-      await ccSendMomentumSignal(bonusMomentum - bonusDiceBought - extraMomentum);
+      await ccSendMomentumSignal(bonusMomentum - bonusDiceCost - extraMomentum);
       await ccSendThreatSignal(complicationCount);
   
       finishRoll(roll.rollId, {
@@ -2514,7 +2532,7 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
         bonus_momentum: bonusMomentum,
         complications: complicationCount,
         extra_momentum: extraMomentum,
-        momentum_spent: bonusDiceBought + extraMomentum,
+        momentum_spent: bonusDiceCost + extraMomentum,
         fatigue_removed: fatigueRemoved,
       });
     } catch (err) {
@@ -2679,7 +2697,7 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
     });
   
     const complicationQuery = '?{Complication range (1-5)|1}';
-    const bonusDiceQuery = '?{Additional d20s bought (0-3)|0}';
+    const bonusDiceQuery = '?{Additional d20s bought (0-2)|0}';
   
     const rollString = '&{template:ccskill} ' +
       `{{character_name=@{character_name}}} ` +
@@ -2745,8 +2763,9 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
       });
   
       const weaponBonusMomentum = passed ? Math.max(0, successCount - 1) : 0;
-      const weaponBonusDiceBought = Math.max(0, dice.length - 2);
-      await ccSendMomentumSignal(weaponBonusMomentum - weaponBonusDiceBought);
+      const weaponBonusDiceCount = Math.max(0, dice.length - 2);
+      const weaponBonusDiceCost = ccBonusDiceCost(weaponBonusDiceCount);
+      await ccSendMomentumSignal(weaponBonusMomentum - weaponBonusDiceCost);
       await ccSendThreatSignal(complicationCount);
   
       finishRoll(roll.rollId, {
@@ -2756,7 +2775,7 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
         outcome: passed ? 1 : 0,
         bonus_momentum: weaponBonusMomentum,
         complications: complicationCount,
-        momentum_spent: weaponBonusDiceBought,
+        momentum_spent: weaponBonusDiceCost,
         total_damage: totalDamage,
         effect_count: effectCount,
         damage_dice_text: converted.map((c) => c.symbol).join(' '),

@@ -518,7 +518,7 @@
 
     const difficultyQuery = `?{Difficulty|${difficultyDefault}}`;
     const complicationQuery = '?{Complication range (1-5)|1}';
-    const bonusDiceQuery = '?{Additional d20s bought (0-3)|0}';
+    const bonusDiceQuery = '?{Additional d20s bought (0-2)|0}';
     // Reused verbatim (identical query text) in both extra_momentum and
     // cost_dice below - Roll20 only prompts once per unique query per
     // roll and substitutes that same answer everywhere it appears, the
@@ -599,10 +599,11 @@
       const costThreatGenerated = effectCount * (ccSpellCostThreatPerEffect[spellName] || 0);
 
       const spellBonusMomentum = passed ? Math.max(0, successCount - difficulty) : 0;
-      const spellBonusDiceBought = Math.max(0, dice.length - 2);
-      // ccSendMomentumSignal/ccSendThreatSignal are defined in
-      // views/_global_sheetworker.pug.
-      await ccSendMomentumSignal(spellBonusMomentum - spellBonusDiceBought - extraMomentum);
+      const spellBonusDiceCount = Math.max(0, dice.length - 2);
+      // ccSendMomentumSignal/ccSendThreatSignal/ccBonusDiceCost are
+      // defined in views/_global_sheetworker.pug.
+      const spellBonusDiceCost = ccBonusDiceCost(spellBonusDiceCount);
+      await ccSendMomentumSignal(spellBonusMomentum - spellBonusDiceCost - extraMomentum);
       await ccSendThreatSignal(complicationCount + dabblingPowerThreat + costThreatGenerated);
 
       finishRoll(roll.rollId, {
@@ -613,7 +614,7 @@
         bonus_momentum: spellBonusMomentum,
         complications: complicationCount,
         extra_momentum: extraMomentum,
-        momentum_spent: spellBonusDiceBought + extraMomentum,
+        momentum_spent: spellBonusDiceCost + extraMomentum,
         dabbling_power_threat: dabblingPowerThreat,
         cost_total: totalCost,
         cost_effect_count: effectCount,

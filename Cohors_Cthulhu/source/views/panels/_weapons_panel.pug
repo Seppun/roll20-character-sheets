@@ -271,7 +271,7 @@
     });
 
     const complicationQuery = '?{Complication range (1-5)|1}';
-    const bonusDiceQuery = '?{Additional d20s bought (0-3)|0}';
+    const bonusDiceQuery = '?{Additional d20s bought (0-2)|0}';
 
     const rollString = '&{template:ccskill} ' +
       `{{character_name=@{character_name}}} ` +
@@ -337,8 +337,9 @@
       });
 
       const weaponBonusMomentum = passed ? Math.max(0, successCount - 1) : 0;
-      const weaponBonusDiceBought = Math.max(0, dice.length - 2);
-      await ccSendMomentumSignal(weaponBonusMomentum - weaponBonusDiceBought);
+      const weaponBonusDiceCount = Math.max(0, dice.length - 2);
+      const weaponBonusDiceCost = ccBonusDiceCost(weaponBonusDiceCount);
+      await ccSendMomentumSignal(weaponBonusMomentum - weaponBonusDiceCost);
       await ccSendThreatSignal(complicationCount);
 
       finishRoll(roll.rollId, {
@@ -348,7 +349,7 @@
         outcome: passed ? 1 : 0,
         bonus_momentum: weaponBonusMomentum,
         complications: complicationCount,
-        momentum_spent: weaponBonusDiceBought,
+        momentum_spent: weaponBonusDiceCost,
         total_damage: totalDamage,
         effect_count: effectCount,
         damage_dice_text: converted.map((c) => c.symbol).join(' '),
