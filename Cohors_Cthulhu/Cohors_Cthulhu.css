@@ -1654,7 +1654,7 @@ body .ui-dialog .tab-content .charsheet .cc-character .cc-footer {
   opacity: 0.6;
 }
 body .ui-dialog .tab-content .charsheet .cc-character .cc-build-css::after {
-  content: "CSS build: 2026-10-02 05:50:23 UTC";
+  content: "CSS build: 2026-10-02 05:56:05 UTC";
 }
 body .ui-dialog .tab-content .charsheet .cc-character .cc-languages textarea {
   min-height: 4rem;
@@ -1821,15 +1821,26 @@ body .ui-dialog .tab-content .charsheet .cc-character .cc-truths-scars-checkbox:
 }
 body .ui-dialog .tab-content .charsheet .cc-character .cc-vitals {
   display: grid;
-  grid-template-columns: 1.6fr 2fr 1.4fr;
-  gap: 0.75rem;
+  grid-template-columns: 1.5fr 0.4fr 1fr 0.4fr 1.6fr;
   align-items: start;
+}
+body .ui-dialog .tab-content .charsheet .cc-character .cc-vitals-stress {
+  grid-column: 1;
+}
+body .ui-dialog .tab-content .charsheet .cc-character .cc-vitals-courage-armor {
+  grid-column: 3;
+}
+body .ui-dialog .tab-content .charsheet .cc-character .cc-vitals-injuries-fortune {
+  grid-column: 5;
 }
 body .ui-dialog .tab-content .charsheet .cc-character .cc-vitals-courage-armor,
 body .ui-dialog .tab-content .charsheet .cc-character .cc-vitals-injuries-fortune {
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
+}
+body .ui-dialog .tab-content .charsheet .cc-character .cc-vitals .cc-banner {
+  align-self: flex-start;
 }
 body .ui-dialog .tab-content .charsheet .cc-character .cc-stress-max {
   flex-direction: row;
@@ -2232,7 +2243,7 @@ body {
   opacity: 0.6;
 }
 .cc-character .cc-build-css::after {
-  content: "CSS build: 2026-10-02 05:50:23 UTC";
+  content: "CSS build: 2026-10-02 05:56:05 UTC";
 }
 .cc-character .cc-languages textarea {
   min-height: 4rem;
@@ -2403,15 +2414,26 @@ body {
 
 .cc-character .cc-vitals {
   display: grid;
-  grid-template-columns: 1.6fr 2fr 1.4fr;
-  gap: 0.75rem;
+  grid-template-columns: 1.5fr 0.4fr 1fr 0.4fr 1.6fr;
   align-items: start;
+}
+.cc-character .cc-vitals-stress {
+  grid-column: 1;
+}
+.cc-character .cc-vitals-courage-armor {
+  grid-column: 3;
+}
+.cc-character .cc-vitals-injuries-fortune {
+  grid-column: 5;
 }
 .cc-character .cc-vitals-courage-armor,
 .cc-character .cc-vitals-injuries-fortune {
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
+}
+.cc-character .cc-vitals .cc-banner {
+  align-self: flex-start;
 }
 .cc-character .cc-stress-max {
   flex-direction: row;
