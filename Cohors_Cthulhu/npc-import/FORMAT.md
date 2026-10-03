@@ -217,7 +217,10 @@ come from: `runic`, `oracular`, `celtic`, or the NPC-only Mythos tomes
 `cthulhu`, `mormo`, `nyarlathotep` and `yog_sothoth`. Spell names must
 match `source/data/spells.json`; their details fill in on first sheet open.
 Rituals aren't battlefield spells, so they're recorded in the NPC's notes.
-Escalation options go into the NPC Profile panel, one per line.
+Escalation options go into the NPC Profile panel, one per line. An
+escalation weapon should also be listed in `weapons`, named with
+" (Escalation)" (e.g. `"Totemic Staff (Escalation)"`), so it's a rollable
+attack row once the GM pays the Threat for it.
 
 ### Fatigue / Stress (optional, default 0)
 

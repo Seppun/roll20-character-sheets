@@ -140,6 +140,47 @@ on('ready', () => {
     createObj('attribute', {characterid: characterId, name, current: String(value)});
   };
 
+  // generateRowID() exists in sheet workers but NOT in the API sandbox, so
+  // the API needs its own copy. This is the widely used community version:
+  // a timestamp-ordered 20-character ID in Roll20's own row-ID alphabet,
+  // so imported rows also sort in creation order.
+  const generateUUID = (() => {
+    const chars = '-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz';
+    let lastTime = 0;
+    const lastRandom = [];
+    return () => {
+      let now = Date.now();
+      const sameTime = now === lastTime;
+      lastTime = now;
+      const timeChars = new Array(8);
+      for (let i = 7; i >= 0; i--) {
+        timeChars[i] = chars.charAt(now % 64);
+        now = Math.floor(now / 64);
+      }
+      let id = timeChars.join('');
+      if (sameTime) {
+        let i = 11;
+        for (; i >= 0 && lastRandom[i] === 63; i--) { lastRandom[i] = 0; }
+        lastRandom[i] += 1;
+      } else {
+        for (let i = 0; i < 12; i++) { lastRandom[i] = Math.floor(64 * Math.random()); }
+      }
+      for (let i = 0; i < 12; i++) { id += chars.charAt(lastRandom[i]); }
+      return id;
+    };
+  })();
+  // Underscores would break repeating attribute names, so they become 'Z' -
+  // which can make two consecutive IDs identical (a counter stepping from
+  // 'Z' to '_'), silently merging two rows. Issued IDs are tracked and a
+  // repeat is redrawn.
+  const issuedRowIds = new Set();
+  const generateRowID = () => {
+    let id = generateUUID().replace(/_/g, 'Z');
+    while (issuedRowIds.has(id)) { id = generateUUID().replace(/_/g, 'Z'); }
+    issuedRowIds.add(id);
+    return id;
+  };
+
   const createRepeatingRow = (characterId, section, fields) => {
     const rowId = generateRowID();
     Object.keys(fields).forEach((field) => {
@@ -388,7 +429,16 @@ on('ready', () => {
       sendChat('CCImport', `/w "${whisperTo(who)}" No NPCs found in that JSON.`);
       return;
     }
-    announceResults(who, npcs.map(importNpc));
+    // One NPC failing must not hide what happened to the rest, and a crash
+    // part-way through should say so rather than look like a clean import.
+    announceResults(who, npcs.map((npc) => {
+      try {
+        return importNpc(npc);
+      } catch (err) {
+        log(`[CCImport] import of "${npc && npc.name}" failed: ${err.stack || err.message}`);
+        return {name: (npc && npc.name) || '(unnamed)', warnings: [`IMPORT FAILED part-way (${err.message}) - delete this character and report the error`]};
+      }
+    }));
   };
 
   const usage = (who) => {

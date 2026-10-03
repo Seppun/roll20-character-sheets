@@ -87,8 +87,10 @@ a named ability against that file before treating it as custom.
    `damage_effects` exactly as printed, too. Mark (Mental Attack) entries
    `"type": "mental"`. An attribute printed as "—" is `null`; an
    Extraordinary bonus printed as "Brawn 13(2)" means `"brawn": 13` plus an
-   `Extraordinary Brawn 2` special rule. ESCALATION OPTIONS go in
-   `escalation_options`, not `weapons`.
+   `Extraordinary Brawn 2` special rule. Every ESCALATION OPTIONS
+   entry goes in `escalation_options` as text; an escalation *weapon* is
+   also added to `weapons` with " (Escalation)" after its name, so the GM
+   can roll it once they've paid the Threat.
 8. **Special rules, spells, rituals.** List every SPECIAL RULES entry by its
    printed name. Omit `description` for a common rule (above) unless the
    profile adds something specific; write the profile's wording for any

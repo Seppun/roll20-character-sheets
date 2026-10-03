@@ -377,7 +377,7 @@
       "items": {
         "type": "string"
       },
-      "description": "The profile's ESCALATION OPTIONS, one entry each, written out in full (e.g. \"Totemic Staff: (Melee), Reach 2, 5, Drain, Stun\")."
+      "description": "The profile's ESCALATION OPTIONS, one entry each, written out in full (e.g. \"Totemic Staff: (Melee), Reach 2, 5, Drain, Stun\"). Also add an escalation weapon to weapons as \"<Name> (Escalation)\" so it can be rolled."
     }
   },
   "definitions": {
