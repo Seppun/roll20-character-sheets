@@ -47,6 +47,11 @@
 on('ready', () => {
   'use strict';
 
+  // msg.who for a GM carries a " (GM)" suffix ("Han V. (GM)"), which /w
+  // can't resolve ("Unable to find a player or character with name") -
+  // whisper to the bare display name instead.
+  const whisperTo = (who) => String(who || '').replace(/\s*\(GM\)\s*$/, '');
+
   const STATE_KEY = 'CCThreat';
   const TURN_ORDER_ID = '-ccthreat-pool';
   const TOKEN_NAME = 'threat pool';
@@ -173,12 +178,12 @@ on('ready', () => {
 
     if (command === '!threat-set') {
       if (!playerIsGM(msg.playerid)) {
-        sendChat('Threat Pool', `/w "${msg.who}" Only the GM can set the Threat pool directly.`);
+        sendChat('Threat Pool', `/w "${whisperTo(msg.who)}" Only the GM can set the Threat pool directly.`);
         return;
       }
       const value = Number(args[0]);
       if (!Number.isFinite(value)) {
-        sendChat('Threat Pool', `/w "${msg.who}" Usage: !threat-set <number>`);
+        sendChat('Threat Pool', `/w "${whisperTo(msg.who)}" Usage: !threat-set <number>`);
         return;
       }
       setPool(value);
@@ -188,12 +193,12 @@ on('ready', () => {
 
     if (command === '!threat-adjust') {
       if (!playerIsGM(msg.playerid)) {
-        sendChat('Threat Pool', `/w "${msg.who}" Only the GM can manually adjust the Threat pool.`);
+        sendChat('Threat Pool', `/w "${whisperTo(msg.who)}" Only the GM can manually adjust the Threat pool.`);
         return;
       }
       const delta = Number(args[0]);
       if (!Number.isFinite(delta)) {
-        sendChat('Threat Pool', `/w "${msg.who}" Usage: !threat-adjust <number, may be negative>`);
+        sendChat('Threat Pool', `/w "${whisperTo(msg.who)}" Usage: !threat-adjust <number, may be negative>`);
         return;
       }
       setPool(getPool() + delta);

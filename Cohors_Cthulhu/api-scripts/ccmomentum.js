@@ -68,6 +68,11 @@
 on('ready', () => {
   'use strict';
 
+  // msg.who for a GM carries a " (GM)" suffix ("Han V. (GM)"), which /w
+  // can't resolve ("Unable to find a player or character with name") -
+  // whisper to the bare display name instead.
+  const whisperTo = (who) => String(who || '').replace(/\s*\(GM\)\s*$/, '');
+
   const STATE_KEY = 'CCMomentum';
   const TURN_ORDER_ID = '-ccmomentum-pool';
   const TOKEN_NAME = 'momentum pool';
@@ -273,12 +278,12 @@ on('ready', () => {
 
     if (command === '!momentum-set') {
       if (!playerIsGM(msg.playerid)) {
-        sendChat('Momentum Pool', `/w "${msg.who}" Only the GM can set the Momentum pool directly.`);
+        sendChat('Momentum Pool', `/w "${whisperTo(msg.who)}" Only the GM can set the Momentum pool directly.`);
         return;
       }
       const value = Number(args[0]);
       if (!Number.isFinite(value)) {
-        sendChat('Momentum Pool', `/w "${msg.who}" Usage: !momentum-set <number>`);
+        sendChat('Momentum Pool', `/w "${whisperTo(msg.who)}" Usage: !momentum-set <number>`);
         return;
       }
       setPool(value);
@@ -288,12 +293,12 @@ on('ready', () => {
 
     if (command === '!momentum-adjust') {
       if (!playerIsGM(msg.playerid)) {
-        sendChat('Momentum Pool', `/w "${msg.who}" Only the GM can manually adjust the Momentum pool.`);
+        sendChat('Momentum Pool', `/w "${whisperTo(msg.who)}" Only the GM can manually adjust the Momentum pool.`);
         return;
       }
       const delta = Number(args[0]);
       if (!Number.isFinite(delta)) {
-        sendChat('Momentum Pool', `/w "${msg.who}" Usage: !momentum-adjust <number, may be negative>`);
+        sendChat('Momentum Pool', `/w "${whisperTo(msg.who)}" Usage: !momentum-adjust <number, may be negative>`);
         return;
       }
       const actualDelta = applyDelta(delta);

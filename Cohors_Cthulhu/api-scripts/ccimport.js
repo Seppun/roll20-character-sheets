@@ -60,6 +60,11 @@
 on('ready', () => {
   'use strict';
 
+  // msg.who for a GM carries a " (GM)" suffix ("Han V. (GM)"), which /w
+  // can't resolve ("Unable to find a player or character with name") -
+  // whisper to the bare display name instead.
+  const whisperTo = (who) => String(who || '').replace(/\s*\(GM\)\s*$/, '');
+
   const ccAttributeNames = ['agility', 'brawn', 'coordination', 'gravitas', 'insight', 'reason', 'will'];
   const ccNpcTiers = ['trooper', 'toughened', 'nemesis'];
   const ccCapitalize = (text) => String(text || '').charAt(0).toUpperCase() + String(text || '').slice(1);
@@ -338,36 +343,37 @@ on('ready', () => {
     .trim();
 
   const announceResults = (who, results) => {
+    results.forEach((r) => log(`[CCImport] imported "${r.name}"${r.warnings.length ? ` - warnings: ${r.warnings.join('; ')}` : ''}`));
     const lines = results.map((r) => {
       const warn = r.warnings.length ? ` (${r.warnings.join('; ')})` : '';
       return `${r.name}${warn}`;
     });
-    sendChat('CCImport', `/w "${who}" &{template:default} {{name=NPC Import}} {{Imported ${results.length}=${lines.join(' | ')}}}`);
+    sendChat('CCImport', `/w "${whisperTo(who)}" &{template:default} {{name=NPC Import}} {{Imported ${results.length}=${lines.join(' | ')}}}`);
   };
 
   const runImport = (who, rawNotes) => {
     const cleaned = stripHtmlNotes(rawNotes);
     if (!cleaned) {
-      sendChat('CCImport', `/w "${who}" That handout's GM Notes are empty.`);
+      sendChat('CCImport', `/w "${whisperTo(who)}" That handout's GM Notes are empty.`);
       return;
     }
     let data;
     try {
       data = JSON.parse(cleaned);
     } catch (err) {
-      sendChat('CCImport', `/w "${who}" Could not parse JSON from GM Notes: ${err.message}`);
+      sendChat('CCImport', `/w "${whisperTo(who)}" Could not parse JSON from GM Notes: ${err.message}`);
       return;
     }
     const npcs = Array.isArray(data) ? data : [data];
     if (!npcs.length) {
-      sendChat('CCImport', `/w "${who}" No NPCs found in that JSON.`);
+      sendChat('CCImport', `/w "${whisperTo(who)}" No NPCs found in that JSON.`);
       return;
     }
     announceResults(who, npcs.map(importNpc));
   };
 
   const usage = (who) => {
-    sendChat('CCImport', `/w "${who}" Usage: !ccimport handout|<Handout Name> - paste one NPC object or a JSON array of several into that handout's GM Notes first. See npc-import/FORMAT.md for the data format.`);
+    sendChat('CCImport', `/w "${whisperTo(who)}" Usage: !ccimport handout|<Handout Name> - paste one NPC object or a JSON array of several into that handout's GM Notes first. See npc-import/FORMAT.md for the data format.`);
   };
 
   // Same diagnostic logging convention as ccmomentum.js/ccthreat.js - kept
@@ -389,7 +395,7 @@ on('ready', () => {
 
     const handout = findObjs({_type: 'handout', name: identifier})[0];
     if (!handout) {
-      sendChat('CCImport', `/w "${msg.who}" No handout named "${identifier}" found.`);
+      sendChat('CCImport', `/w "${whisperTo(msg.who)}" No handout named "${identifier}" found.`);
       return;
     }
     // handout.get('gmnotes', callback) is asynchronous (unlike most other
