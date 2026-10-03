@@ -40,6 +40,16 @@ Javelin (Thrown), Pilum, Plumbata, Sling.
 **Known Armor**: Chainmail / Lorica Hamata, Leather Armor, Lorica
 Segmentata, Lorica Squamata.
 
+**Mythos spellbooks** (NPC-only; `spellcasting.tradition` value in
+brackets): Tome of Cthulhu [`cthulhu`], Compendium of Mormo [`mormo`],
+Grimoire of Nyarlathotep [`nyarlathotep`], Spellbook of Yog-Sothoth
+[`yog_sothoth`]. Spell names must match `source/data/spells.json` exactly.
+
+**Common NPC special rules**: Brutal, Extraordinary [Attribute], Fast
+Recovery, Fearsome, Feeds Upon Fear, Flight, Grasping, Immune to,
+Incorporeal, Invulnerable, Keen Senses, Menacing, Mindless, Natural Armor,
+Natural Courage, Night Vision, Scale, Spellcaster, Threatening, Tough.
+
 **Talents**: ~159 entries in `source/data/talents.json` in this repo - check
 a named ability against that file before treating it as custom.
 
@@ -60,27 +70,39 @@ a named ability against that file before treating it as custom.
    Chitin Plating) plus every other field filled by hand - the sheet's Name
    field takes any free text, it isn't limited to the lists above. This is
    the normal way to represent a natural attack or innate armor.
-4. **Don't pad a sparse stat block.** A Minion-tier NPC with three
+4. **Don't pad a sparse stat block.** A Trooper NPC with three
    mechanical lines should produce a sparse JSON object, not one with
    invented Talents or Focuses to look more complete. Omit optional fields
    rather than guessing.
 5. **Carry flavor text forward.** The descriptive paragraph around a stat
    block (not just the numbers) is often more useful at the table than the
    raw mechanics - put it in `traits`/`notes`.
-6. **Set `character_type`.** `"cannon_fodder"` for a disposable combat extra
-   (a Minion-tier mook meant to die in groups - a cultist thug, a ghoul, a
-   robber); `"npc"` for a recurring or important character (a named
-   antagonist, a Nemesis-tier threat, anyone the GM plays across multiple
-   scenes). When genuinely unsure, prefer `"npc"` (the schema's own
-   default) - it only means "show the full sheet," never a
-   mechanical difference. Mentioning Minion/Toughened/Nemesis from the
-   source stays in `notes` either way (see the next rule) - `character_type`
-   is about sheet layout, not that tier scale.
-7. **No `tier` field.** This format deliberately has no Minion/Toughened/
-   Nemesis field - that's a GM-facing difficulty label, not something the
-   sheet renders differently. If the source names a tier, mention it as
-   plain text in `notes` instead of inventing a structured field for it.
-8. **Every object must validate against the schema below** before you
+6. **Set `npc_type` from the profile.** The line under the NPC's name
+   reads TROOPER NPC, TOUGHENED NPC or NEMESIS NPC: use `"trooper"`,
+   `"toughened"` or `"nemesis"`. Leave `allegiance` out (adversary) unless
+   the text says the NPC is an ally.
+7. **Copy the printed totals and damage, don't recompute them.** STRESS,
+   INJURIES, ARMOR, COURAGE and Power go in `profile` exactly as printed;
+   they already include special-rule bonuses. Attack damage goes in
+   `damage_effects` exactly as printed, too. Mark (Mental Attack) entries
+   `"type": "mental"`. An attribute printed as "—" is `null`; an
+   Extraordinary bonus printed as "Brawn 13(2)" means `"brawn": 13` plus an
+   `Extraordinary Brawn 2` special rule. ESCALATION OPTIONS go in
+   `escalation_options`, not `weapons`.
+8. **Special rules, spells, rituals.** List every SPECIAL RULES entry by its
+   printed name. Omit `description` for a common rule (above) unless the
+   profile adds something specific; write the profile's wording for any
+   other rule. For casters, set `spellcasting.attribute` from "uses X to
+   cast spells", `spellcasting.tradition` from the spellbook named, list
+   the spells in `spells` and any rituals in `rituals`.
+9. **Beware jumbled columns.** PDF text from two-column pages often
+   interleaves: an attack's damage effects can appear several lines after
+   its name, and attribute blocks from two neighbouring profiles can land
+   next to each other. Match values by the profile's own structure (every
+   NPC has exactly seven attributes and one STRESS/INJURIES/ARMOR/COURAGE
+   line). If you can't attribute a value confidently, leave it out and say
+   so in your summary.
+10. **Every object must validate against the schema below** before you
    consider it done - required fields are `name` and all seven
    `attributes`; everything else is optional. Re-read a field's
    description in the schema if its shape is unclear (e.g. `skills` nests

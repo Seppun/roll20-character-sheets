@@ -193,5 +193,256 @@
       "effect": "Targets one enemy or object within Medium range, inflicting power+2 physical damage with Piercing 3.",
       "momentum": "For 2 Momentum, add the Intense damage effect.\n\nFor 2 Momentum, add the Vicious damage effect."
     }
+  },
+  "cthulhu": {
+    "Call of the Deep": {
+      "skill": "Resilience",
+      "difficulty": "2, opposed by target's Will + Resilience",
+      "cost": "5 Drain",
+      "duration": "Until the end of the current scene",
+      "category": "Curse spell",
+      "effect": "Targets a single living creature within Medium range. If affected, it moves towards the nearest large body of water it can see (GM's discretion whether it is large enough). Its only actions are moving towards that water and trying to break free (Will + Resilience, difficulty 2). On reaching the water it enters and dives downwards until it breaks free or drowns. If it cannot see a body of water it acts normally, but the spell stays in effect until it breaks free.\n\nEach Effect rolled on the cost adds 1 to Threat.",
+      "momentum": "For 2 Momentum, the difficulty of any test to break free increases by +1 (not repeatable).\n\nFor 2 Momentum, the target moves towards the nearest large body of water whether or not it can see it."
+    },
+    "Curse of Cthulhu": {
+      "skill": "Academia",
+      "difficulty": "2",
+      "cost": "4 Drain, Piercing 1",
+      "duration": "Instant",
+      "category": "Attack spell",
+      "effect": "All enemies within Close range suffer power+1 mental stress with the Piercing 1 and Stun effects.\n\nFlawed: affects all creatures within range, not just enemies.",
+      "momentum": "For 2 Momentum, add the Persistent 4 effect to the damage; the persistent damage also has the Stun effect."
+    },
+    "Echo of the Ocean": {
+      "skill": "Persuasion",
+      "difficulty": "1",
+      "cost": "2 Drain",
+      "duration": "A number of rounds equal to the spellcaster's power",
+      "category": "Blessing spell",
+      "effect": "The spellcaster and all allies within Close range inflict +1 stress on all their attacks (melee, ranged and mental) and gain +2 Morale.",
+      "momentum": ""
+    },
+    "Gift of Cthulhu": {
+      "skill": "Survival",
+      "difficulty": "2; if the target is unwilling, opposed by its Will + Resilience (difficulty 2)",
+      "cost": "4 Drain, Piercing 1",
+      "duration": "A number of days equal to the spellcaster's power, or earlier if the spellcaster ends it",
+      "category": "Transmutation spell",
+      "effect": "Targets the spellcaster or a single human within Reach. The target gains the truth Deep One Transmutation (breathes and moves easily underwater, peculiar appearance), an Athletics focus in Swimming, and the Nauseating ability (see Deep One Hybrid). When the effects end, unwilling targets roll to see if they develop a scar, as if recovering from a mental injury.",
+      "momentum": "If cast on an unwilling victim, for 2 Momentum the target also suffers 4 Piercing 2 mental damage.\n\nIf cast on the spellcaster or a willing target, for 2 Momentum they may suppress the transmutation for up to an hour at a time without ending the effect."
+    },
+    "Pool of Limpid Bliss": {
+      "skill": "Resilience",
+      "difficulty": "3",
+      "cost": "5 Drain",
+      "duration": "Until the end of the current scene",
+      "category": "Manifestation spell",
+      "effect": "Choose a zone within Medium range: an alluring pool appears there. Enemies in that zone at the start of their turn must pass a Will + Resilience test (difficulty 2) or suffer 4 mental stress with the Stun effect and move into the pool (even if stunned). A character defeated by mental stress from the pool submerges and begins Dying as they drown.",
+      "momentum": "For 2 Momentum, increase the difficulty of all tests to resist the spell by 1.\n\nFor 1 Momentum each, increase the spell's damage by +1.\n\nFor 2 Momentum, add the Piercing 1 effect."
+    },
+    "Swimmer in the Elder Current": {
+      "skill": "Survival",
+      "difficulty": "2",
+      "cost": "4 Drain, Stun",
+      "duration": "Instant",
+      "category": "Blessing spell",
+      "effect": "Affects the spellcaster and allies within Close range, up to half the spellcaster's power (rounding up) in targets. They turn to water and reappear moments later anywhere within sight within Long range. Characters moved this way cannot act on their following turn, as if Stunned.",
+      "momentum": "For 2 Momentum, all transported characters gain +2 cover until the start of the spellcaster's next turn.\n\nFor 2 Momentum, all transported characters other than the spellcaster recover stress equal to the spellcaster's Survival skill."
+    },
+    "Wave Storm": {
+      "skill": "Survival",
+      "difficulty": "2",
+      "cost": "5 Drain, Piercing 1",
+      "duration": "A number of rounds equal to the spellcaster's power",
+      "category": "Summoning spell",
+      "effect": "Conjures a vortex of water in a zone within Medium range. It takes its own turn and cannot be attacked or damaged. At the start of its turn it inflicts physical stress equal to the spellcaster's power+1, with the Piercing 1 and Snare effects, on all creatures and damageable objects within Close range, then moves to an adjacent zone carrying anything it ensnared. The spellcaster chooses its direction while within Medium range of it; otherwise it stays put, or the GM may spend 1 Threat to move it.\n\nFlawed: the spellcaster cannot control the vortex, and the GM need not spend Threat to move it.",
+      "momentum": "The spellcaster may increase the vortex's damage by +1 per Momentum spent."
+    }
+  },
+  "mormo": {
+    "Acidic Transformation": {
+      "skill": "Medicine",
+      "difficulty": "3",
+      "cost": "6 Drain, Piercing 2",
+      "duration": "Not stated",
+      "category": "",
+      "effect": "The spellcaster's flesh becomes corrosive. Their unarmed attacks inflict +Power physical damage with the Persistent 4 and Piercing 1 effects. Enemies who make melee attacks against or grapple the spellcaster with natural weapons or unarmed attacks suffer 3 physical stress with the Piercing 1 effect.\n\nFlawed: the spellcaster's body corrodes too: they suffer 3 physical stress with the Drain effect at the end of every turn while the spell lasts.",
+      "momentum": "For 1 Momentum, damage inflicted by this spell's effect gains the Vicious effect."
+    },
+    "Black Goat's Blessing": {
+      "skill": "Resilience",
+      "difficulty": "3",
+      "cost": "4 Drain",
+      "duration": "Until the end of the current scene",
+      "category": "",
+      "effect": "Choose a number of allies within Close range equal to your Power: their Armor resistance increases by +2 and they regenerate 2 stress at the end of each turn.\n\nFlawed: recipients mutate grotesquely, increasing their Complication range by +1.",
+      "momentum": "For 2 Momentum, increase the stress regeneration by an additional 2.\n\nFor 1+ Momentum, affect one additional ally per Momentum spent."
+    },
+    "Call the Corpse Eaters": {
+      "skill": "Persuasion",
+      "difficulty": "1 plus the number of ghoul mobs",
+      "cost": "5 Drain, Piercing 2",
+      "duration": "Until the end of the current scene",
+      "category": "Summoning spell",
+      "effect": "Summons one, two or three ghouls (see Ghoul) to aid the spellcaster; several act as a mob. They obey the spellcaster's commands, though demanding orders may need more persuasion, and return to their realm when the spell ends.\n\nFlawed: the ghouls are summoned but not under the spellcaster's control.",
+      "momentum": "For 1+ Momentum, summon one additional ghoul per Momentum spent."
+    },
+    "Foul Birthing": {
+      "skill": "Survival",
+      "difficulty": "3",
+      "cost": "4 Drain",
+      "duration": "Until the end of the current scene",
+      "category": "",
+      "effect": "Infuses a single allied NPC with a latent transformation that triggers on their defeat, spawning an insect swarm or a rat swarm. The creatures disperse when the spell ends.\n\nFlawed: it may trigger prematurely; the GM may spend 2 Threat to make it trigger whenever they wish.",
+      "momentum": "For 1 Momentum (paid when cast), the spawned creatures are under the spellcaster's control."
+    },
+    "Necrophagus": {
+      "skill": "Medicine",
+      "difficulty": "4",
+      "cost": "5 Drain",
+      "duration": "Instant",
+      "category": "",
+      "effect": "Targets a single enemy within Medium range, inflicting physical stress equal to the spellcaster's Power+2. The spellcaster or an ally within Close range recovers up to half the stress inflicted.\n\nFlawed: neither the spellcaster nor an ally recovers stress.",
+      "momentum": "For 1 Momentum, the spell gains the Vicious effect."
+    },
+    "Sacrificial Rebirth": {
+      "skill": "Survival",
+      "difficulty": "4",
+      "cost": "5 Drain, Piercing 3",
+      "duration": "Until the end of the current scene",
+      "category": "",
+      "effect": "Sacrifices a creature within Reach (willing or completely immobile, no larger than Scale 0, and a Trooper NPC; slain instantly) to summon a Foetid Young of Mormo that obeys the spellcaster until the end of the scene, then vanishes.\n\nFlawed: the Foetid Young is summoned but not under the spellcaster's control.",
+      "momentum": "For 2 Momentum, the Foetid Young is summoned with an additional +1 Brawn and Resilience."
+    },
+    "Whisper of the Woods": {
+      "skill": "Survival",
+      "difficulty": "2",
+      "cost": "3 Drain",
+      "duration": "Until the end of the current scene",
+      "category": "",
+      "effect": "Plant life grows rapidly to ensnare enemies. Select a single zone within Long range: enemies there must pass an Athletics test (difficulty 2) or become restrained, unable to move until they pass an Athletics test on their turn.\n\nFlawed: the plants grow out of control, affecting every creature in the area, not only enemies.",
+      "momentum": "For 2 Momentum, affect one additional zone within range; usable up to a number of times equal to the spellcaster's Power."
+    }
+  },
+  "nyarlathotep": {
+    "Delirium of the Dark Pharaoh": {
+      "skill": "Persuasion",
+      "difficulty": "2",
+      "cost": "5 Drain",
+      "duration": "Instant",
+      "category": "Control spell",
+      "effect": "Targets a single creature within Medium range: it suffers power rating+1 mental stress with the Persistent 5 effect. If this (or the Persistent damage) would inflict one or more injuries, the target instead flies into a violent frenzy, attacking the nearest creature, friend or foe, until the end of the scene or until Defeated.\n\nEach Effect rolled on the cost adds 1 to Threat.",
+      "momentum": "For 2 Momentum, the initial damage and the Persistent rolls gain the Piercing 1 effect.\n\nFor every 2 Momentum, affect one additional target."
+    },
+    "Lesser Black Rain": {
+      "skill": "Fighting",
+      "difficulty": "2",
+      "cost": "4 Drain, Piercing 1",
+      "duration": "A number of rounds equal to the spellcaster's power rating",
+      "category": "Manifestation spell",
+      "effect": "A storm gathers above a zone the spellcaster can perceive within Long range. It cannot be attacked or damaged and takes its own turn. It does nothing on its first turn; on each later turn it inflicts power rating+1 physical damage with the Piercing 1 effect on all creatures and damageable objects in its zone that are not within hard cover.",
+      "momentum": "For 2 Momentum, add the Vicious effect.\n\nFor 2 Momentum, move the storm to an adjacent zone as a major action (Will + Resilience, difficulty 2)."
+    },
+    "Mask of the Faceless Sphinx": {
+      "skill": "Academia",
+      "difficulty": "2",
+      "cost": "4 Drain, Persistent 3",
+      "duration": "A number of rounds equal to the spellcaster's power rating",
+      "category": "Blessing spell",
+      "effect": "The spellcaster and all allies within Close range become harder to hit: attacks against them are +1 difficulty, and they count as having heavy cover.",
+      "momentum": "For 2 Momentum, the difficulty increase becomes +2.\n\nFor 2 Momentum, affected characters gain +4 Cover resistance instead of heavy cover's +2.\n\nFor 3 Momentum, any ranged or melee attack that misses an affected character inflicts 4 mental damage with the Stun effect on the attacker."
+    },
+    "Rays of the Black Sun": {
+      "skill": "Fighting",
+      "difficulty": "3",
+      "cost": "5 Drain, Piercing 1",
+      "duration": "Instant",
+      "category": "Attack spell",
+      "effect": "Also called Lesser Dread Equinox. Targets a single enemy within Medium range: power rating+2 mental damage with the Piercing 1 and Snare effects.",
+      "momentum": "For 2 Momentum, the spell gains the Persistent 4 effect.\n\nFor every 2 Momentum, affect one additional target."
+    },
+    "The Nameless Mists": {
+      "skill": "Academia",
+      "difficulty": "2",
+      "cost": "5 Drain",
+      "duration": "A number of rounds equal to the spellcaster's power",
+      "category": "Manifestation spell",
+      "effect": "A foul mist fills the spellcaster's zone. Any enemy in it at the end of their turn suffers mental damage equal to the spellcaster's power rating+1, with the Piercing 2 and Stun effects. The zone gains the truth Shifting, Vile Mists, hindering vision for the spellcaster's enemies only.\n\nEach Effect rolled on the cost adds 1 to Threat.\n\nFlawed: it affects all creatures, not just enemies.",
+      "momentum": "For 2 Momentum, the spell also gains the Drain effect.\n\nExtend the mist into adjacent zones for 2 Momentum per additional zone."
+    },
+    "The Shape of Hate": {
+      "skill": "Academia",
+      "difficulty": "2",
+      "cost": "4 Drain, Piercing 1",
+      "duration": "A number of rounds equal to the spellcaster's power rating",
+      "category": "Blessing spell",
+      "effect": "Affects a number of allies within Close range equal to the spellcaster's power rating (may include or exclude the spellcaster). When first cast, they immediately make a minor action to move toward the nearest enemy. Affected allies inflict +2 damage on all melee attacks.\n\n[Check against the book, p.164: the PDF text for this spell and the two after it was jumbled across columns.]",
+      "momentum": "For 2 Momentum, the spell gains the Intense damage effect.\n\nFor 2 Momentum, when an affected ally makes a successful melee attack, they may make a second melee attack at +1 difficulty."
+    }
+  },
+  "yog_sothoth": {
+    "Binding of Yog-Sothoth": {
+      "skill": "Persuasion",
+      "difficulty": "2",
+      "cost": "5 Drain",
+      "duration": "Instant",
+      "category": "Control spell",
+      "effect": "All enemies within Close range suffer power+2 mental stress with the Snare effect. Enemies who would suffer one or more injuries are paralyzed instead; a paralyzed enemy can only try to break free (Will + Resilience, difficulty 3).\n\n[Check against the book, p.165: Momentum options were not clearly attributable in the PDF text.]",
+      "momentum": ""
+    },
+    "Touch of the Black Sun": {
+      "skill": "Fighting",
+      "difficulty": "2",
+      "cost": "4 Drain, Piercing 1",
+      "duration": "Instant",
+      "category": "Attack spell",
+      "effect": "Targets an enemy within Close range with a torrent of black flame, inflicting power rating+2 physical damage with the Area and Persistent 4 effects. The spellcaster cannot affect themselves with this spell.\n\n[Check against the book, p.165: the PDF text was jumbled across columns.]\n\nFlawed: it affects all creatures within Close range, not just enemies.",
+      "momentum": "For 2 Momentum, the spell gains the Piercing 1 effect.\n\nFor 2 Momentum, the spell gains the Persistent 3 effect; the Persistent damage also has the Snare effect."
+    },
+    "Foetid Touch of Aforgomon": {
+      "skill": "Fighting",
+      "difficulty": "3, opposed by the target's Agility + Fighting (difficulty 3)",
+      "cost": "7 Drain",
+      "duration": "Instant",
+      "category": "Attack spell",
+      "effect": "Targets a single enemy within Reach: power+1 physical stress with the Persistent 3 effect. A character Defeated by this spell starts dying; if they die, a Bloodborn emerges from their remains the following round.\n\nEach Effect rolled on the cost adds 1 to Threat.",
+      "momentum": "For 2 Momentum, gain Piercing 2 on both the initial and the Persistent stress.\n\nFor 2 Momentum, gain Intense on both the initial and the Persistent stress."
+    },
+    "Gaze of the Multiverse": {
+      "skill": "Academia",
+      "difficulty": "3",
+      "cost": "5 Drain, Piercing 2",
+      "duration": "Instant",
+      "category": "Attack spell",
+      "effect": "All enemies within Close range suffer power+2 mental stress with the Stun effect.\n\nFlawed: it affects all creatures within Close range, not just enemies.",
+      "momentum": "For 2 Momentum, the spell gains the Drain effect.\n\nFor 2 Momentum, the spell gains the Vicious effect."
+    },
+    "Loathsome Bond of 'Umr at-Tawil": {
+      "skill": "Persuasion",
+      "difficulty": "2",
+      "cost": "4 Drain",
+      "duration": "Instant",
+      "category": "Attack spell",
+      "effect": "Each enemy within Close range suffers power+1 mental stress with the Drain and Piercing 1 effects. If the spell inflicts one or more injuries, the spellcaster may remove one of their own injuries.\n\nEach Effect rolled on the cost adds 1 to Threat.\n\nFlawed: it targets every creature within Close range, not just enemies.",
+      "momentum": "For 2 Momentum, the spell gains the Piercing 2 effect.\n\nFor 2 Momentum, the spell gains the Intense effect.\n\nFor 2 Momentum, the spellcaster removes one injury for each injury inflicted."
+    },
+    "Way of the Gatekeeper": {
+      "skill": "Academia",
+      "difficulty": "2",
+      "cost": "5 Drain, Piercing 2",
+      "duration": "Instant",
+      "category": "Manifestation spell",
+      "effect": "Transports a number of willing allies within Close range equal to half the spellcaster's power (rounding up), optionally including themselves; they vanish and reappear in any zone within Long range.",
+      "momentum": "For 2 Momentum, the maximum number of allies equals the spellcaster's power instead of half.\n\nFor 2 Momentum, they may reappear at a familiar location within a mile (somewhere the spellcaster has spent at least an hour)."
+    },
+    "Spheres of Yog-Sothoth": {
+      "skill": "Fighting",
+      "difficulty": "Equal to the number of spheres (1-3)",
+      "cost": "5 Drain",
+      "duration": "Instant",
+      "category": "Attack spell",
+      "effect": "Conjures one, two or three spheres hurled at different enemies within Medium range; the difficulty equals the number of spheres. Each enemy hit suffers power+2 physical stress with the Drain and Stun effects.\n\nEach Effect rolled on the cost adds 1 to Threat.",
+      "momentum": "For 2 Momentum, the spell gains the Piercing 2 effect."
+    }
   }
 }

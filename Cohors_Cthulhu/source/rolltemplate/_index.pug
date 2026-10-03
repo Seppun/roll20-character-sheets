@@ -42,13 +42,18 @@
       .cc-roll-row
         span Successes:
         span {{computed::successes}}
+      //- Extraordinary [Attribute] X - already counted in Successes above.
+      +rollGreater({values: 'computed::auto_successes 0'})
+        .cc-roll-row
+          span Extraordinary (auto):
+          span +{{computed::auto_successes}}
       +rollGreater({values: 'computed::complications 0'})
         .cc-roll-row.cc-roll-complication
           span Complications:
           span {{computed::complications}}
     +rollTotal({values: 'computed::outcome 1'})
       .cc-roll-outcome.cc-roll-pass
-        span Passed - Momentum: {{computed::bonus_momentum}}
+        span Passed - {{pool}}: {{computed::bonus_momentum}}
     +rollTotal({values: 'computed::outcome 0'})
       .cc-roll-outcome.cc-roll-fail
         span Failed
@@ -63,7 +68,7 @@
     //- complications above.
     +rollGreater({values: 'computed::momentum_spent 0'})
       .cc-roll-row
-        span Momentum Spent:
+        span {{pool}} Spent:
         span {{computed::momentum_spent}}
     //- Exclusive to initiateFatigueResistRoll
     //- (views/panels/_vitals_panel.pug) - never set by any other roll
@@ -84,6 +89,12 @@
     //- unconditionally and only hiding the display keeps this out of the
     //- "conditional rolls in roll templates" trouble documented there,
     //- while still reading as "no damage" on a miss.
+    //- {{pool}} is a plain literal set in each roll string (Threat for an
+    //- adversary NPC, else Momentum - see ccPoolName in
+    //- views/_global_sheetworker.pug), so it displays without computed::.
+    +templateConditionalDisplay('mental')
+      .cc-roll-row.cc-roll-note
+        span Target must be aware of the attacker and within Medium range. Resisted by Courage + Morale.
     +templateConditionalDisplay('is_weapon')
       +rollTotal({values: 'computed::outcome 1'})
         .cc-roll-header.cc-roll-damage-header
@@ -248,6 +259,11 @@
        the rest of the row text around them. */
     .sheet-cc-roll-dice-result {
       font-size: 1.4rem;
+    }
+
+    .sheet-cc-roll-note {
+      font-size: 0.8rem;
+      font-style: italic;
     }
 
     .sheet-cc-roll-complication {

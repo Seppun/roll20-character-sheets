@@ -178,19 +178,9 @@
   }
 
 +module.
-  // Query string for choosing which Attribute pairs with a skill/focus
-  // roll (skill-to-attribute pairing isn't fixed by RAW) - used only by
-  // this panel's own two roll initiators below, unlike Attributes' own
-  // roll which always knows its attribute already.
-  const ccAttributeQuery = '?{Attribute' +
-    '|Agility,@{agility_rating}' +
-    '|Brawn,@{brawn_rating}' +
-    '|Coordination,@{coordination_rating}' +
-    '|Gravitas,@{gravitas_rating}' +
-    '|Insight,@{insight_rating}' +
-    '|Reason,@{reason_rating}' +
-    '|Will,@{will_rating}}';
-
+  // Skill-to-attribute pairing isn't fixed by RAW, so both initiators below
+  // ask via ccAttributeQuery (views/_global_sheetworker.pug).
+  //
   // Plain Skill roll (no specific focus): crit only on a natural 1, per
   // RAW ("if you don't have a focus that applies, each die that rolls a
   // 1 is a critical success"). Shares runCcRoll/ccNormalizeName/
@@ -200,9 +190,10 @@
     const skill = ccNormalizeName(trigger.name).replace(/_skill_roll$/, '');
     const skillRanks = Number(attributes[`${skill}_ranks`]) || 0;
     await runCcRoll({
+      attributes,
       skillLabel: ccCapitalize(skill),
       focusLabel: '',
-      attributeExpr: ccAttributeQuery,
+      attributeExpr: ccAttributeQuery(attributes),
       skillRanks,
       critMax: 1,
     });
@@ -217,9 +208,10 @@
     const [, skill, focusSlug] = match;
     const skillRanks = Number(attributes[`${skill}_ranks`]) || 0;
     await runCcRoll({
+      attributes,
       skillLabel: ccCapitalize(skill),
       focusLabel: ccCapitalize(focusSlug),
-      attributeExpr: ccAttributeQuery,
+      attributeExpr: ccAttributeQuery(attributes),
       skillRanks,
       critMax: skillRanks,
     });

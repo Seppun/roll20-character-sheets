@@ -1,6 +1,6 @@
 {
   "name": "Centurion Marcus Aquilinus",
-  "character_type": "npc",
+  "npc_type": "nemesis",
   "archetype": "Veteran officer",
   "culture": "Roman",
   "caste": "Equestrian",

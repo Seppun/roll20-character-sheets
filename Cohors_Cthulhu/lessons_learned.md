@@ -495,6 +495,19 @@ standalone `<input list>` test page gave misleading results, likely
 because it didn't reproduce the real field's box-model/width/border
 context closely enough.
 
+## Never duplicate an attribute's radios on another tab
+
+All radios named `attr_<x>` form ONE browser radio group across the whole
+sheet, whichever tab they sit on. Copying the Character tab's
+`character_type` radios onto the Spells tab (so that page's CSS could see
+the type) meant the browser allowed only one of the eight to be checked:
+on load the Spells tab's `pc` copy won and the Character tab showed no
+type selected at all, with every type-driven panel rule dead. Fix: give the
+other tab its own calculated marker attribute (`spells_type_marker`,
+`calcSpellsTypeMarker`) and add it to the source attribute's `affects`,
+the same pattern as `tradition_marker`. Duplicated *text/number/select*
+fields with one attribute name are fine; radios aren't.
+
 ## Native HTML radios vs. Roll20's own attribute-group binding
 
 A named radio group bound to one attribute (the standard way Roll20

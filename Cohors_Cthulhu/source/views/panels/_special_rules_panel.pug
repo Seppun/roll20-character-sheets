@@ -1,0 +1,205 @@
+//- views/panels/_special_rules_panel.pug
+//- NPC-only Special Rules (hidden for player characters - see
+//- .cc-npc-panel in views/_character.pug). Name is a free-text combobox
+//- seeded with the GM's Guide's Common NPC Special Abilities; picking one
+//- fills in its summary, and any other name is a custom rule.
+//-
+//- Only roll-time effects that a stat block's printed numbers don't already
+//- include are automated, so nothing is counted twice:
+//-  - Extraordinary [Attribute] X: +X automatic successes on tests using
+//-    that attribute (ccExtraordinary, views/_global_sheetworker.pug).
+//-  - Brutal X: melee attacks use Brawn instead of Agility
+//-    (initiateWeaponRoll, views/panels/_weapons_panel.pug).
+//- Everything else (stress, armor, courage and damage bonuses) is already
+//- in the profile's printed totals, so those rules are reference text here;
+//- each row's button posts the rule to chat.
+-
+  const ccSpecialRuleProfiles = {
+    'Brutal': 'Relies on overwhelming brute force. Add X to the damage of its melee attacks, and it may always use Brawn when making or defending against a melee attack.',
+    'Extraordinary Agility': 'Agility far beyond human. X automatic successes on tests using Agility.',
+    'Extraordinary Brawn': 'Brawn far beyond human. X automatic successes on tests using Brawn, +X damage on attacks with Brawn bonus damage, +X maximum stress.',
+    'Extraordinary Coordination': 'Coordination far beyond human. X automatic successes on tests using Coordination.',
+    'Extraordinary Gravitas': 'Gravitas far beyond human. X automatic successes on tests using Gravitas.',
+    'Extraordinary Insight': 'Insight far beyond human. X automatic successes on tests using Insight, +X damage on attacks with Insight bonus damage.',
+    'Extraordinary Reason': 'Reason far beyond human. X automatic successes on tests using Reason.',
+    'Extraordinary Will': 'Will far beyond human. X automatic successes on tests using Will, +X damage on attacks with Will bonus damage, +X maximum stress.',
+    'Fast Recovery': 'Removes X stress at the end of each of its turns. If it has any injuries at the start of its turn, spend 2 Threat to remove one completely. Stops working once it is defeated.',
+    'Fearsome': 'Adds X damage and the Piercing X effect to its mental attacks when face-to-face. The first time a player character sees it, they must pass a Will + Resilience test (difficulty X) or suffer the stress of its basic mental attack.',
+    'Feeds Upon Fear': 'Whenever a character suffers a mental injury within Medium range of it, generate 2 Threat.',
+    'Flight': 'Moves freely through the air and can hover, but must spend at least a minor action moving each turn or fall (also falls if knocked prone). Carrying something heavy needs a Brawn + Athletics test. May take the Athletics focus Flight.',
+    'Grasping': 'Spend 1 Threat after a successful melee attack to add the Snare effect. While holding a target it cannot melee attack anyone else, but melee attacks against the held target are 1 difficulty lower.',
+    'Immune to': 'Unaffected by the listed condition (such as cold, disease, fear, pain, poison, heat or suffocation).',
+    'Incorporeal': 'Only partly physical: gains X armor and moves freely through rough or difficult terrain. Spend 1 Threat to move through solid objects such as a wall or door.',
+    'Invulnerable': 'Cannot be injured in any way. It still suffers stress from attacks, but no injuries.',
+    'Keen Senses': 'One sense is especially sharp: tests using it are 2 difficulty lower, and it can detect things with it that others cannot.',
+    'Menacing': 'When it enters a scene, immediately generate 1 Threat, even if it is an ally.',
+    'Mindless': 'Unless commanded, mindlessly moves toward and attacks the nearest enemy. Cannot make reactions, cannot suffer mental stress or mental injuries, and cannot be reasoned with.',
+    'Natural Armor': 'Innate resistance to physical stress: X armor, on top of any armor worn.',
+    'Natural Courage': 'Innate resistance to mental stress: X courage, on top of any other source.',
+    'Night Vision': 'Sees in complete darkness: ignores difficulty and complication range increases from darkness, and can attempt tests darkness would otherwise make impossible.',
+    'Scale': 'Larger or smaller than humans (scale 0). Add its scale to the stress needed to inflict an injury on it; size also makes some tests easier or harder.',
+    'Spellcaster': 'A spellcaster with base 2 Power plus the listed attribute\'s bonus (Insight, Reason or Will). Knows X spells.',
+    'Threatening': 'Begins each scene with a personal pool of X Threat. Allied NPCs may spend from it instead of adding to Threat. Add 3 points to it by voluntarily suffering a complication related to the NPC.',
+    'Tough': 'Can withstand X more injuries before being defeated. Spend 3 Threat to ignore an injury being inflicted on it.',
+  };
+
+.cc-panel.cc-npc-panel.cc-special-rules
+  .cc-banner Special Rules
+  .cc-rep-table.cc-rep-special-rules
+    .cc-rep-header
+      span
+      span
+      span Name
+      span X
+      span Description
+    +fieldset({name: 'specialrule'})
+      +action({
+        name: 'special rule post',
+        class: 'cc-special-rule-post',
+        trigger: {triggeredFuncs: ['ccPostSpecialRule']}
+      })
+      +action({
+        name: 'special rule apply',
+        class: 'cc-special-rule-apply',
+        trigger: {triggeredFuncs: ['ccApplySpecialRulePreset']}
+      })
+      +text({
+        name: 'name',
+        list: 'cc-special-rule-options',
+        trigger: {triggeredFuncs: ['ccApplySpecialRulePreset']}
+      })
+      +number({name: 'x'})
+      +textarea({name: 'description'})
+  //- Options written out individually rather than looped - see the
+  //- comment above ccWeaponProfiles (views/panels/_weapons_panel.pug).
+  datalist#cc-special-rule-options
+    option(value='Brutal')
+    option(value='Extraordinary Agility')
+    option(value='Extraordinary Brawn')
+    option(value='Extraordinary Coordination')
+    option(value='Extraordinary Gravitas')
+    option(value='Extraordinary Insight')
+    option(value='Extraordinary Reason')
+    option(value='Extraordinary Will')
+    option(value='Fast Recovery')
+    option(value='Fearsome')
+    option(value='Feeds Upon Fear')
+    option(value='Flight')
+    option(value='Grasping')
+    option(value='Immune to')
+    option(value='Incorporeal')
+    option(value='Invulnerable')
+    option(value='Keen Senses')
+    option(value='Menacing')
+    option(value='Mindless')
+    option(value='Natural Armor')
+    option(value='Natural Courage')
+    option(value='Night Vision')
+    option(value='Scale')
+    option(value='Spellcaster')
+    option(value='Threatening')
+    option(value='Tough')
+
++scss.
+  .cc-character {
+    .cc-rep-special-rules {
+      .cc-rep-header,
+      fieldset,
+      .repcontainer .repitem {
+        grid-template-columns: 1.6rem 1.6rem 1.2fr 2.5rem 3fr;
+        align-items: center;
+      }
+
+      textarea {
+        min-height: 1.8rem;
+        width: 100%;
+      }
+
+      // Same plain-icon-button look as .cc-weapon-apply.
+      .cc-special-rule-apply,
+      .cc-special-rule-post {
+        background: none;
+        border: none;
+        padding: 0;
+        color: inherit;
+        font-size: 1rem;
+        cursor: pointer;
+        justify-self: center;
+
+        &:before {
+          opacity: 0.8;
+        }
+
+        &:hover:before {
+          opacity: 1;
+        }
+      }
+
+      .cc-special-rule-apply:before {
+        content: '\21BB';
+      }
+
+      // Speech-balloon-ish arrow: "post this rule to chat".
+      .cc-special-rule-post:before {
+        content: '\27A4';
+      }
+    }
+  }
+
++module.
+  const ccSpecialRuleProfiles = !{JSON.stringify(ccSpecialRuleProfiles)};
+
+  // "Fearsome 2", "Immune to Cold, Suffocation" or "Spellcaster (Will) 3"
+  // all resolve to their common rule: the longest profile name the typed
+  // name starts with.
+  const ccFindSpecialRule = (name) => {
+    const lower = String(name || '').trim().toLowerCase();
+    return Object.keys(ccSpecialRuleProfiles)
+      .filter((key) => lower.startsWith(key.toLowerCase()))
+      .sort((a, b) => b.length - a.length)[0];
+  };
+
+  // Fills in a known rule's summary, and X from a trailing number in the
+  // name, without overwriting anything already typed.
+  const ccApplySpecialRulePreset = ({trigger, attributes}) => {
+    const [section, rowID] = k.parseRepeatName(trigger.name);
+    const prefix = `${section}_${rowID}_`;
+    const name = attributes[`${prefix}name`];
+    const key = ccFindSpecialRule(name);
+    if (!key) { return; }
+    if (!attributes[`${prefix}description`]) {
+      attributes[`${prefix}description`] = ccSpecialRuleProfiles[key];
+    }
+    const trailing = String(name || '').match(/(\d+)\s*$/);
+    if (trailing && !attributes[`${prefix}x`]) {
+      attributes[`${prefix}x`] = Number(trailing[1]);
+    }
+  };
+  k.registerFuncs({ccApplySpecialRulePreset});
+
+  // Roll-template fields can't contain "}}" or "|" safely.
+  const ccTemplateSafe = (text) => String(text || '').replace(/[{}|]/g, '').replace(/\n+/g, ' ');
+
+  // Posts the rule to chat. A Fearsome rule also spells out the first-sight
+  // test and which mental attack it inflicts (the first Mental row in
+  // Weapons & Attacks).
+  const ccPostSpecialRule = async ({trigger, attributes}) => {
+    const [section, rowID] = k.parseRepeatName(trigger.name);
+    const prefix = `${section}_${rowID}_`;
+    const name = attributes[`${prefix}name`] || 'Special Rule';
+    const x = Number(attributes[`${prefix}x`]) || 0;
+    let extra = '';
+    if (ccFindSpecialRule(name) === 'Fearsome') {
+      const mental = (attributes.repeating_weapon || []).find((row) => row.attack_type === 'mental');
+      const attack = mental ? `${mental.name} (${mental.damage_effects})` : 'its basic mental attack';
+      extra = `{{First sight=Will + Resilience test, difficulty ${x || 1}, or suffer ${ccTemplateSafe(attack)}}} `;
+    }
+    try {
+      const roll = await startRoll(`&{template:default} {{name=@{character_name}: ${ccTemplateSafe(name)}}} ` +
+        `{{Rule=${ccTemplateSafe(attributes[`${prefix}description`])}}} ${extra}`);
+      finishRoll(roll.rollId, {});
+    } catch (err) {
+      console.log('[CC] Special rule post failed:', err.message);
+    }
+  };
+  k.registerFuncs({ccPostSpecialRule});

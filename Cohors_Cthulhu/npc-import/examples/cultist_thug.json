@@ -1,6 +1,6 @@
 {
   "name": "Cultist Thug",
-  "character_type": "cannon_fodder",
+  "npc_type": "trooper",
   "archetype": "Minor antagonist",
   "culture": "Provincial",
   "attributes": {"agility": 8, "brawn": 10, "coordination": 8, "gravitas": 8, "insight": 7, "reason": 7, "will": 9},

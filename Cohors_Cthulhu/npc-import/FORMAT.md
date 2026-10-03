@@ -31,23 +31,46 @@ else defaults to empty/zero. See `examples/` for fuller NPCs.
 
 ## Fields
 
-### Character type (optional, default `"npc"`)
+### NPC type and allegiance (optional)
 
 ```json
-"character_type": "cannon_fodder"
+"npc_type": "toughened",
+"allegiance": "adversary"
 ```
 
-Which of the sheet's two NPC modes this is. `"cannon_fodder"` is for
-disposable combat extras (ghouls, legionaries, a robber, a cult priest) -
-the sheet shows only Name, Vitals, Attributes, Skills, Weapons, Armor and
-Talents, hiding Culture/Caste/Wealth, Archetype/Specialization/Background/
-Characteristic, Truths & Scars, Languages and Experience (Spellcasting and
-Notes stay available either way, for a caster like the cult priest).
-`"npc"` (the default when this field is omitted) is a recurring/important
-character and gets the full sheet, identical to a PC. Importing never
-leaves fields blank just because they're hidden in a mode - fill in
-whatever the NPC actually has; the mode only controls what the sheet
-*shows*.
+`npc_type` is the profile's type from the GM's Guide, the line under its
+name: `"trooper"`, `"toughened"` or `"nemesis"` (default `"toughened"`).
+Trooper and Toughened NPCs get the sheet's compact combat layout; Nemesis
+NPCs get the full sheet. The type also sets the fallback Max Stress
+(Troopers halve it) and injury limit (1/2/3) when `profile` doesn't print
+them. Older files with `character_type` `"cannon_fodder"`/`"npc"` still
+import, as Trooper/Nemesis.
+
+`allegiance` is `"adversary"` (default: buys d20s with Threat, extra
+successes become Threat) or `"ally"` (uses the party's Momentum like a PC).
+It can be switched on the sheet at any time.
+
+### Truths (optional)
+
+```json
+"truths": ["Deep One Priest of the Elder Gods", "Amphibious"]
+```
+
+The profile's TRUTHS, one per entry (up to five).
+
+### Profile totals (optional)
+
+```json
+"profile": {"stress": 16, "injuries": 3, "armor": 3, "courage": 6, "power": 5}
+```
+
+The stat block's printed STRESS, INJURIES, ARMOR, COURAGE and Power (plus
+`morale` if given). These already include every special rule's bonus
+(Tough, Natural Armor, Extraordinary Brawn...), so they are written to the
+sheet as-is and win over its own formulas. Omit any the profile doesn't
+print and the tier formula applies instead. Not to be confused with the
+top-level `stress` (stress already marked) and `injuries` (injuries
+already sustained).
 
 ### Identity
 
@@ -65,7 +88,7 @@ values.
 ```
 
 All seven ratings, rulebook scale (typically 6-16). Required even for a
-Minion that will only ever use one or two of them - this sheet's own derived
+Trooper that will only ever use one or two of them - this sheet's own derived
 fields (Base Armour, Total Armor, Courage, Max Stress) are computed from
 attributes/skills/armor during import, the same way the PC sheet's own
 `calcBaseArmour`/`calcCourage`/`calcTotalArmor`/`calcStressMaxBase`/
@@ -146,6 +169,56 @@ claws and natural hide for an example of both). Known names:
 - **Armor**: Chainmail / Lorica Hamata, Leather Armor, Lorica Segmentata,
   Lorica Squamata
 
+### Attacks and mental attacks
+
+Every entry in `weapons` can carry `"type"`: `"melee"`, `"ranged"` or
+`"mental"`. Use `"mental"` for the profile's (Mental Attack) entries:
+
+```json
+{"name": "Horrific Presence", "type": "mental", "reach_range": "Medium", "damage_effects": "7, Piercing 2, Stun"}
+```
+
+For NPCs, copy the printed damage exactly. It already includes the
+attribute's bonus damage, Brutal and Fearsome, so the sheet adds nothing on
+top (a PC's weapon row adds bonus damage; an NPC's doesn't). Mental attacks
+roll Will + Persuasion or Survival at difficulty 1.
+
+### Special rules (optional)
+
+```json
+"special_rules": [
+  {"name": "Fearsome 2"},
+  {"name": "Dark Preacher", "description": "When making a mental attack, may spend 3 Threat to add the Area and Drain effects."}
+]
+```
+
+Name each rule as printed. The GM's Guide's common rules (Brutal, Fearsome,
+Tough, Extraordinary [Attribute], Natural Armor, Immune to, Night
+Vision...) fill in a summary on first sheet open if `description` is
+omitted; give the profile's wording for anything specific to this NPC. `x`
+is optional when the name ends with the number. On the sheet,
+Extraordinary [Attribute] X adds X automatic successes to rolls with that
+attribute, and Brutal makes melee attacks roll Brawn; every other rule is
+reference text, because its effect is already in the printed totals.
+
+### Spells, rituals and escalation options (optional)
+
+```json
+"spellcasting": {"attribute": "will", "tradition": "cthulhu"},
+"spells": ["Call of the Deep", "Curse of Cthulhu"],
+"rituals": ["Commune with Deity"],
+"escalation_options": ["Totemic Staff: (Melee), Reach 2, 5, Drain, Stun"]
+```
+
+`spellcasting.attribute` is the profile's "uses Will to cast spells"
+(insight, reason or will): base Power 2 plus that attribute's bonus, unless
+`profile.power` prints a total. `tradition` is the spellbook the `spells`
+come from: `runic`, `oracular`, `celtic`, or the NPC-only Mythos tomes
+`cthulhu`, `mormo`, `nyarlathotep` and `yog_sothoth`. Spell names must
+match `source/data/spells.json`; their details fill in on first sheet open.
+Rituals aren't battlefield spells, so they're recorded in the NPC's notes.
+Escalation options go into the NPC Profile panel, one per line.
+
 ### Fatigue / Stress (optional, default 0)
 
 `fatigue` and `stress` let an NPC start partway hurt (e.g. a survivor found
@@ -155,10 +228,3 @@ mid-encounter). Max Stress is always computed, never set directly.
 
 `injuries`, `traits`, `notes` - plain text, mapped straight onto the
 matching fields on the sheet.
-
-## What's deliberately not here yet
-
-No `tier` (Minion/Toughened/Nemesis) field - that's a GM-facing difficulty
-label from the rulebook, not something the sheet renders differently
-(unlike `character_type`, which does change what the sheet shows). Put it
-in `notes` if it's worth recording, as the examples here do.

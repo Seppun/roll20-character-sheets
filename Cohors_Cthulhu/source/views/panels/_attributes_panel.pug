@@ -141,10 +141,13 @@
   const initiateAttributeRoll = async ({trigger, attributes}) => {
     const attr = ccNormalizeName(trigger.name).replace(/_roll$/, '');
     const rating = Number(attributes[`${attr}_rating`]) || 0;
+    // Packed the same way ccAttributeQuery packs it (rating + 100x
+    // Extraordinary bonus) - see views/_global_sheetworker.pug.
     await runCcRoll({
+      attributes,
       skillLabel: ccCapitalize(attr),
       focusLabel: '',
-      attributeExpr: String(rating),
+      attributeExpr: String(rating + 100 * ccExtraordinary(attributes, attr)),
       skillRanks: 0,
       critMax: 1,
     });

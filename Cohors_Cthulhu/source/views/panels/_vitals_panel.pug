@@ -138,7 +138,7 @@
     .cc-vitals-injuries
       .cc-banner Injuries
       +textarea({name: 'injuries'}).cc-injuries
-    .cc-field
+    .cc-field.cc-vitals-fortune
       .cc-banner Fortune
       //- Hand-expanded rather than using +fillLeft directly, same as
       //- .cc-stress-track above and for the same reason (action-button
@@ -461,10 +461,15 @@
   const calcBaseArmour = ({attributes}) => ccAttributeBonus(attributes.brawn_rating);
   k.registerFuncs({calcBaseArmour});
 
-  const calcCourage = ({attributes}) => ccAttributeBonus(attributes.will_rating);
+  const calcCourage = ({attributes}) => {
+    const book = ccNpcBookValue(attributes, 'npc_courage');
+    return book !== null ? book : ccAttributeBonus(attributes.will_rating);
+  };
   k.registerFuncs({calcCourage});
 
   const calcTotalArmor = ({attributes}) => {
+    const book = ccNpcBookValue(attributes, 'npc_armor');
+    if (book !== null) { return book; }
     const base = ccAttributeBonus(attributes.brawn_rating);
     const armorRows = attributes.repeating_armor || [];
     const armorSum = armorRows.reduce((sum, row) => sum + (Number(row.resistance) || 0), 0);
@@ -484,13 +489,22 @@
   // calcStressMaxBase's own "Max" field/.cc-fatigue-max-marker, which both
   // need the UN-reduced number (Fatigue capping its own, already-Fatigue-
   // reduced cap would be self-referential).
+  //
+  // NPCs (GM's Guide, Types of NPC): Toughened/Nemesis use the same
+  // Brawn/Will + Resilience; Troopers halve it, rounding up. A book value
+  // overrides either.
   const ccStressMaxBase = (attributes) => {
+    const book = ccNpcBookValue(attributes, 'npc_stress');
+    if (book !== null) { return book; }
     const resilience = Number(attributes.resilience_ranks) || 0;
     const brawn = Number(attributes.brawn_rating) || 0;
     const will = Number(attributes.will_rating) || 0;
+    const base = Math.max(brawn, will) + resilience;
+    if (attributes.character_type === 'trooper') { return Math.ceil(base / 2); }
+    if (ccIsNpc(attributes)) { return base; }
     const talents = attributes.repeating_talent || [];
     const hasUnyielding = talents.some((row) => String(row.name || '').trim().toLowerCase() === 'unyielding');
-    return Math.max(brawn, will) + resilience + (hasUnyielding ? 3 : 0);
+    return base + (hasUnyielding ? 3 : 0);
   };
 
   const calcStressMaxBase = ({attributes}) => ccStressMaxBase(attributes);
@@ -509,6 +523,16 @@
     return Math.max(0, ccStressMaxBase(attributes) - fatigue);
   };
   k.registerFuncs({calcStressMax});
+
+  // Injuries a character can take before being defeated: 3 for PCs and
+  // Nemesis NPCs, 2 for Toughened, 1 for Troopers (GM's Guide) - a book
+  // value (which already includes Tough X) overrides it.
+  const calcInjuryLimit = ({attributes}) => {
+    const book = ccNpcBookValue(attributes, 'npc_injuries');
+    if (book !== null) { return book; }
+    return {trooper: 1, toughened: 2}[attributes.character_type] || 3;
+  };
+  k.registerFuncs({calcInjuryLimit});
 
   // Backs every box in the Stress/Fortune/Fatigue trackers. Clicking a
   // box jumps the track straight to that box's value (fill up to /
@@ -552,8 +576,9 @@
 
     const difficultyQuery = '?{Difficulty|1}';
     const complicationQuery = '?{Complication range (1-5)|1}';
-    const bonusDiceQuery = '?{Additional d20s bought (0-2)|0}';
-    const extraMomentumQuery = '?{Momentum spent to remove extra fatigue|0}';
+    const bonusDiceQuery = ccBonusDiceQuery(attributes);
+    const extraMomentumQuery = `?{${ccPoolName(attributes)} spent to remove extra fatigue|0}`;
+    const extraordinary = ccExtraordinary(attributes, brawnRating >= willRating ? 'brawn' : 'will');
 
     const rollString = '&{template:ccskill} ' +
       `{{character_name=@{character_name}}} ` +
@@ -571,7 +596,9 @@
       `{{complications=[[0]]}} ` +
       `{{bonus_momentum=[[0]]}} ` +
       `{{momentum_spent=[[0]]}} ` +
-      `{{fatigue_removed=[[0]]}}`;
+      `{{fatigue_removed=[[0]]}} ` +
+      `{{auto_successes=[[0]]}} ` +
+      `{{pool=${ccPoolName(attributes)}}}`;
 
     const roll = await startRoll(rollString);
 
@@ -590,13 +617,11 @@
       const targetNumber = attributeRating + resilienceRanks;
       const complicationThreshold = 21 - complicationRange;
       const successCount = dice.filter((d) => d <= targetNumber).length +
-        dice.filter((d) => d <= 1).length;
+        dice.filter((d) => d <= 1).length + extraordinary;
       const complicationCount = dice.filter((d) => d >= complicationThreshold).length;
       const passed = successCount >= difficulty;
       const bonusMomentum = passed ? Math.max(0, successCount - difficulty) : 0;
       const bonusDiceCount = Math.max(0, dice.length - 2);
-      // ccBonusDiceCost is defined in views/_global_sheetworker.pug.
-      const bonusDiceCost = ccBonusDiceCost(bonusDiceCount);
 
       // "Passing the test removes 1 point of fatigue, plus 1 more for each
       // point of Momentum spent" - applied straight to the attribute (same
@@ -607,9 +632,10 @@
         attributes.fatigue = Math.max(0, (Number(attributes.fatigue) || 0) - fatigueRemoved);
       }
 
-      await ccSendMomentumSignal(bonusMomentum - extraMomentum);
-      await ccSendMomentumSpendSignal(bonusDiceCost);
-      await ccSendThreatSignal(complicationCount);
+      // ccSettleRoll is defined in views/_global_sheetworker.pug.
+      const poolSpent = await ccSettleRoll({
+        attributes, generated: bonusMomentum, bonusDiceCount, extraSpent: extraMomentum, complications: complicationCount,
+      });
 
       finishRoll(roll.rollId, {
         target_number: targetNumber,
@@ -619,8 +645,9 @@
         bonus_momentum: bonusMomentum,
         complications: complicationCount,
         extra_momentum: extraMomentum,
-        momentum_spent: bonusDiceCost + extraMomentum,
+        momentum_spent: poolSpent,
         fatigue_removed: fatigueRemoved,
+        auto_successes: extraordinary,
       });
     } catch (err) {
       finishRoll(roll.rollId, {

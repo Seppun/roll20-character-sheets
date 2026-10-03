@@ -184,9 +184,36 @@ play Roll20 character:
    mechanism. Give `description` directly in the JSON for an NPC-only
    ability not on this game's talent list.
 
-Importing today creates a full PC-style character - Stress/Fatigue/Fortune
-trackers just sit at their given or default values, since this sheet
-doesn't have a condensed Minion/Toughened/Nemesis layout yet.
+Imported NPCs open as the profile's own tier (Trooper, Toughened or
+Nemesis - see NPC sheets below), with the stat block's printed Stress,
+Injuries, Armor, Courage and Power, its attacks (including mental attacks),
+special rules, spells and escalation options filled in.
+
+## NPC sheets
+
+The Character Type selector at the top of the Character tab switches a
+character between Player Character and the GM's Guide's three NPC tiers:
+
+- **Trooper** and **Toughened** NPCs get a compact combat layout (no
+  background, languages or experience); **Nemesis** NPCs keep the full
+  sheet. Every NPC tier shows Truths without Scars, hides the Fortune track
+  (NPC Fortune spends cost Threat) and adds two panels:
+  - **NPC Profile**: Adversary/Ally switch, the tier's rules reminder, the
+    stat block's printed Max Stress, Injuries, Armor, Courage, Morale and
+    Power (leave blank to use the tier formula: Troopers halve Max Stress;
+    injury limits are 1/2/3), and Escalation Options.
+  - **Special Rules**: the GM's Guide's common rules as suggestions, with
+    each rule postable to chat. Extraordinary [Attribute] X adds automatic
+    successes, and Brutal makes melee attacks roll Brawn.
+- **Adversary rolls use Threat**: extra d20s cost 1/2/3 Threat (up to three
+  dice) and extra successes go to the Threat pool, through the same
+  `ccthreat.js` API script. Allies roll with Momentum like a PC.
+- **Weapons & Attacks** has a Type column; a Mental attack rolls Will +
+  Persuasion or Survival at difficulty 1. An NPC's damage is used as
+  printed (it already includes bonus damage), unlike a PC's.
+- **Mythos spells**: the Spells tab offers the Tome of Cthulhu, Compendium
+  of Mormo, Grimoire of Nyarlathotep and Spellbook of Yog-Sothoth, plus NPC
+  Spellcaster types, only on NPC sheets.
 
 ## Building from source
 

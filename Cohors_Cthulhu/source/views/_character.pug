@@ -22,6 +22,8 @@
 //- older was pasted from a stale copy of that file (Sheet Layout vs
 //- Sheet Style are two separate paste targets in Game Settings).
 - const buildVersion = new Date().toISOString().replace('T', ' ').slice(0, 19) + ' UTC'
+//- Every calculation that reads character_type has to rerun when it changes.
+- const ccCharacterTypeTrigger = {affects: ['stress_max_base', 'stress_max', 'stress_max_marker', 'fatigue_max_marker', 'courage', 'total_armor', 'injury_limit', 'power_rating', 'spells_type_marker']}
 
 include ./_global_sheetworker.pug
 
@@ -29,40 +31,37 @@ include ./_global_sheetworker.pug
   .cc-page.cc-character
 
     .cc-banner Cohors Cthulhu
-    //- Lets a GM render this same sheet as a lean combat-only NPC instead
-    //- of the full character layout below, without a second sheet (Roll20
-    //- only supports one Custom Sheet HTML/CSS pair per game). No stored
-    //- value (every character that already exists) behaves exactly like
-    //- "pc" - every panel below shows - so this is fully backward
-    //- compatible. "npc" (a recurring/important NPC) is intentionally
-    //- identical to "pc": it exists so api-scripts/ccimport.js and a GM
-    //- glancing at the sheet both know which kind of character this is,
-    //- not because anything renders differently for it today. Only
-    //- "cannon_fodder" actually hides anything - see the cc-identity-extra/
-    //- cc-identity-flavor/cc-truths-scars/cc-languages/cc-experience rules
-    //- in this file's own +scss. block below. Same hidden-radio-plus-
-    //- styled-label pattern as .cc-fatigue-ignore-toggle (panels/
-    //- _vitals_panel.pug) and .cc-truths-scars-toggle (panels/
-    //- _truths_scars_panel.pug), just a 3-way radio group here instead of
-    //- a single checkbox. The radios themselves are direct children of
-    //- .cc-page.cc-character (NOT nested inside .cc-character-type below) -
-    //- they have to be true siblings of .cc-identity-extra/.cc-truths-scars/
-    //- etc. for the general sibling selector in the +scss. block to reach
-    //- them at all; only their labels live inside .cc-character-type, for
-    //- the segmented-control layout.
-    +radio({name: 'character_type', value: 'pc', checked: ''}).cc-character-type-input#cc-character-type-pc
-    +radio({name: 'character_type', value: 'cannon_fodder'}).cc-character-type-input#cc-character-type-fodder
-    +radio({name: 'character_type', value: 'npc'}).cc-character-type-input#cc-character-type-npc
+    //- Lets a GM render this same sheet as one of the GM's Guide's three
+    //- NPC tiers (Chapter 8, Types of NPC) instead of a player character,
+    //- without a second sheet (Roll20 only supports one Custom Sheet per
+    //- game). No stored value (every character that already exists)
+    //- behaves exactly like "pc". Trooper and Toughened use a compact
+    //- combat layout; Nemesis NPCs are "treated like player characters in
+    //- many ways", so they keep the full sheet plus the NPC-only panels.
+    //- Pre-tier values (cannon_fodder/npc) are migrated on sheet open - see
+    //- ccRecomputeOnOpen in views/_global_sheetworker.pug.
+    //-
+    //- The radios are direct children of .cc-page.cc-character (NOT nested
+    //- inside .cc-character-type below) - they have to be true siblings of
+    //- the panels they show/hide for the general sibling selector in the
+    //- +scss. block to reach them; only their labels live inside
+    //- .cc-character-type, for the segmented-control layout. The Spells tab
+    //- uses its own calculated marker (spells_type_marker), not copies of
+    //- these radios - see the comment there for why.
+    +radio({name: 'character_type', value: 'pc', checked: '', trigger: ccCharacterTypeTrigger}).cc-character-type-input#cc-character-type-pc
+    +radio({name: 'character_type', value: 'trooper', trigger: ccCharacterTypeTrigger}).cc-character-type-input#cc-character-type-trooper
+    +radio({name: 'character_type', value: 'toughened', trigger: ccCharacterTypeTrigger}).cc-character-type-input#cc-character-type-toughened
+    +radio({name: 'character_type', value: 'nemesis', trigger: ccCharacterTypeTrigger}).cc-character-type-input#cc-character-type-nemesis
     .cc-character-type
       label.cc-character-type-label(for='cc-character-type-pc') Player Character
-      label.cc-character-type-label(for='cc-character-type-fodder') Cannon Fodder
-      label.cc-character-type-label(for='cc-character-type-npc') NPC
+      label.cc-character-type-label(for='cc-character-type-trooper') Trooper NPC
+      label.cc-character-type-label(for='cc-character-type-toughened') Toughened NPC
+      label.cc-character-type-label(for='cc-character-type-nemesis') Nemesis NPC
     .cc-field-group.cc-identity-core
       .cc-field
         span Name & Pronoun
         +text({name: 'name pronoun'})
-    //- Cut for Cannon Fodder (see the +scss. block below) - combat extras
-    //- don't need a Culture/Caste/Wealth line, just a name.
+    //- Cut for Trooper/Toughened NPCs (see the +scss. block below).
     .cc-field-group.cc-identity-extra
       .cc-field
         span Culture
@@ -73,8 +72,7 @@ include ./_global_sheetworker.pug
       .cc-field
         span Wealth
         +text({name: 'wealth'})
-    //- Also cut for Cannon Fodder - this whole row is background/flavor,
-    //- not combat mechanics.
+    //- Also cut for Trooper/Toughened - background/flavor, not combat.
     .cc-field-group.cc-identity-flavor
       .cc-field
         span Archetype
@@ -103,6 +101,7 @@ include ./_global_sheetworker.pug
         span Characteristic
         +text({name: 'characteristic'})
 
+    include ./panels/_npc_profile_panel.pug
     include ./panels/_truths_scars_panel.pug
     include ./panels/_vitals_panel.pug
     include ./panels/_attributes_panel.pug
@@ -110,6 +109,7 @@ include ./_global_sheetworker.pug
     include ./panels/_weapons_panel.pug
     include ./panels/_armor_panel.pug
     include ./panels/_talents_panel.pug
+    include ./panels/_special_rules_panel.pug
 
     .cc-field-group
       .cc-field.cc-languages
@@ -192,33 +192,70 @@ include ./_global_sheetworker.pug
     }
 
     // Reaches each label the same way the panel-hiding rules below reach
-    // .cc-languages/.cc-experience - the label isn't a direct sibling of
-    // its radio (it's nested inside .cc-character-type), so this needs the
+    // nested elements - the label isn't a direct sibling of its radio
+    // (it's nested inside .cc-character-type), so this needs the
     // sibling-then-descendant form, not a bare sibling selector.
     #cc-character-type-pc:checked ~ .cc-character-type label[for='cc-character-type-pc'],
-    #cc-character-type-fodder:checked ~ .cc-character-type label[for='cc-character-type-fodder'],
-    #cc-character-type-npc:checked ~ .cc-character-type label[for='cc-character-type-npc'] {
+    #cc-character-type-trooper:checked ~ .cc-character-type label[for='cc-character-type-trooper'],
+    #cc-character-type-toughened:checked ~ .cc-character-type label[for='cc-character-type-toughened'],
+    #cc-character-type-nemesis:checked ~ .cc-character-type label[for='cc-character-type-nemesis'] {
       background: var(--cc-banner);
       color: var(--cc-banner-text);
       border-color: var(--cc-banner);
     }
 
-    // Cannon Fodder trims this page down to combat essentials (Vitals/
-    // Attributes/Skills/Weapons/Armor/Talents stay) - everything here is
-    // background/flavor/progression a disposable combat extra doesn't
-    // need. .cc-truths-scars/.cc-languages/.cc-experience already carry
-    // their own distinguishing classes (used elsewhere for their own
-    // styling) - .cc-identity-extra/.cc-identity-flavor are new, added
-    // purely so this rule has something to target. Reaches .cc-languages/
-    // .cc-experience via their shared .cc-field-group parent since neither
-    // is a direct sibling of the radio (both are nested inside that one
-    // group) - the general sibling selector still works for a descendant
-    // of a later sibling, just not for the sibling itself.
-    #cc-character-type-fodder:checked ~ .cc-identity-extra,
-    #cc-character-type-fodder:checked ~ .cc-identity-flavor,
-    #cc-character-type-fodder:checked ~ .cc-truths-scars,
-    #cc-character-type-fodder:checked ~ .cc-field-group .cc-languages,
-    #cc-character-type-fodder:checked ~ .cc-field-group .cc-experience {
+    // Trooper and Toughened NPCs get the compact combat layout: identity
+    // flavor, Languages and Experience go. Reaches .cc-languages/
+    // .cc-experience via their shared .cc-field-group parent (descendants
+    // of a later sibling), as neither is a direct sibling of the radio.
+    #cc-character-type-trooper:checked ~ .cc-identity-extra,
+    #cc-character-type-trooper:checked ~ .cc-identity-flavor,
+    #cc-character-type-trooper:checked ~ .cc-field-group .cc-languages,
+    #cc-character-type-trooper:checked ~ .cc-field-group .cc-experience,
+    #cc-character-type-toughened:checked ~ .cc-identity-extra,
+    #cc-character-type-toughened:checked ~ .cc-identity-flavor,
+    #cc-character-type-toughened:checked ~ .cc-field-group .cc-languages,
+    #cc-character-type-toughened:checked ~ .cc-field-group .cc-experience {
       display: none;
+    }
+
+    // Every NPC tier: stat blocks have Truths but no Scars, and NPC
+    // Fortune spends cost 3 Threat instead of a personal Fortune track
+    // (the NPC Profile panel's tier note says so).
+    #cc-character-type-trooper:checked ~ .cc-truths-scars .cc-scar,
+    #cc-character-type-trooper:checked ~ .cc-truths-scars .cc-truths-scars-toggle,
+    #cc-character-type-trooper:checked ~ .cc-truths-scars .cc-truths-scars-extra,
+    #cc-character-type-trooper:checked ~ .cc-vitals .cc-vitals-fortune,
+    #cc-character-type-toughened:checked ~ .cc-truths-scars .cc-scar,
+    #cc-character-type-toughened:checked ~ .cc-truths-scars .cc-truths-scars-toggle,
+    #cc-character-type-toughened:checked ~ .cc-truths-scars .cc-truths-scars-extra,
+    #cc-character-type-toughened:checked ~ .cc-vitals .cc-vitals-fortune,
+    #cc-character-type-nemesis:checked ~ .cc-truths-scars .cc-scar,
+    #cc-character-type-nemesis:checked ~ .cc-truths-scars .cc-truths-scars-toggle,
+    #cc-character-type-nemesis:checked ~ .cc-truths-scars .cc-truths-scars-extra,
+    #cc-character-type-nemesis:checked ~ .cc-vitals .cc-vitals-fortune {
+      display: none;
+    }
+
+    // NPC-only panels (NPC Profile, Special Rules) are hidden for players.
+    .cc-npc-panel {
+      display: none;
+    }
+
+    #cc-character-type-trooper:checked ~ .cc-npc-panel,
+    #cc-character-type-toughened:checked ~ .cc-npc-panel,
+    #cc-character-type-nemesis:checked ~ .cc-npc-panel {
+      display: block;
+    }
+
+    // One tier note per tier inside the NPC Profile panel.
+    .cc-tier-note {
+      display: none;
+    }
+
+    #cc-character-type-trooper:checked ~ .cc-npc-profile .cc-tier-note-trooper,
+    #cc-character-type-toughened:checked ~ .cc-npc-profile .cc-tier-note-toughened,
+    #cc-character-type-nemesis:checked ~ .cc-npc-profile .cc-tier-note-nemesis {
+      display: block;
     }
   }

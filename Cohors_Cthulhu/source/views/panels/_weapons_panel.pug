@@ -49,12 +49,13 @@
   const ccWeaponProfiles = Object.assign({}, ccMeleeWeapons, ccRangedWeapons);
 
 .cc-panel.cc-weapons
-  .cc-banner Weapons
+  .cc-banner Weapons &amp; Attacks
   .cc-rep-table.cc-rep-weapons
     .cc-rep-header
       span
       span
       span Name
+      span Type
       span Focus
       span Reach or Range
       span Damage &amp; Effects
@@ -92,6 +93,19 @@
         list: 'cc-weapon-options',
         trigger: {triggeredFuncs: ['ccApplyWeaponPreset']}
       })
+      //- Blank (the default for every pre-existing row) infers Melee or
+      //- Ranged from Focus, as before. Mental is the GM's Guide's mental
+      //- attack (Fearsome creatures, some spells and relics): Will +
+      //- Persuasion or Survival, difficulty 1, resisted by Courage + Morale.
+      +select({name: 'attack type'})
+        +option({value: ''})
+          | Auto
+        +option({value: 'melee'})
+          | Melee
+        +option({value: 'ranged'})
+          | Ranged
+        +option({value: 'mental'})
+          | Mental
       +text({name: 'focus'})
       +text({name: 'reach range'})
       +text({name: 'damage effects'})
@@ -130,7 +144,7 @@
       .cc-rep-header,
       fieldset,
       .repcontainer .repitem {
-        grid-template-columns: 1.6rem 1.6rem 1fr 1fr 1fr 2fr 0.6fr 1.4fr;
+        grid-template-columns: 1.6rem 1.6rem 1fr 0.8fr 1fr 0.9fr 1.7fr 0.6fr 1.2fr;
         align-items: center;
       }
 
@@ -244,52 +258,77 @@
     };
   };
 
-  // Weapon roll: attack and damage rolled together in a single message,
-  // since a Cohors Cthulhu attack is an opposed test - there's no static
-  // Difficulty to pass/fail against (the GM's opposing roll decides that),
-  // so damage is rolled unconditionally alongside the attack rather than
-  // as a separate, gated follow-up roll.
+  // Weapon/attack roll: attack and damage rolled together in a single
+  // message - a melee attack is an opposed test (the GM's opposing roll
+  // decides it), so damage is rolled unconditionally alongside it and the
+  // card only shows it on a pass.
   //
-  // Unlike a generic Skill/Focus roll, an attack roll always has
-  // Difficulty 1 (no query) and doesn't ask which Attribute to pair -
-  // melee/unarmed weapons always use Agility, ranged/thrown weapons always
-  // use Coordination (Agility + Fighting / Coordination + Fighting, per
-  // RAW). Known-focus status is still checked explicitly (same as Skills'
-  // initiateFocusRoll) since clicking a weapon's roll button isn't itself
-  // a declaration that its Focus is known - crit range only opens up to
-  // Fighting's ranks when that specific focus checkbox is checked, else it
-  // stays a natural-1-only crit like a plain Skill roll.
+  // Attribute and skill per attack type (Core Rules, Making a Physical or
+  // Mental Attack): melee Agility + Fighting (Brawn instead for an NPC with
+  // Brutal X), ranged Coordination + Fighting, mental Will + Persuasion or
+  // Survival (a query), all difficulty 1. A blank Type infers melee/ranged
+  // from Focus, as before Type existed.
+  //
+  // Damage: a PC's row holds the weapon's base rating, so the attribute's
+  // bonus damage is added here. An NPC's row holds the stat block's printed
+  // total, which already includes bonus damage, Brutal and Fearsome - so
+  // nothing is added for NPCs, to avoid counting them twice.
+  //
+  // Crit range opens up to Fighting's ranks only when this row's Focus is
+  // a known Fighting focus; mental attacks crit on a natural 1.
   const initiateWeaponRoll = async ({trigger, attributes}) => {
     const [section, rowID] = k.parseRepeatName(trigger.name);
     const prefix = `${section}_${rowID}_`;
     const weaponName = attributes[`${prefix}name`] || 'Weapon';
     const focus = attributes[`${prefix}focus`] || '';
     const damageEffects = attributes[`${prefix}damage_effects`] || '';
+    const isNpc = ccIsNpc(attributes);
+
+    const focusLower = focus.toLowerCase();
+    const inferredType = (focusLower === 'archery' || focusLower === 'thrown weapons') ? 'ranged' : 'melee';
+    const attackType = attributes[`${prefix}attack_type`] || inferredType;
+    const isMental = attackType === 'mental';
+    const isRanged = attackType === 'ranged';
+
+    let attrName = isRanged ? 'coordination' : 'agility';
+    if (isMental) { attrName = 'will'; }
+    if (attackType === 'melee' && isNpc && ccHasSpecialRule(attributes, /^\s*brutal\b/i)) { attrName = 'brawn'; }
+    const attributeRating = Number(attributes[`${attrName}_rating`]) || 0;
+    const autoSuccesses = ccExtraordinary(attributes, attrName);
 
     const fightingRanks = Number(attributes.fighting_ranks) || 0;
-    const focusSlug = focus.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
-    const knownFocus = Boolean(focusSlug && attributes[`fighting_focus_${focusSlug}_known`]);
+    const focusSlug = focusLower.replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
+    const knownFocus = Boolean(!isMental && focusSlug && attributes[`fighting_focus_${focusSlug}_known`]);
     const critMax = knownFocus ? fightingRanks : 1;
 
-    const isRanged = focus.toLowerCase() === 'archery' || focus.toLowerCase() === 'thrown weapons';
-    const attributeRating = Number(attributes[isRanged ? 'coordination_rating' : 'agility_rating']) || 0;
-    const bonusDamage = Number(attributes[isRanged ? 'insight_bonus_damage' : 'brawn_bonus_damage']) || 0;
+    // Mental attacks pick Persuasion or Survival at roll time; the option
+    // value is that skill's ranks, read back as the skill part of the TN.
+    const persuasionRanks = Number(attributes.persuasion_ranks) || 0;
+    const survivalRanks = Number(attributes.survival_ranks) || 0;
+    const skillQuery = `?{Mental attack skill|Persuasion,${persuasionRanks}|Survival,${survivalRanks}}`;
+
+    let bonusDamageAttr = isRanged ? 'insight' : 'brawn';
+    if (isMental) { bonusDamageAttr = 'will'; }
+    const bonusDamage = isNpc ? 0 : (Number(attributes[`${bonusDamageAttr}_bonus_damage`]) || 0);
 
     const {baseRating, effects} = ccParseDamageEffects(damageEffects);
     const diceCount = Math.max(1, baseRating + bonusDamage);
 
     console.log('[CC] Weapon roll:', {
-      weaponName, focus, isRanged, attributeRating, fightingRanks, knownFocus, critMax, diceCount,
+      weaponName, focus, attackType, attrName, attributeRating, fightingRanks, knownFocus, critMax, diceCount, autoSuccesses,
     });
 
     const complicationQuery = '?{Complication range (1-5)|1}';
-    const bonusDiceQuery = '?{Additional d20s bought (0-2)|0}';
+    const bonusDiceQuery = ccBonusDiceQuery(attributes);
+    let focusLabel = focus;
+    if (isMental) { focusLabel = 'Mental Attack'; }
 
     const rollString = '&{template:ccskill} ' +
       `{{character_name=@{character_name}}} ` +
       `{{skill=${weaponName}}} ` +
-      (focus ? `{{focus=${focus}}} ` : '') +
+      (focusLabel ? `{{focus=${focusLabel}}} ` : '') +
       `{{attribute_choice=[[0+${attributeRating}]]}} ` +
+      (isMental ? `{{skill_choice=[[0+${skillQuery}]]}} {{mental=1}} ` : '') +
       `{{difficulty=1}} ` +
       `{{complication_range=[[0+${complicationQuery}]]}} ` +
       `{{roll1=[[(2+${bonusDiceQuery})d20]]}} ` +
@@ -300,6 +339,8 @@
       `{{complications=[[0]]}} ` +
       `{{bonus_momentum=[[0]]}} ` +
       `{{momentum_spent=[[0]]}} ` +
+      `{{auto_successes=[[0]]}} ` +
+      `{{pool=${ccPoolName(attributes)}}} ` +
       `{{is_weapon=1}} ` +
       `{{damage_dice=[[${diceCount}d6]]}} ` +
       `{{total_damage=[[0]]}} ` +
@@ -311,6 +352,7 @@
 
     try {
       const complicationRange = Number(roll.results.complication_range.result) || 1;
+      const skillRanks = isMental ? (Number(roll.results.skill_choice.result) || 0) : fightingRanks;
 
       const roll1 = roll.results.roll1;
       const dice = Array.isArray(roll1.dice) ?
@@ -319,10 +361,10 @@
 
       console.log(`[CC] ${weaponName} attack roll - d20s:`, dice);
 
-      const targetNumber = attributeRating + fightingRanks;
+      const targetNumber = attributeRating + skillRanks;
       const complicationThreshold = 21 - complicationRange;
       const successCount = dice.filter((d) => d <= targetNumber).length +
-        dice.filter((d) => d <= critMax).length;
+        dice.filter((d) => d <= critMax).length + autoSuccesses;
       const complicationCount = dice.filter((d) => d >= complicationThreshold).length;
       const passed = successCount >= 1;
 
@@ -331,10 +373,7 @@
         damageDice.dice :
         (damageDice.rolls && damageDice.rolls[0] && damageDice.rolls[0].results || []).map((r) => r.v);
 
-      console.log(`[CC] ${weaponName} damage roll - raw d6s:`, rawDamageDice);
-
       const converted = rawDamageDice.map(ccChallengeDieFromD6);
-      console.log(`[CC] ${weaponName} Challenge Dice faces:`, converted);
 
       const isVicious = effects.some((e) => /vicious/i.test(e));
       const effectCount = converted.filter((c) => c.effect).length;
@@ -350,10 +389,9 @@
 
       const weaponBonusMomentum = passed ? Math.max(0, successCount - 1) : 0;
       const weaponBonusDiceCount = Math.max(0, dice.length - 2);
-      const weaponBonusDiceCost = ccBonusDiceCost(weaponBonusDiceCount);
-      await ccSendMomentumSignal(weaponBonusMomentum);
-      await ccSendMomentumSpendSignal(weaponBonusDiceCost);
-      await ccSendThreatSignal(complicationCount);
+      const weaponPoolSpent = await ccSettleRoll({
+        attributes, generated: weaponBonusMomentum, bonusDiceCount: weaponBonusDiceCount, complications: complicationCount,
+      });
 
       finishRoll(roll.rollId, {
         target_number: targetNumber,
@@ -362,7 +400,8 @@
         outcome: passed ? 1 : 0,
         bonus_momentum: weaponBonusMomentum,
         complications: complicationCount,
-        momentum_spent: weaponBonusDiceCost,
+        momentum_spent: weaponPoolSpent,
+        auto_successes: autoSuccesses,
         total_damage: totalDamage,
         effect_count: effectCount,
         damage_dice_text: converted.map((c) => c.symbol).join(' '),

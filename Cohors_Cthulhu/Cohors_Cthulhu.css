@@ -1671,7 +1671,7 @@ body .ui-dialog .tab-content .charsheet .cc-character .cc-footer {
   opacity: 0.6;
 }
 body .ui-dialog .tab-content .charsheet .cc-character .cc-build-css::after {
-  content: "CSS build: 2026-10-02 18:47:06 UTC";
+  content: "CSS build: 2026-10-03 20:24:33 UTC";
 }
 body .ui-dialog .tab-content .charsheet .cc-character .cc-languages textarea {
   min-height: 4rem;
@@ -1708,18 +1708,52 @@ body .ui-dialog .tab-content .charsheet .cc-character .cc-character-type-label:l
   border-radius: 0 4px 4px 0;
 }
 body .ui-dialog .tab-content .charsheet .cc-character #cc-character-type-pc:checked ~ .cc-character-type label[for=cc-character-type-pc],
-body .ui-dialog .tab-content .charsheet .cc-character #cc-character-type-fodder:checked ~ .cc-character-type label[for=cc-character-type-fodder],
-body .ui-dialog .tab-content .charsheet .cc-character #cc-character-type-npc:checked ~ .cc-character-type label[for=cc-character-type-npc] {
+body .ui-dialog .tab-content .charsheet .cc-character #cc-character-type-trooper:checked ~ .cc-character-type label[for=cc-character-type-trooper],
+body .ui-dialog .tab-content .charsheet .cc-character #cc-character-type-toughened:checked ~ .cc-character-type label[for=cc-character-type-toughened],
+body .ui-dialog .tab-content .charsheet .cc-character #cc-character-type-nemesis:checked ~ .cc-character-type label[for=cc-character-type-nemesis] {
   background: var(--cc-banner);
   color: var(--cc-banner-text);
   border-color: var(--cc-banner);
 }
-body .ui-dialog .tab-content .charsheet .cc-character #cc-character-type-fodder:checked ~ .cc-identity-extra,
-body .ui-dialog .tab-content .charsheet .cc-character #cc-character-type-fodder:checked ~ .cc-identity-flavor,
-body .ui-dialog .tab-content .charsheet .cc-character #cc-character-type-fodder:checked ~ .cc-truths-scars,
-body .ui-dialog .tab-content .charsheet .cc-character #cc-character-type-fodder:checked ~ .cc-field-group .cc-languages,
-body .ui-dialog .tab-content .charsheet .cc-character #cc-character-type-fodder:checked ~ .cc-field-group .cc-experience {
+body .ui-dialog .tab-content .charsheet .cc-character #cc-character-type-trooper:checked ~ .cc-identity-extra,
+body .ui-dialog .tab-content .charsheet .cc-character #cc-character-type-trooper:checked ~ .cc-identity-flavor,
+body .ui-dialog .tab-content .charsheet .cc-character #cc-character-type-trooper:checked ~ .cc-field-group .cc-languages,
+body .ui-dialog .tab-content .charsheet .cc-character #cc-character-type-trooper:checked ~ .cc-field-group .cc-experience,
+body .ui-dialog .tab-content .charsheet .cc-character #cc-character-type-toughened:checked ~ .cc-identity-extra,
+body .ui-dialog .tab-content .charsheet .cc-character #cc-character-type-toughened:checked ~ .cc-identity-flavor,
+body .ui-dialog .tab-content .charsheet .cc-character #cc-character-type-toughened:checked ~ .cc-field-group .cc-languages,
+body .ui-dialog .tab-content .charsheet .cc-character #cc-character-type-toughened:checked ~ .cc-field-group .cc-experience {
   display: none;
+}
+body .ui-dialog .tab-content .charsheet .cc-character #cc-character-type-trooper:checked ~ .cc-truths-scars .cc-scar,
+body .ui-dialog .tab-content .charsheet .cc-character #cc-character-type-trooper:checked ~ .cc-truths-scars .cc-truths-scars-toggle,
+body .ui-dialog .tab-content .charsheet .cc-character #cc-character-type-trooper:checked ~ .cc-truths-scars .cc-truths-scars-extra,
+body .ui-dialog .tab-content .charsheet .cc-character #cc-character-type-trooper:checked ~ .cc-vitals .cc-vitals-fortune,
+body .ui-dialog .tab-content .charsheet .cc-character #cc-character-type-toughened:checked ~ .cc-truths-scars .cc-scar,
+body .ui-dialog .tab-content .charsheet .cc-character #cc-character-type-toughened:checked ~ .cc-truths-scars .cc-truths-scars-toggle,
+body .ui-dialog .tab-content .charsheet .cc-character #cc-character-type-toughened:checked ~ .cc-truths-scars .cc-truths-scars-extra,
+body .ui-dialog .tab-content .charsheet .cc-character #cc-character-type-toughened:checked ~ .cc-vitals .cc-vitals-fortune,
+body .ui-dialog .tab-content .charsheet .cc-character #cc-character-type-nemesis:checked ~ .cc-truths-scars .cc-scar,
+body .ui-dialog .tab-content .charsheet .cc-character #cc-character-type-nemesis:checked ~ .cc-truths-scars .cc-truths-scars-toggle,
+body .ui-dialog .tab-content .charsheet .cc-character #cc-character-type-nemesis:checked ~ .cc-truths-scars .cc-truths-scars-extra,
+body .ui-dialog .tab-content .charsheet .cc-character #cc-character-type-nemesis:checked ~ .cc-vitals .cc-vitals-fortune {
+  display: none;
+}
+body .ui-dialog .tab-content .charsheet .cc-character .cc-npc-panel {
+  display: none;
+}
+body .ui-dialog .tab-content .charsheet .cc-character #cc-character-type-trooper:checked ~ .cc-npc-panel,
+body .ui-dialog .tab-content .charsheet .cc-character #cc-character-type-toughened:checked ~ .cc-npc-panel,
+body .ui-dialog .tab-content .charsheet .cc-character #cc-character-type-nemesis:checked ~ .cc-npc-panel {
+  display: block;
+}
+body .ui-dialog .tab-content .charsheet .cc-character .cc-tier-note {
+  display: none;
+}
+body .ui-dialog .tab-content .charsheet .cc-character #cc-character-type-trooper:checked ~ .cc-npc-profile .cc-tier-note-trooper,
+body .ui-dialog .tab-content .charsheet .cc-character #cc-character-type-toughened:checked ~ .cc-npc-profile .cc-tier-note-toughened,
+body .ui-dialog .tab-content .charsheet .cc-character #cc-character-type-nemesis:checked ~ .cc-npc-profile .cc-tier-note-nemesis {
+  display: block;
 }
 body .ui-dialog .tab-content .charsheet .cc-spells .cc-spell-block {
   border: 1px solid var(--cc-rule);
@@ -1733,12 +1767,30 @@ body .ui-dialog .tab-content .charsheet .cc-spells .cc-spell-block textarea {
 }
 body .ui-dialog .tab-content .charsheet .cc-spells .cc-tradition-marker-runic,
 body .ui-dialog .tab-content .charsheet .cc-spells .cc-tradition-marker-oracular,
-body .ui-dialog .tab-content .charsheet .cc-spells .cc-tradition-marker-celtic {
+body .ui-dialog .tab-content .charsheet .cc-spells .cc-tradition-marker-celtic,
+body .ui-dialog .tab-content .charsheet .cc-spells .cc-tradition-marker-cthulhu,
+body .ui-dialog .tab-content .charsheet .cc-spells .cc-tradition-marker-mormo,
+body .ui-dialog .tab-content .charsheet .cc-spells .cc-tradition-marker-nyarlathotep,
+body .ui-dialog .tab-content .charsheet .cc-spells .cc-tradition-marker-yog_sothoth {
+  display: none;
+}
+body .ui-dialog .tab-content .charsheet .cc-spells .cc-spells-type,
+body .ui-dialog .tab-content .charsheet .cc-spells .cc-npc-only {
+  display: none;
+}
+body .ui-dialog .tab-content .charsheet .cc-spells .cc-spells-type-npc:checked ~ .cc-spellcasting-header .cc-npc-only {
+  display: block;
+}
+body .ui-dialog .tab-content .charsheet .cc-spells .cc-spells-type-npc:checked ~ .cc-spellcasting-header .cc-pc-only {
   display: none;
 }
 body .ui-dialog .tab-content .charsheet .cc-spells .cc-spell-name-runic,
 body .ui-dialog .tab-content .charsheet .cc-spells .cc-spell-name-oracular,
-body .ui-dialog .tab-content .charsheet .cc-spells .cc-spell-name-celtic {
+body .ui-dialog .tab-content .charsheet .cc-spells .cc-spell-name-celtic,
+body .ui-dialog .tab-content .charsheet .cc-spells .cc-spell-name-cthulhu,
+body .ui-dialog .tab-content .charsheet .cc-spells .cc-spell-name-mormo,
+body .ui-dialog .tab-content .charsheet .cc-spells .cc-spell-name-nyarlathotep,
+body .ui-dialog .tab-content .charsheet .cc-spells .cc-spell-name-yog_sothoth {
   display: none;
 }
 body .ui-dialog .tab-content .charsheet .cc-spells .cc-tradition-marker-runic:checked ~ .cc-spell-list .cc-spell-name-runic {
@@ -1748,6 +1800,18 @@ body .ui-dialog .tab-content .charsheet .cc-spells .cc-tradition-marker-oracular
   display: block;
 }
 body .ui-dialog .tab-content .charsheet .cc-spells .cc-tradition-marker-celtic:checked ~ .cc-spell-list .cc-spell-name-celtic {
+  display: block;
+}
+body .ui-dialog .tab-content .charsheet .cc-spells .cc-tradition-marker-cthulhu:checked ~ .cc-spell-list .cc-spell-name-cthulhu {
+  display: block;
+}
+body .ui-dialog .tab-content .charsheet .cc-spells .cc-tradition-marker-mormo:checked ~ .cc-spell-list .cc-spell-name-mormo {
+  display: block;
+}
+body .ui-dialog .tab-content .charsheet .cc-spells .cc-tradition-marker-nyarlathotep:checked ~ .cc-spell-list .cc-spell-name-nyarlathotep {
+  display: block;
+}
+body .ui-dialog .tab-content .charsheet .cc-spells .cc-tradition-marker-yog_sothoth:checked ~ .cc-spell-list .cc-spell-name-yog_sothoth {
   display: block;
 }
 body .ui-dialog .tab-content .charsheet .cc-spells .cc-spell-name-row {
@@ -1837,6 +1901,63 @@ body .ui-dialog .tab-content .charsheet .cc-notes textarea {
 }
 body .ui-dialog .tab-content .charsheet .cc-notes .cc-journal textarea {
   min-height: 14rem;
+}
+body .ui-dialog .tab-content .charsheet .cc-character .cc-npc-profile-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem 0.8rem;
+  margin-bottom: 0.3rem;
+}
+body .ui-dialog .tab-content .charsheet .cc-character .cc-npc-allegiance {
+  display: flex;
+}
+body .ui-dialog .tab-content .charsheet .cc-character .cc-npc-allegiance-input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+body .ui-dialog .tab-content .charsheet .cc-character .cc-npc-allegiance-label {
+  background: var(--cc-editable-fill);
+  color: var(--cc-ink);
+  border: 1px solid var(--cc-rule);
+  padding: 0.15rem 0.5rem;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+}
+body .ui-dialog .tab-content .charsheet .cc-character .cc-npc-allegiance-label:first-of-type {
+  border-radius: 4px 0 0 4px;
+}
+body .ui-dialog .tab-content .charsheet .cc-character .cc-npc-allegiance-label:last-of-type {
+  border-left: none;
+  border-radius: 0 4px 4px 0;
+}
+body .ui-dialog .tab-content .charsheet .cc-character #cc-npc-allegiance-adversary:checked ~ label[for=cc-npc-allegiance-adversary],
+body .ui-dialog .tab-content .charsheet .cc-character #cc-npc-allegiance-ally:checked ~ label[for=cc-npc-allegiance-ally] {
+  background: var(--cc-banner);
+  color: var(--cc-banner-text);
+  border-color: var(--cc-banner);
+}
+body .ui-dialog .tab-content .charsheet .cc-character .cc-tier-notes {
+  flex: 1 1 16rem;
+  font-size: 0.72rem;
+  font-style: italic;
+}
+body .ui-dialog .tab-content .charsheet .cc-character .cc-npc-book {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.4rem;
+}
+body .ui-dialog .tab-content .charsheet .cc-character .cc-npc-book-hint {
+  font-size: 0.65rem;
+  opacity: 0.7;
+  margin: 0.15rem 0 0.3rem;
+}
+body .ui-dialog .tab-content .charsheet .cc-character .cc-npc-escalation textarea {
+  min-height: 2.5rem;
 }
 body .ui-dialog .tab-content .charsheet .cc-character .cc-truths-scars-grid {
   display: grid;
@@ -2203,7 +2324,7 @@ body .ui-dialog .tab-content .charsheet .cc-character .cc-focus-item .cc-focus-r
 body .ui-dialog .tab-content .charsheet .cc-character .cc-rep-weapons .cc-rep-header,
 body .ui-dialog .tab-content .charsheet .cc-character .cc-rep-weapons fieldset,
 body .ui-dialog .tab-content .charsheet .cc-character .cc-rep-weapons .repcontainer .repitem {
-  grid-template-columns: 1.6rem 1.6rem 1fr 1fr 1fr 2fr 0.6fr 1.4fr;
+  grid-template-columns: 1.6rem 1.6rem 1fr 0.8fr 1fr 0.9fr 1.7fr 0.6fr 1.2fr;
   align-items: center;
 }
 body .ui-dialog .tab-content .charsheet .cc-character .cc-rep-weapons .cc-weapon-apply {
@@ -2309,6 +2430,40 @@ body .ui-dialog .tab-content .charsheet .cc-character .cc-rep-talents .cc-talent
 body .ui-dialog .tab-content .charsheet .cc-character .cc-rep-talents textarea {
   min-height: 3rem;
 }
+body .ui-dialog .tab-content .charsheet .cc-character .cc-rep-special-rules .cc-rep-header,
+body .ui-dialog .tab-content .charsheet .cc-character .cc-rep-special-rules fieldset,
+body .ui-dialog .tab-content .charsheet .cc-character .cc-rep-special-rules .repcontainer .repitem {
+  grid-template-columns: 1.6rem 1.6rem 1.2fr 2.5rem 3fr;
+  align-items: center;
+}
+body .ui-dialog .tab-content .charsheet .cc-character .cc-rep-special-rules textarea {
+  min-height: 1.8rem;
+  width: 100%;
+}
+body .ui-dialog .tab-content .charsheet .cc-character .cc-rep-special-rules .cc-special-rule-apply,
+body .ui-dialog .tab-content .charsheet .cc-character .cc-rep-special-rules .cc-special-rule-post {
+  background: none;
+  border: none;
+  padding: 0;
+  color: inherit;
+  font-size: 1rem;
+  cursor: pointer;
+  justify-self: center;
+}
+body .ui-dialog .tab-content .charsheet .cc-character .cc-rep-special-rules .cc-special-rule-apply:before,
+body .ui-dialog .tab-content .charsheet .cc-character .cc-rep-special-rules .cc-special-rule-post:before {
+  opacity: 0.8;
+}
+body .ui-dialog .tab-content .charsheet .cc-character .cc-rep-special-rules .cc-special-rule-apply:hover:before,
+body .ui-dialog .tab-content .charsheet .cc-character .cc-rep-special-rules .cc-special-rule-post:hover:before {
+  opacity: 1;
+}
+body .ui-dialog .tab-content .charsheet .cc-character .cc-rep-special-rules .cc-special-rule-apply:before {
+  content: "↻";
+}
+body .ui-dialog .tab-content .charsheet .cc-character .cc-rep-special-rules .cc-special-rule-post:before {
+  content: "➤";
+}
 body.sheet-darkmode {
   --cc-page-bg: #201d18;
   --cc-parchment: #2a2620;
@@ -2362,7 +2517,7 @@ body {
   opacity: 0.6;
 }
 .cc-character .cc-build-css::after {
-  content: "CSS build: 2026-10-02 18:47:06 UTC";
+  content: "CSS build: 2026-10-03 20:24:33 UTC";
 }
 .cc-character .cc-languages textarea {
   min-height: 4rem;
@@ -2399,18 +2554,52 @@ body {
   border-radius: 0 4px 4px 0;
 }
 .cc-character #cc-character-type-pc:checked ~ .cc-character-type label[for=cc-character-type-pc],
-.cc-character #cc-character-type-fodder:checked ~ .cc-character-type label[for=cc-character-type-fodder],
-.cc-character #cc-character-type-npc:checked ~ .cc-character-type label[for=cc-character-type-npc] {
+.cc-character #cc-character-type-trooper:checked ~ .cc-character-type label[for=cc-character-type-trooper],
+.cc-character #cc-character-type-toughened:checked ~ .cc-character-type label[for=cc-character-type-toughened],
+.cc-character #cc-character-type-nemesis:checked ~ .cc-character-type label[for=cc-character-type-nemesis] {
   background: var(--cc-banner);
   color: var(--cc-banner-text);
   border-color: var(--cc-banner);
 }
-.cc-character #cc-character-type-fodder:checked ~ .cc-identity-extra,
-.cc-character #cc-character-type-fodder:checked ~ .cc-identity-flavor,
-.cc-character #cc-character-type-fodder:checked ~ .cc-truths-scars,
-.cc-character #cc-character-type-fodder:checked ~ .cc-field-group .cc-languages,
-.cc-character #cc-character-type-fodder:checked ~ .cc-field-group .cc-experience {
+.cc-character #cc-character-type-trooper:checked ~ .cc-identity-extra,
+.cc-character #cc-character-type-trooper:checked ~ .cc-identity-flavor,
+.cc-character #cc-character-type-trooper:checked ~ .cc-field-group .cc-languages,
+.cc-character #cc-character-type-trooper:checked ~ .cc-field-group .cc-experience,
+.cc-character #cc-character-type-toughened:checked ~ .cc-identity-extra,
+.cc-character #cc-character-type-toughened:checked ~ .cc-identity-flavor,
+.cc-character #cc-character-type-toughened:checked ~ .cc-field-group .cc-languages,
+.cc-character #cc-character-type-toughened:checked ~ .cc-field-group .cc-experience {
   display: none;
+}
+.cc-character #cc-character-type-trooper:checked ~ .cc-truths-scars .cc-scar,
+.cc-character #cc-character-type-trooper:checked ~ .cc-truths-scars .cc-truths-scars-toggle,
+.cc-character #cc-character-type-trooper:checked ~ .cc-truths-scars .cc-truths-scars-extra,
+.cc-character #cc-character-type-trooper:checked ~ .cc-vitals .cc-vitals-fortune,
+.cc-character #cc-character-type-toughened:checked ~ .cc-truths-scars .cc-scar,
+.cc-character #cc-character-type-toughened:checked ~ .cc-truths-scars .cc-truths-scars-toggle,
+.cc-character #cc-character-type-toughened:checked ~ .cc-truths-scars .cc-truths-scars-extra,
+.cc-character #cc-character-type-toughened:checked ~ .cc-vitals .cc-vitals-fortune,
+.cc-character #cc-character-type-nemesis:checked ~ .cc-truths-scars .cc-scar,
+.cc-character #cc-character-type-nemesis:checked ~ .cc-truths-scars .cc-truths-scars-toggle,
+.cc-character #cc-character-type-nemesis:checked ~ .cc-truths-scars .cc-truths-scars-extra,
+.cc-character #cc-character-type-nemesis:checked ~ .cc-vitals .cc-vitals-fortune {
+  display: none;
+}
+.cc-character .cc-npc-panel {
+  display: none;
+}
+.cc-character #cc-character-type-trooper:checked ~ .cc-npc-panel,
+.cc-character #cc-character-type-toughened:checked ~ .cc-npc-panel,
+.cc-character #cc-character-type-nemesis:checked ~ .cc-npc-panel {
+  display: block;
+}
+.cc-character .cc-tier-note {
+  display: none;
+}
+.cc-character #cc-character-type-trooper:checked ~ .cc-npc-profile .cc-tier-note-trooper,
+.cc-character #cc-character-type-toughened:checked ~ .cc-npc-profile .cc-tier-note-toughened,
+.cc-character #cc-character-type-nemesis:checked ~ .cc-npc-profile .cc-tier-note-nemesis {
+  display: block;
 }
 
 .cc-spells .cc-spell-block {
@@ -2425,12 +2614,30 @@ body {
 }
 .cc-spells .cc-tradition-marker-runic,
 .cc-spells .cc-tradition-marker-oracular,
-.cc-spells .cc-tradition-marker-celtic {
+.cc-spells .cc-tradition-marker-celtic,
+.cc-spells .cc-tradition-marker-cthulhu,
+.cc-spells .cc-tradition-marker-mormo,
+.cc-spells .cc-tradition-marker-nyarlathotep,
+.cc-spells .cc-tradition-marker-yog_sothoth {
+  display: none;
+}
+.cc-spells .cc-spells-type,
+.cc-spells .cc-npc-only {
+  display: none;
+}
+.cc-spells .cc-spells-type-npc:checked ~ .cc-spellcasting-header .cc-npc-only {
+  display: block;
+}
+.cc-spells .cc-spells-type-npc:checked ~ .cc-spellcasting-header .cc-pc-only {
   display: none;
 }
 .cc-spells .cc-spell-name-runic,
 .cc-spells .cc-spell-name-oracular,
-.cc-spells .cc-spell-name-celtic {
+.cc-spells .cc-spell-name-celtic,
+.cc-spells .cc-spell-name-cthulhu,
+.cc-spells .cc-spell-name-mormo,
+.cc-spells .cc-spell-name-nyarlathotep,
+.cc-spells .cc-spell-name-yog_sothoth {
   display: none;
 }
 .cc-spells .cc-tradition-marker-runic:checked ~ .cc-spell-list .cc-spell-name-runic {
@@ -2440,6 +2647,18 @@ body {
   display: block;
 }
 .cc-spells .cc-tradition-marker-celtic:checked ~ .cc-spell-list .cc-spell-name-celtic {
+  display: block;
+}
+.cc-spells .cc-tradition-marker-cthulhu:checked ~ .cc-spell-list .cc-spell-name-cthulhu {
+  display: block;
+}
+.cc-spells .cc-tradition-marker-mormo:checked ~ .cc-spell-list .cc-spell-name-mormo {
+  display: block;
+}
+.cc-spells .cc-tradition-marker-nyarlathotep:checked ~ .cc-spell-list .cc-spell-name-nyarlathotep {
+  display: block;
+}
+.cc-spells .cc-tradition-marker-yog_sothoth:checked ~ .cc-spell-list .cc-spell-name-yog_sothoth {
   display: block;
 }
 .cc-spells .cc-spell-name-row {
@@ -2530,6 +2749,64 @@ body {
 }
 .cc-notes .cc-journal textarea {
   min-height: 14rem;
+}
+
+.cc-character .cc-npc-profile-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem 0.8rem;
+  margin-bottom: 0.3rem;
+}
+.cc-character .cc-npc-allegiance {
+  display: flex;
+}
+.cc-character .cc-npc-allegiance-input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.cc-character .cc-npc-allegiance-label {
+  background: var(--cc-editable-fill);
+  color: var(--cc-ink);
+  border: 1px solid var(--cc-rule);
+  padding: 0.15rem 0.5rem;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+}
+.cc-character .cc-npc-allegiance-label:first-of-type {
+  border-radius: 4px 0 0 4px;
+}
+.cc-character .cc-npc-allegiance-label:last-of-type {
+  border-left: none;
+  border-radius: 0 4px 4px 0;
+}
+.cc-character #cc-npc-allegiance-adversary:checked ~ label[for=cc-npc-allegiance-adversary],
+.cc-character #cc-npc-allegiance-ally:checked ~ label[for=cc-npc-allegiance-ally] {
+  background: var(--cc-banner);
+  color: var(--cc-banner-text);
+  border-color: var(--cc-banner);
+}
+.cc-character .cc-tier-notes {
+  flex: 1 1 16rem;
+  font-size: 0.72rem;
+  font-style: italic;
+}
+.cc-character .cc-npc-book {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.4rem;
+}
+.cc-character .cc-npc-book-hint {
+  font-size: 0.65rem;
+  opacity: 0.7;
+  margin: 0.15rem 0 0.3rem;
+}
+.cc-character .cc-npc-escalation textarea {
+  min-height: 2.5rem;
 }
 
 .cc-character .cc-truths-scars-grid {
@@ -2901,7 +3178,7 @@ body {
 .cc-character .cc-rep-weapons .cc-rep-header,
 .cc-character .cc-rep-weapons fieldset,
 .cc-character .cc-rep-weapons .repcontainer .repitem {
-  grid-template-columns: 1.6rem 1.6rem 1fr 1fr 1fr 2fr 0.6fr 1.4fr;
+  grid-template-columns: 1.6rem 1.6rem 1fr 0.8fr 1fr 0.9fr 1.7fr 0.6fr 1.2fr;
   align-items: center;
 }
 .cc-character .cc-rep-weapons .cc-weapon-apply {
@@ -3010,6 +3287,41 @@ body {
   min-height: 3rem;
 }
 
+.cc-character .cc-rep-special-rules .cc-rep-header,
+.cc-character .cc-rep-special-rules fieldset,
+.cc-character .cc-rep-special-rules .repcontainer .repitem {
+  grid-template-columns: 1.6rem 1.6rem 1.2fr 2.5rem 3fr;
+  align-items: center;
+}
+.cc-character .cc-rep-special-rules textarea {
+  min-height: 1.8rem;
+  width: 100%;
+}
+.cc-character .cc-rep-special-rules .cc-special-rule-apply,
+.cc-character .cc-rep-special-rules .cc-special-rule-post {
+  background: none;
+  border: none;
+  padding: 0;
+  color: inherit;
+  font-size: 1rem;
+  cursor: pointer;
+  justify-self: center;
+}
+.cc-character .cc-rep-special-rules .cc-special-rule-apply:before,
+.cc-character .cc-rep-special-rules .cc-special-rule-post:before {
+  opacity: 0.8;
+}
+.cc-character .cc-rep-special-rules .cc-special-rule-apply:hover:before,
+.cc-character .cc-rep-special-rules .cc-special-rule-post:hover:before {
+  opacity: 1;
+}
+.cc-character .cc-rep-special-rules .cc-special-rule-apply:before {
+  content: "↻";
+}
+.cc-character .cc-rep-special-rules .cc-special-rule-post:before {
+  content: "➤";
+}
+
 /* Plain hardcoded colors only in this block - roll-template CSS can't
    use custom properties (var()), unlike the main sheet stylesheet (see
    lessons_learned.md). Every class used inside a rolltemplate's markup
@@ -3078,6 +3390,10 @@ body {
 }
 .sheet-rolltemplate-ccskill .sheet-cc-roll-card .sheet-cc-roll-dice-result {
   font-size: 1.4rem;
+}
+.sheet-rolltemplate-ccskill .sheet-cc-roll-card .sheet-cc-roll-note {
+  font-size: 0.8rem;
+  font-style: italic;
 }
 .sheet-rolltemplate-ccskill .sheet-cc-roll-card .sheet-cc-roll-complication {
   color: #8a1c2b;

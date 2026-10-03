@@ -29,7 +29,7 @@ late pages) rather than guessing blindly through the whole document.
    even if the user's requested range cuts it off early.
 3. Extract every stat block found in range into the JSON shape, following
    `prompt.md`'s rules exactly (controlled skill/focus/weapon/armor
-   vocabularies, talent resolution, sparse-is-fine, no `tier` field).
+   vocabularies, talent resolution, sparse-is-fine, npc_type from the profile line, printed totals copied as-is).
 4. **Validate before writing anything.** Run this schema check against
    each extracted object before saving it:
 

@@ -61,6 +61,8 @@ on('ready', () => {
   'use strict';
 
   const ccAttributeNames = ['agility', 'brawn', 'coordination', 'gravitas', 'insight', 'reason', 'will'];
+  const ccNpcTiers = ['trooper', 'toughened', 'nemesis'];
+  const ccCapitalize = (text) => String(text || '').charAt(0).toUpperCase() + String(text || '').slice(1);
   const ccBonusDamageAttributes = ['brawn', 'insight', 'will'];
   const ccSkillNames = [
     'academia', 'athletics', 'crafting', 'engineering', 'fighting', 'medicine',
@@ -163,23 +165,38 @@ on('ready', () => {
     // field sets for a character created through the Roll20 UI.
     setAttr(id, 'sheet_version', '0.1.0');
 
-    // Drives the Character tab's Cannon Fodder/NPC panel show-hide (see
-    // source/views/_character.pug) - anything other than the one
-    // recognized value falls back to "npc" (the full sheet), same default
-    // the schema itself documents, rather than failing the import or
-    // leaving the attribute unset (an unset character_type also renders as
-    // the full sheet, since the toggle's "pc" radio is the only one with
-    // `checked` by default, but setting it explicitly here keeps an
-    // imported NPC's stored value self-documenting).
-    if (npc.character_type !== undefined && npc.character_type !== 'cannon_fodder' && npc.character_type !== 'npc') {
-      warnings.push(`unknown character_type "${npc.character_type}" - defaulted to "npc"`);
+    // NPC tier (see the Character Type selector in source/views/
+    // _character.pug). Pre-tier files used character_type cannon_fodder/
+    // npc; those are mapped the same way the sheet migrates them.
+    const legacyTypes = {cannon_fodder: 'trooper', npc: 'nemesis'};
+    let npcType = npc.npc_type || legacyTypes[npc.character_type] || 'toughened';
+    if (!ccNpcTiers.includes(npcType)) {
+      warnings.push(`unknown npc_type "${npcType}" - defaulted to "toughened"`);
+      npcType = 'toughened';
     }
-    setAttr(id, 'character_type', npc.character_type === 'cannon_fodder' ? 'cannon_fodder' : 'npc');
+    setAttr(id, 'character_type', npcType);
+    setAttr(id, 'spells_type_marker', 'npc');
+    setAttr(id, 'npc_allegiance', npc.allegiance === 'ally' ? 'ally' : 'adversary');
 
     ['archetype', 'culture', 'caste', 'wealth', 'specialization', 'background', 'characteristic', 'injuries', 'traits'].forEach((field) => {
       setAttr(id, field, npc[field]);
     });
-    setAttr(id, 'journal_notes', npc.notes);
+    (Array.isArray(npc.truths) ? npc.truths : []).slice(0, 5).forEach((truth, i) => {
+      setAttr(id, `truth_${i + 1}`, truth);
+    });
+
+    const rituals = Array.isArray(npc.rituals) ? npc.rituals : [];
+    const notes = [npc.notes, rituals.length ? `Rituals: ${rituals.join(', ')}` : ''].filter(Boolean).join('\n\n');
+    setAttr(id, 'journal_notes', notes);
+    setAttr(id, 'npc_escalation', (Array.isArray(npc.escalation_options) ? npc.escalation_options : []).join('\n'));
+
+    // The stat block's printed totals - see the "book" fields in
+    // source/views/panels/_npc_profile_panel.pug.
+    const profile = (npc.profile && typeof npc.profile === 'object') ? npc.profile : {};
+    const hasBook = (key) => profile[key] !== undefined && profile[key] !== null && profile[key] !== '';
+    [['stress', 'npc_stress'], ['injuries', 'npc_injuries'], ['armor', 'npc_armor'], ['courage', 'npc_courage'], ['morale', 'npc_morale'], ['power', 'npc_power']].forEach(([key, attr]) => {
+      if (hasBook(key)) { setAttr(id, attr, Number(profile[key])); }
+    });
 
     ccAttributeNames.forEach((attr) => {
       if (npc.attributes[attr] === undefined) {
@@ -226,8 +243,12 @@ on('ready', () => {
     // "override any field alongside name" rule as FORMAT.md documents.
     (Array.isArray(npc.weapons) ? npc.weapons : []).forEach((weapon) => {
       const resolved = Object.assign({}, ccWeaponProfiles[weapon.name] || {}, weapon);
+      if (resolved.type && !['melee', 'ranged', 'mental'].includes(resolved.type)) {
+        warnings.push(`weapon "${resolved.name}" has unknown type "${resolved.type}" - left as Auto`);
+      }
       createRepeatingRow(id, 'weapon', {
         name: resolved.name,
+        attack_type: ['melee', 'ranged', 'mental'].includes(resolved.type) ? resolved.type : '',
         focus: resolved.focus,
         reach_range: resolved.reach_range,
         damage_effects: resolved.damage_effects,
@@ -247,18 +268,51 @@ on('ready', () => {
       totalResistance += Number(resolved.resistance) || 0;
     });
 
+    (Array.isArray(npc.special_rules) ? npc.special_rules : []).forEach((rule) => {
+      if (!rule || !rule.name) {
+        warnings.push('a special rule is missing "name" - skipped');
+        return;
+      }
+      // An omitted description fills in from the sheet's common-rule
+      // summaries the next time the sheet is opened (ccRecomputeOnOpen).
+      createRepeatingRow(id, 'specialrule', {name: rule.name, x: rule.x, description: rule.description});
+    });
+
+    // Spells: name only - Skill/Difficulty/Cost/Effect fill in from the
+    // sheet's own spellbooks on first open (ccRecomputeOnOpen), so this
+    // script doesn't carry a second copy of source/data/spells.json.
+    const spellcasting = (npc.spellcasting && typeof npc.spellcasting === 'object') ? npc.spellcasting : {};
+    if (spellcasting.attribute) {
+      setAttr(id, 'spellcasting_type', `npc_${spellcasting.attribute}`);
+      setAttr(id, 'spellcasting_attribute', ccCapitalize(spellcasting.attribute));
+      setAttr(id, 'base_power', 2);
+    }
+    if (spellcasting.tradition) {
+      setAttr(id, 'magical_tradition', spellcasting.tradition);
+      setAttr(id, 'tradition_marker', spellcasting.tradition);
+    }
+    const spells = Array.isArray(npc.spells) ? npc.spells : [];
+    if (spells.length && !spellcasting.tradition) {
+      warnings.push('spells listed without spellcasting.tradition - they will not resolve to spell details');
+    }
+    spells.forEach((spell) => createRepeatingRow(id, 'spell', {name: spell}));
+
     // Derived fields - see this file's top comment for why these are
-    // computed here rather than left for the sheet to recalculate.
+    // computed here as well as on first sheet open. A profile's printed
+    // total wins; otherwise the same tier formulas as the sheet apply.
     const brawn = Number(npc.attributes.brawn) || 0;
     const will = Number(npc.attributes.will) || 0;
     const baseArmour = ccAttributeBonus(brawn);
     setAttr(id, 'base_armour', baseArmour);
-    setAttr(id, 'total_armor', baseArmour + totalResistance);
-    setAttr(id, 'courage', ccAttributeBonus(will));
+    setAttr(id, 'total_armor', hasBook('armor') ? Number(profile.armor) : baseArmour + totalResistance);
+    setAttr(id, 'courage', hasBook('courage') ? Number(profile.courage) : ccAttributeBonus(will));
+    setAttr(id, 'injury_limit', hasBook('injuries') ? Number(profile.injuries) : {trooper: 1, toughened: 2, nemesis: 3}[npcType]);
+    if (hasBook('power')) { setAttr(id, 'power_rating', Number(profile.power)); }
 
     const resilienceRanks = Number((skills.resilience || {}).ranks) || 0;
-    const hasUnyielding = talents.some((t) => t && String(t.name || '').trim().toLowerCase() === 'unyielding');
-    const stressMaxBase = Math.max(brawn, will) + resilienceRanks + (hasUnyielding ? 3 : 0);
+    const formulaStress = Math.max(brawn, will) + resilienceRanks;
+    let stressMaxBase = npcType === 'trooper' ? Math.ceil(formulaStress / 2) : formulaStress;
+    if (hasBook('stress')) { stressMaxBase = Number(profile.stress); }
     setAttr(id, 'stress_max_base', stressMaxBase);
 
     const fatigue = Number(npc.fatigue) || 0;

@@ -135,6 +135,106 @@
     }
   };
 
+  // NPC tiers from the GM's Guide (Chapter 8) - see the Character Type
+  // selector in views/_character.pug.
+  const ccNpcTiers = ['trooper', 'toughened', 'nemesis'];
+  const ccIsNpc = (attributes) => ccNpcTiers.includes(attributes.character_type);
+
+  // Adversary NPCs "save extra successes as ... Threat" and buy d20s with
+  // Threat; allied NPCs use the party's Momentum exactly like a PC (GM's
+  // Guide, NPC Allegiance). Allegiance defaults to adversary.
+  const ccIsAdversary = (attributes) => ccIsNpc(attributes) && attributes.npc_allegiance !== 'ally';
+
+  // NPC stat blocks print final Max Stress / Injuries / Armor / Courage /
+  // Power with every special rule already applied, so on an NPC sheet a
+  // filled-in "book" value (views/panels/_npc_profile_panel.pug) wins over
+  // the formula; blank (null here) means the tier's own formula applies.
+  // Used by the Vitals calculations and Spells' calcPowerRating.
+  const ccNpcBookValue = (attributes, name) => {
+    if (!ccIsNpc(attributes)) { return null; }
+    const raw = String(attributes[name] === undefined || attributes[name] === null ? '' : attributes[name]).trim();
+    return (raw === '' || Number.isNaN(Number(raw))) ? null : Number(raw);
+  };
+
+  // RAW 2d20 escalating cost for Threat-bought dice: 1st extra d20 costs
+  // 1, 2nd costs 2, 3rd costs 3, capped at 3 extra dice - unlike the PCs'
+  // own house-ruled ccBonusDiceCost above.
+  const ccBonusDiceCostThreat = (count) => {
+    const n = Math.min(3, Math.max(0, count));
+    return (n * (n + 1)) / 2;
+  };
+
+  const ccBonusDiceQuery = (attributes) => (ccIsAdversary(attributes) ?
+    '?{Additional d20s bought with Threat (0-3)|0}' :
+    '?{Additional d20s bought (0-2)|0}');
+
+  // Which pool a roll's extra successes/spends go to - also printed on the
+  // roll card (the {{pool}} field), since an adversary's card must say
+  // Threat where a PC's says Momentum.
+  const ccPoolName = (attributes) => (ccIsAdversary(attributes) ? 'Threat' : 'Momentum');
+
+  // Settles every pool effect of one finished roll, shared by all roll
+  // sites. generated: extra successes; bonusDiceCount: d20s bought;
+  // extraSpent: pool spent on a roll's own options (spell Extra Momentum,
+  // Fatigue removal); extraThreat: Threat a roll always generates
+  // regardless of who rolled (Dabbling power boost, Curse of Loki).
+  // An adversary's net result rides the existing Threat signal as one
+  // signed delta - api-scripts/ccthreat.js already accepts negative deltas
+  // and floors the pool at 0. An adversary's complications are NOT added to
+  // Threat (that rule is the players' complications feeding the GM); they
+  // still show on the card for the GM to adjudicate. Returns what was
+  // spent, for the card's "<pool> Spent" row.
+  const ccSettleRoll = async ({attributes, generated, bonusDiceCount, extraSpent = 0, complications, extraThreat = 0}) => {
+    if (ccIsAdversary(attributes)) {
+      const spent = ccBonusDiceCostThreat(bonusDiceCount) + extraSpent;
+      await ccSendThreatSignal(generated - spent + extraThreat);
+      return spent;
+    }
+    const diceCost = ccBonusDiceCost(bonusDiceCount);
+    await ccSendMomentumSignal(generated - extraSpent);
+    await ccSendMomentumSpendSignal(diceCost);
+    await ccSendThreatSignal(complications + extraThreat);
+    return diceCost + extraSpent;
+  };
+
+  // Sum of X across this character's special rules whose name matches
+  // pattern (see views/panels/_special_rules_panel.pug). X comes from the
+  // row's own X field, falling back to a trailing number in the name
+  // ("Extraordinary Brawn 2"), then to 1.
+  const ccSpecialRuleValue = (attributes, pattern) => (attributes.repeating_specialrule || [])
+    .filter((row) => pattern.test(String(row.name || '')))
+    .reduce((sum, row) => {
+      const trailing = String(row.name || '').match(/(\d+)\s*$/);
+      return sum + (Number(row.x) || (trailing ? Number(trailing[1]) : 1));
+    }, 0);
+
+  // "Extraordinary [Attribute] X: ... X automatic successes on skill tests
+  // that use that attribute" - the only special-rule effect applied at roll
+  // time, because stat-block totals (stress, armor, attack damage) already
+  // include every other rule's bonus.
+  const ccExtraordinary = (attributes, attrName) => (attrName ?
+    ccSpecialRuleValue(attributes, new RegExp(`^\\s*extraordinary\\s+${attrName}\\b`, 'i')) : 0);
+
+  const ccHasSpecialRule = (attributes, pattern) => (attributes.repeating_specialrule || [])
+    .some((row) => pattern.test(String(row.name || '')));
+
+  const ccAttributeNames = ['agility', 'brawn', 'coordination', 'gravitas', 'insight', 'reason', 'will'];
+
+  // Attribute-choice query for skill/focus rolls. Each option's value packs
+  // the rating plus 100x that attribute's Extraordinary bonus, because a
+  // roll query can only return one number and the auto-success bonus
+  // depends on which attribute was picked. ccUnpackAttributeChoice reverses
+  // it. Built per roll from current ratings rather than @{} references.
+  const ccAttributeQuery = (attributes) => '?{Attribute' + ccAttributeNames.map((name) => {
+    const rating = Number(attributes[`${name}_rating`]) || 0;
+    return `|${ccCapitalize(name)},${rating + 100 * ccExtraordinary(attributes, name)}`;
+  }).join('') + '}';
+
+  const ccUnpackAttributeChoice = (value) => ({
+    rating: value % 100,
+    autoSuccesses: Math.floor(value / 100),
+  });
+
   // Shared 2d20 roll core, used for Attribute-only rolls (Attributes
   // panel), plain Skill rolls (no focus), and Focus rolls (both Skills
   // panel) - three call sites across two panel files. attributeExpr is
@@ -144,10 +244,13 @@
   // views/panels/_skills_panel.pug). critMax is the die value at/under
   // which a die is a critical success (this skill's ranks if a focus
   // applies, else 1).
-  const runCcRoll = async ({skillLabel, focusLabel, attributeExpr, skillRanks, critMax}) => {
+  //
+  // attributeExpr's value is packed (rating + 100x Extraordinary bonus, see
+  // ccAttributeQuery) and unpacked after the roll.
+  const runCcRoll = async ({attributes, skillLabel, focusLabel, attributeExpr, skillRanks, critMax}) => {
     const difficultyQuery = '?{Difficulty|1}';
     const complicationQuery = '?{Complication range (1-5)|1}';
-    const bonusDiceQuery = '?{Additional d20s bought (0-2)|0}';
+    const bonusDiceQuery = ccBonusDiceQuery(attributes);
 
     // Every field finishRoll will later override must already exist here
     // as a [[0]] placeholder (see lessons_learned.md).
@@ -165,12 +268,15 @@
       `{{outcome=[[0]]}} ` +
       `{{complications=[[0]]}} ` +
       `{{bonus_momentum=[[0]]}} ` +
-      `{{momentum_spent=[[0]]}}`;
+      `{{momentum_spent=[[0]]}} ` +
+      `{{auto_successes=[[0]]}} ` +
+      `{{pool=${ccPoolName(attributes)}}}`;
 
     const roll = await startRoll(rollString);
 
     try {
-      const attributeChoice = Number(roll.results.attribute_choice.result) || 0;
+      const {rating: attributeChoice, autoSuccesses} =
+        ccUnpackAttributeChoice(Number(roll.results.attribute_choice.result) || 0);
       const difficulty = Number(roll.results.difficulty.result) || 1;
       const complicationRange = Number(roll.results.complication_range.result) || 1;
 
@@ -198,20 +304,19 @@
       const targetNumber = attributeChoice + skillRanks;
       const complicationThreshold = 21 - complicationRange;
       const successCount = dice.filter((d) => d <= targetNumber).length +
-        dice.filter((d) => d <= critMax).length;
+        dice.filter((d) => d <= critMax).length + autoSuccesses;
       const complicationCount = dice.filter((d) => d >= complicationThreshold).length;
       const passed = successCount >= difficulty;
       const bonusMomentum = passed ? Math.max(0, successCount - difficulty) : 0;
 
       // dice.length is 2 plus however many were bought via bonusDiceQuery
       // above, so this recovers that count without needing its own roll-
-      // string field - ccBonusDiceCost then prices it (1st extra die costs
-      // 1 Momentum, 2nd costs 3, win or lose per 2d20 RAW).
+      // string field - ccSettleRoll then prices it per pool (PC/ally
+      // Momentum house rule, or adversary Threat 1/2/3).
       const bonusDiceCount = Math.max(0, dice.length - 2);
-      const bonusDiceCost = ccBonusDiceCost(bonusDiceCount);
-      await ccSendMomentumSignal(bonusMomentum);
-      await ccSendMomentumSpendSignal(bonusDiceCost);
-      await ccSendThreatSignal(complicationCount);
+      const bonusDiceCost = await ccSettleRoll({
+        attributes, generated: bonusMomentum, bonusDiceCount, complications: complicationCount,
+      });
 
       // outcome is a plain 0/1 flag (rather than separate passed/failed
       // fields) because the Passed/Failed blocks are gated with the
@@ -227,6 +332,7 @@
         bonus_momentum: bonusMomentum,
         complications: complicationCount,
         momentum_spent: bonusDiceCost,
+        auto_successes: autoSuccesses,
       };
 
       console.log(`[CC] ${skillLabel} outcome:`, {
@@ -276,11 +382,20 @@
   // every module-level function and constant in the whole sheet has already
   // been declared once, top to bottom, at script load.
   const ccRecomputeOnOpen = ({attributes, sections}) => {
+    // The interim Cannon Fodder / NPC types became the GM's Guide's tiers.
+    const legacyTypes = {cannon_fodder: 'trooper', npc: 'nemesis'};
+    if (legacyTypes[attributes.character_type]) {
+      attributes.character_type = legacyTypes[attributes.character_type];
+    }
+
     attributes.base_armour = calcBaseArmour({attributes});
     attributes.total_armor = calcTotalArmor({attributes});
     attributes.courage = calcCourage({attributes});
     attributes.stress_max_base = calcStressMaxBase({attributes});
     attributes.stress_max = calcStressMax({attributes});
+    attributes.injury_limit = calcInjuryLimit({attributes});
+    attributes.spells_type_marker = calcSpellsTypeMarker({attributes});
+    attributes.power_rating = calcPowerRating({attributes});
 
     (sections.repeating_talent || []).forEach((rowId) => {
       const prefix = `repeating_talent_${rowId}_`;
@@ -296,3 +411,34 @@
     });
   };
   k.registerFuncs({ccRecomputeOnOpen}, {type: ['opener']});
+
+  // Same name-only backfill for the other two sections api-scripts/
+  // ccimport.js writes by name: spells (from the selected tradition's
+  // spellbook, ccSpellbooks in views/_spells.pug) and special rules (the
+  // common-rule summaries in views/panels/_special_rules_panel.pug). Never
+  // overwrites anything already filled in.
+  const ccBackfillNamedRows = ({attributes, sections}) => {
+    const book = ccSpellbooks[attributes.magical_tradition] || {};
+    (sections.repeating_spell || []).forEach((rowId) => {
+      const prefix = `repeating_spell_${rowId}_`;
+      const profile = book[attributes[`${prefix}name`]];
+      if (!profile || attributes[`${prefix}effect`]) { return; }
+      Object.keys(profile).forEach((field) => {
+        attributes[`${prefix}${field}`] = profile[field];
+      });
+    });
+    (sections.repeating_specialrule || []).forEach((rowId) => {
+      const prefix = `repeating_specialrule_${rowId}_`;
+      const name = attributes[`${prefix}name`];
+      const key = ccFindSpecialRule(name);
+      if (!key) { return; }
+      if (!attributes[`${prefix}description`]) {
+        attributes[`${prefix}description`] = ccSpecialRuleProfiles[key];
+      }
+      const trailing = String(name || '').match(/(\d+)\s*$/);
+      if (trailing && !attributes[`${prefix}x`]) {
+        attributes[`${prefix}x`] = Number(trailing[1]);
+      }
+    });
+  };
+  k.registerFuncs({ccBackfillNamedRows}, {type: ['opener']});
