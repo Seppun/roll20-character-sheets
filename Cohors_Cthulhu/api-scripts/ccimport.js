@@ -331,15 +331,28 @@ on('ready', () => {
   // Handout GM Notes/Notes fields come back as rich-text HTML, not plain
   // text - a pasted JSON blob typically survives as literal characters, but
   // the editor still wraps lines in <p>/<br> and may entity-escape quotes.
-  const stripHtmlNotes = (raw) => String(raw || '')
+  // Roll20's handout editor also stores indentation as &nbsp; (or the raw
+  // U+00A0 character), may "smarten" straight quotes into curly ones, and
+  // can wrap lines in <div>s - none of which JSON.parse accepts, so all of
+  // it is normalized back to plain JSON text here.
+  const decodeEntities = (text) => text
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/&quot;/gi, '"')
+    .replace(/&apos;/gi, '\'')
+    .replace(/&lt;/gi, '<')
+    .replace(/&gt;/gi, '>')
+    .replace(/&#x([0-9a-f]+);/gi, (_, hex) => String.fromCharCode(parseInt(hex, 16)))
+    .replace(/&#(\d+);/g, (_, dec) => String.fromCharCode(Number(dec)))
+    .replace(/&amp;/gi, '&');
+
+  const stripHtmlNotes = (raw) => decodeEntities(String(raw || '')
     .replace(/<br\s*\/?>/gi, '\n')
-    .replace(/<\/p>/gi, '\n')
-    .replace(/<[^>]+>/g, '')
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, '\'')
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
+    .replace(/<\/(p|div|li)>/gi, '\n')
+    .replace(/<[^>]+>/g, ''))
+    .replace(/[   ]/g, ' ')
+    .replace(/[​-‍﻿]/g, '')
+    .replace(/[“”„″]/g, '"')
+    .replace(/[‘’′]/g, '\'')
     .trim();
 
   const announceResults = (who, results) => {
@@ -361,7 +374,13 @@ on('ready', () => {
     try {
       data = JSON.parse(cleaned);
     } catch (err) {
-      sendChat('CCImport', `/w "${whisperTo(who)}" Could not parse JSON from GM Notes: ${err.message}`);
+      // Show the text around the failure point - in chat and the API
+      // console - so a stray character can be found without guessing.
+      const pos = Number((String(err.message).match(/position (\d+)/) || [])[1]);
+      const near = Number.isFinite(pos) ? cleaned.slice(Math.max(0, pos - 30), pos + 30) : cleaned.slice(0, 60);
+      const codes = Number.isFinite(pos) ? ` (character there: U+${cleaned.charCodeAt(pos).toString(16).toUpperCase().padStart(4, '0')})` : '';
+      log(`[CCImport] JSON parse failed: ${err.message}${codes}; near: ${JSON.stringify(near)}; raw GM Notes start: ${JSON.stringify(String(rawNotes || '').slice(0, 300))}`);
+      sendChat('CCImport', `/w "${whisperTo(who)}" Could not parse JSON from GM Notes: ${err.message}${codes}. Near: ${near.replace(/[{}[\]]/g, ' ')}`);
       return;
     }
     const npcs = Array.isArray(data) ? data : [data];
