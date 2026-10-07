@@ -1,0 +1,18 @@
+//- Cohors_Cthulhu.pug
+include k-scaffold
+include ./components/_index.pug
+
+- k.sheetName = "CohorsCthulhu";
+- k.version = "0.1.0";
+
++hidden({name: 'sheet version', value: '0.1.0'})
+
+main#main
+  +tabs({name: 'cohors-cthulhu', defaultActiveTab: 'character'})
+    include ./views/_index.pug
+
+include ./rolltemplate/_index.pug
+
++kscript
+    | k.sheetName = "CohorsCthulhu";
+    | k.version = "0.1.0";

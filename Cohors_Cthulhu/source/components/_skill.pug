@@ -1,0 +1,22 @@
+//- components/_skill.pug
+//- One Skills row: name, Ranks and the skill's Focuses. extraAffects lets
+//- Ranks feed a derived stat (Resilience -> Max Stress).
+mixin skill(name, focuses, extraAffects)
+  tr.cc-skill-row
+    th
+      +roller({
+        name: `${name} skill roll`,
+        class: 'cc-skill-name-roll',
+        trigger: {triggeredFuncs: ['initiateSkillRoll']}
+      })
+        = name
+    td.cc-skill-ranks-cell
+      +number({
+        name: `${name} ranks`,
+        trigger: extraAffects ?
+          {affects: extraAffects, triggeredFuncs: ['ccUpdateTalentFilter']} :
+          {triggeredFuncs: ['ccUpdateTalentFilter']}
+      }).cc-skill-ranks
+    td.cc-skill-focuses
+      each focus in focuses
+        +focusItem(name, focus)
