@@ -1,10 +1,11 @@
 # NPC interchange format
 
 This is the data format for getting an NPC into the Cohors Cthulhu Roll20
-game: write it, then hand it to `api-scripts/ccimport.js` (see the main
-`README.md`'s "Importing NPCs" section for that last step). The machine-checkable version of everything
-below lives in [`schema/npc.schema.json`](./schema/npc.schema.json); this
-file is the walkthrough.
+game: write it, then import it with the API script,
+`api-scripts/cohors_cthulhu.js` (see the main `README.md`'s "Importing
+NPCs" section for that last step). The machine-checkable version of
+everything below lives in [`schema/npc.schema.json`](./schema/npc.schema.json);
+this file is the walkthrough.
 
 A file holds either **one NPC object**, or a **JSON array of several** for a
 batch (e.g. every NPC in one encounter).

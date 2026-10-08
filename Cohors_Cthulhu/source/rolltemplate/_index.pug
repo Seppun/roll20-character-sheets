@@ -107,19 +107,19 @@
           .cc-roll-row.cc-roll-complication
             span {{computed::cost_threat_generated}} threat generated from this spell's cost effects
 
-//- Hidden signal carrying a Momentum delta to api-scripts/ccmomentum.js (see
-//- ccSendMomentumSignal). The API script matches on the template name
-//- (msg.rolltemplate), so renaming a signal template means updating its
-//- script too.
+//- Hidden signal carrying a Momentum delta to the API script's Momentum pool
+//- (api-scripts/cohors_cthulhu.js; see ccSendMomentumSignal). The script
+//- matches on the template name (msg.rolltemplate), so renaming a signal
+//- template means updating the script too.
 +rolltemplate('ccmomentumsignal')
   span.cc-momentum-signal-delta {{ccmomentumdelta}}
 
-//- Hidden signal for the Threat pool (api-scripts/ccthreat.js).
+//- Hidden signal for the API script's Threat pool.
 +rolltemplate('ccthreatsignal')
   span.cc-threat-signal-delta {{ccthreatdelta}}
 
 //- Hidden signal for a spend the pool may not cover
-//- (ccSendMomentumSpendSignal). ccmomentum.js spends what the pool has and
+//- (ccSendMomentumSpendSignal). The API script spends what the pool has and
 //- converts the shortfall into a ccthreatsignal.
 +rolltemplate('ccmomentumspendsignal')
   span.cc-momentum-spend-signal-amount {{ccmomentumspend}}

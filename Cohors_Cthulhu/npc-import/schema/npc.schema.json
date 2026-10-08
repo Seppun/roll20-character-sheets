@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://github.com/Seppun/roll20-character-sheets/Cohors_Cthulhu/npc-import/schema/npc.schema.json",
   "title": "Cohors Cthulhu NPC",
-  "description": "One NPC, ready for import into the Cohors Cthulhu Roll20 sheet via api-scripts/ccimport.js. See ../FORMAT.md for a full walkthrough. A file may contain either a single object matching this schema, or a JSON array of them for a batch of NPCs.",
+  "description": "One NPC, ready for import into the Cohors Cthulhu Roll20 sheet via the API script, api-scripts/cohors_cthulhu.js. See ../FORMAT.md for a full walkthrough. A file may contain either a single object matching this schema, or a JSON array of them for a batch of NPCs.",
   "type": "object",
   "additionalProperties": false,
   "required": [

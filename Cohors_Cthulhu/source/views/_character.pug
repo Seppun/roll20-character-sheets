@@ -36,9 +36,9 @@ include ./_global_sheetworker.pug
     +radio({name: 'character_type', value: 'trooper', trigger: ccCharacterTypeTrigger}).cc-character-type-input#cc-character-type-trooper
     +radio({name: 'character_type', value: 'toughened', trigger: ccCharacterTypeTrigger}).cc-character-type-input#cc-character-type-toughened
     +radio({name: 'character_type', value: 'nemesis', trigger: ccCharacterTypeTrigger}).cc-character-type-input#cc-character-type-nemesis
-    //- GM-only unlock for the selector, set by api-scripts/ccnpclock.js from
-    //- the GM Notes (which players can't read). Without it the selector is
-    //- hidden. Never visible.
+    //- GM-only unlock for the selector, set by the API script's NPC lock
+    //- (api-scripts/cohors_cthulhu.js) from the GM Notes, which players can't
+    //- read. Without it the selector is hidden. Never visible.
     +checkbox({name: 'npc unlocked', value: 1}).cc-npc-unlock-flag
     .cc-character-type
       label.cc-character-type-label(for='cc-character-type-pc') Player Character

@@ -58,10 +58,10 @@
     return match ? sum + (Number(match[1]) || 1) : sum;
   }, 0);
 
-  // Momentum is a party-wide pool, kept by api-scripts/ccmomentum.js. Each
-  // roll that generates or spends it sends a hidden signal with a net delta:
-  // positive for generated, negative for spent. Bought d20s use
-  // ccSendMomentumSpendSignal instead.
+  // Momentum is a party-wide pool, kept by the API script
+  // (api-scripts/cohors_cthulhu.js). Each roll that generates or spends it
+  // sends a hidden signal with a net delta: positive for generated, negative
+  // for spent. Bought d20s use ccSendMomentumSpendSignal instead.
   //
   // Sheet workers can't call sendChat(), so the signal is a hidden roll
   // template (ccmomentumsignal) whispered to the GM. Harmless without the API
@@ -89,8 +89,8 @@
     }
   };
 
-  // Threat is the GM's pool, kept by api-scripts/ccthreat.js. For PCs, delta
-  // is the roll's Complications (1 Threat each). Kept separate from the
+  // Threat is the GM's pool, kept by the same API script. For PCs, delta is
+  // the roll's Complications (1 Threat each). Kept separate from the
   // Momentum signal.
   const ccSendThreatSignal = async (delta) => {
     if (!delta) { return; }
@@ -133,9 +133,9 @@
   // dice); extraThreat: Threat the roll always generates (Dabbling power
   // boost, Curse of Loki).
   //
-  // An adversary's net result is one signed Threat delta (ccthreat.js floors
-  // at 0). Its complications stay on the card for the GM. Returns what was
-  // spent, for the card's Spent row.
+  // An adversary's net result is one signed Threat delta (the API script
+  // floors the pool at 0). Its complications stay on the card for the GM.
+  // Returns what was spent, for the card's Spent row.
   const ccSettleRoll = async ({attributes, generated, bonusDiceCount, extraSpent = 0, complications, extraThreat = 0}) => {
     if (ccIsAdversary(attributes)) {
       const spent = ccBonusDiceCost(bonusDiceCount) + extraSpent;
@@ -294,7 +294,7 @@
   // Sheet-open recalculation: k-scaffold runs 'opener' functions on every
   // open, unlike change-triggered calculations. It recomputes the derived
   // fields (calcBaseArmour, calcCourage, calcTotalArmor, calcStressMaxBase,
-  // calcStressMax), so characters written by api-scripts/ccimport.js or
+  // calcStressMax), so characters imported by the API script or
   // edited outside the sheet are reconciled, refreshes the hidden markers,
   // matches free-text identity values to their dropdowns, and backfills empty
   // Talent keywords and requirements from ccTalentProfiles. Those are declared later in the

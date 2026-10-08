@@ -75,16 +75,17 @@ Belongings).
   light-on-dark banners/headers swapped to dark-on-white so they stay
   legible on paper.
 
-## Global Momentum and Threat pools (API scripts)
+## Global Momentum and Threat pools (API script)
 
 Momentum and Threat in the 2d20 System are shared, game-wide resources,
 not per-character stats - neither can live as an attribute on this (or
 any) character sheet, since each character's sheet is its own isolated
 set of attributes with no visibility into any other character's, let
-alone a GM-only pool. `api-scripts/` holds two small, independent Roll20
-API scripts, `ccmomentum.js` and `ccthreat.js`, that each maintain one
-such pool, kept in sync automatically by every roll made from this sheet
-(Attribute/Skill/Focus/Weapon/Spell):
+alone a GM-only pool. The Roll20 API script in
+`api-scripts/cohors_cthulhu.js` maintains both pools, kept in sync
+automatically by every roll made from this sheet
+(Attribute/Skill/Focus/Weapon/Spell). The same script also runs the token
+actions, NPC import and NPC lock described below.
 
 - **Momentum** increases by the Momentum a passed roll generates, and
   decreases by Extra Momentum declared spent on a spell or a Fatigue
@@ -115,22 +116,25 @@ such pool, kept in sync automatically by every roll made from this sheet
   effects), which happens in narration rather than on this sheet, so
   `!threat-adjust` (GM only) is the only way the pool goes down.
 
-### Installing the API scripts
+### Installing the API script
 
-These are **separate pieces from the character sheet itself** - neither
-is part of the compiled `Cohors_Cthulhu.html`/`.css`, and neither is
+The script is a **separate piece from the character sheet itself** - it
+isn't part of the compiled `Cohors_Cthulhu.html`/`.css`, and it isn't
 pasted into the Custom Sheet Layout/Style boxes above. Instead, in a
 Pro-tier game with the API sandbox enabled:
 
 1. **Game Settings** > **API Scripts** > **New Script**.
-2. Paste in the whole contents of `api-scripts/ccmomentum.js`, Save
+2. Paste in the whole contents of `api-scripts/cohors_cthulhu.js`, Save
    Script.
-3. Repeat for `api-scripts/ccthreat.js`.
 
-They run side by side as two ordinary API scripts. Without either script
-installed, that pool's hidden signal just renders (and immediately hides)
-a roll template card nobody looks at - rolling still works fine, there's
-just no shared pool.
+Earlier versions came as five separate scripts (`ccmomentum.js`,
+`ccthreat.js`, `ccimport.js`, `ccnpclock.js`, `cctokenactions.js`). If
+your game has those, delete them when you add this one, or every command
+and roll is handled twice. The pools and settings carry over.
+
+Without the script installed, the hidden signals just render (and
+immediately hide) a roll template card nobody looks at - rolling still
+works fine, there's just no shared pool.
 
 ### Using the pools
 
@@ -148,22 +152,21 @@ Chat commands once installed:
 | `!momentum` / `!threat` | anyone | Announce the current pool value |
 | `!momentum-set N` / `!threat-set N` | GM only | Set the pool to an exact value |
 | `!momentum-adjust N` / `!threat-adjust N` | GM only | Add N (negative to subtract) - how a GM spends Threat outside of NPC rolls (adversary NPC rolls on the sheet settle their own Threat) |
-| `!ccdebugon` / `!ccdebugoff` | GM only | Turn debug logging on or off for all the Cohors Cthulhu API scripts (any capitalization works). `!ccdebug` shows the current setting. |
+| `!ccdebugon` / `!ccdebugoff` | GM only | Turn the API script's debug logging on or off (any capitalization works). `!ccdebug` shows the current setting. |
 
 Debug logging is off by default and stays as set across sandbox restarts.
-When on, each script writes what it did to the API console (Game Settings >
-API Scripts): every chat message the pool scripts see, the pool before and
-after each signal or command, how a spend was split between Momentum and
+When on, the script writes what it did to the API console (Game Settings >
+API Scripts), tagged by part (`[CCMomentum]`, `[CCImport]`, ...): every
+chat message it sees, the pool before and after each signal or command, how a spend was split between Momentum and
 Threat, each NPC import, and each NPC Lock check. Errors are always logged.
 
 ## Token actions (API script)
 
-`api-scripts/cctokenactions.js` puts each character's weapons and spells
-in the token action bar: select a token and click an attack or "Cast
-<spell>" to roll it, exactly as from the sheet. Install it like the other
-scripts. It keeps those token actions in step with the sheet as weapons
-and spells are added, renamed or deleted, and `ccimport.js` adds them for
-imported NPCs. It only manages the abilities it creates; your own
+The API script (`api-scripts/cohors_cthulhu.js`) puts each character's
+weapons and spells in the token action bar: select a token and click an
+attack or "Cast <spell>" to roll it, exactly as from the sheet. It keeps
+those token actions in step with the sheet as weapons and spells are
+added, renamed or deleted, and adds them for imported NPCs. It only manages the abilities it creates; your own
 abilities and macros are left alone.
 
 | Command (GM only) | Effect |
@@ -184,10 +187,8 @@ Roll20 character:
    in `npc-import/examples/subura_street_thug.json`. The JSON Schema in
    `npc-import/schema/npc.schema.json` lets any JSON Schema validator check
    a file before you import it.
-2. **Install `api-scripts/ccimport.js`** - same install steps as
-   `ccmomentum.js`/`ccthreat.js` above (**Game Settings** > **API Scripts**
-   > **New Script**, paste the whole file in). Independent of those two -
-   runs fine with neither, either, or both also installed.
+2. **Install the API script**, `api-scripts/cohors_cthulhu.js` (see
+   "Installing the API script" above).
 3. **Import it**: paste the NPC JSON (one object, or a JSON array for
    several at once) into a Handout's **GM Notes**, then in chat run:
    ```
@@ -223,7 +224,7 @@ special rules, spells and escalation options filled in.
 The Character Type selector at the top of the Character tab switches a
 character between Player Character and the three NPC tiers (Trooper, Toughened, Nemesis).
 It's **GM-only**, controlled by the character's GM Notes (which players
-can't see or edit) through the `api-scripts/ccnpclock.js` API script:
+can't see or edit) through the API script (`api-scripts/cohors_cthulhu.js`):
 
 - Put **NPC** anywhere in a character's GM Notes to show the selector on
   that sheet. **NPC: Trooper**, **NPC: Toughened** or **NPC: Nemesis**
@@ -231,12 +232,10 @@ can't see or edit) through the `api-scripts/ccnpclock.js` API script:
 - Without it, the selector is hidden, and an NPC type is reset to Player
   Character - including one a player sets through the Attributes &
   Abilities tab. The GM gets a whisper when that happens.
-- `ccimport.js` writes `NPC: <Tier>` into every imported NPC's GM Notes.
-- Install it like the other scripts (**Game Settings** > **API Scripts** >
-  **New Script**). On its first run it adds "NPC" to the GM Notes of
-  existing NPCs that no player controls, so they keep working. Without
-  this script, nobody can switch a sheet to an NPC type except by
-  importing it.
+- The NPC import writes `NPC: <Tier>` into every imported NPC's GM Notes.
+- On its first run, the script adds "NPC" to the GM Notes of existing NPCs
+  that no player controls, so they keep working. Without the script,
+  nobody can switch a sheet to an NPC type except by importing it.
 
 Each tier changes the sheet like this:
 
@@ -254,7 +253,7 @@ Each tier changes the sheet like this:
 - **Adversary rolls use Threat**: extra d20s cost Threat instead of
   Momentum (same 1/2/3 escalation, up to three dice) and extra successes go
   to the Threat pool, through the same
-  `ccthreat.js` API script. Allies roll with Momentum like a PC.
+  API script. Allies roll with Momentum like a PC.
 - **Weapons & Attacks** has a Type column; a Mental attack rolls Will +
   Persuasion or Survival at difficulty 1. An NPC's damage is used as
   given in its stat block (it already includes bonus damage), unlike a PC's.
@@ -380,9 +379,9 @@ the first time the sheet is opened.
    ```pug
    option(value='Trident')
    ```
-3. **`api-scripts/ccimport.js`**: copy the same profile into its own
-   `ccWeaponProfiles` table so imported NPCs can name the weapon (then
-   replace the script in Roll20).
+3. **`api-scripts/cohors_cthulhu.js`**: copy the same profile into the
+   `ccWeaponProfiles` table in its NPC IMPORT section, so imported NPCs can
+   name the weapon (then replace the script in Roll20).
 4. *Optional*: add the name to the known-weapons list in
    `npc-import/FORMAT.md`.
 
@@ -399,8 +398,9 @@ the first time the sheet is opened.
    ```pug
    option(value='Lorica Plumata')
    ```
-3. **`api-scripts/ccimport.js`**: copy the profile into its `ccArmorProfiles`
-   table (then replace the script in Roll20).
+3. **`api-scripts/cohors_cthulhu.js`**: copy the profile into the
+   `ccArmorProfiles` table in its NPC IMPORT section (then replace the
+   script in Roll20).
 4. *Optional*: add it to the known-armor list in `npc-import/FORMAT.md`.
 
 ### A new talent
@@ -439,6 +439,6 @@ the first time the sheet is opened.
    type their talents freely, with every talent suggested.
 
 Talents given by name in an NPC import file get their keywords and
-requirements from `talents.json` the first time the sheet is opened, so `ccimport.js` needs no change. A talent
+requirements from `talents.json` the first time the sheet is opened, so the import needs no change. A talent
 that changes a calculated value (like Unyielding's +3 Max Stress) also needs
 code: see `ccStressMaxBase` in `source/views/panels/_vitals_panel.pug`.
