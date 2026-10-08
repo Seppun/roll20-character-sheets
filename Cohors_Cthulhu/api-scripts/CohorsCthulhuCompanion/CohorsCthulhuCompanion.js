@@ -1,34 +1,63 @@
-// api-scripts/cohors_cthulhu.js
-// Cohors Cthulhu - companion API script (optional)
+// CohorsCthulhuCompanion.js
+// Cohors Cthulhu Companion - optional API script for the Cohors Cthulhu
+// character sheet (Roll20).
 //
-// Adds to the Cohors Cthulhu character sheet what a sheet can't do on its
-// own. Each section below explains its part:
+// Version:      1.0.0
+// Last updated: 2026-10-08
+// Author:       Han Vanholder
+// Docs:         README.md in this script's folder; !cchelp in game
+//
+// WHAT IT DOES: adds what a character sheet can't do on its own. The sheet
+// works without it. Each section below explains its part:
 //   MOMENTUM POOL  - the party's shared Momentum (0-6), kept in step by rolls
 //   THREAT POOL    - the GM's Threat, kept in step by rolls
 //   TOKEN ACTIONS  - a token action for every weapon and spell
-//   NPC IMPORT     - characters from NPC JSON (npc-import/FORMAT.md)
-// The sheet works without it. Documentation: api-scripts/README.md.
+//   NPC IMPORT     - characters from NPC stat blocks written as JSON
+// Needs a Pro game (for Mods); no other scripts are needed.
 //
-// INSTALL: Settings > Mod (API) Scripts > New Script, paste this file, Save
-// Script. Needs a Pro game; no other scripts are needed.
-//
-// CHAT COMMANDS:
-//   !momentum / !threat                  - announce the pool
-//   !momentum-set N / !threat-set N      - GM only: set the pool
+// SYNTAX (chat commands):
+//   !cchelp                               - list the commands
+//   !momentum / !threat                   - announce the pool
+//   !momentum-set N / !threat-set N       - GM only: set the pool
 //   !momentum-adjust N / !threat-adjust N - GM only: add N (negative to
 //                                           subtract)
-//   !cctokenactions [clear|off|on]       - GM only: see TOKEN ACTIONS
-//   !ccimport handout|<Handout Name>     - GM only: see NPC IMPORT
+//   !cctokenactions [clear|off|on]        - GM only: see TOKEN ACTIONS
+//   !ccimport handout|<Handout Name>      - GM only: see NPC IMPORT
 //   !ccimport tokens, !ccimport token|<Character>[|<Token>]
-//   !ccdebugon / !ccdebugoff             - GM only: debug logging to the API
+//   !ccdebugon / !ccdebugoff              - GM only: debug logging to the API
 //                                           console (!ccdebug: status)
 //
-// Other scripts can act on each imported character: add a function to
-// CCImportHooks and it's called with the new character's id.
-var CCImportHooks = CCImportHooks || [];
+// CONFIGURATION: the CONFIG block at the start of the script's body.
+//
+// FOR OTHER SCRIPTS: CohorsCthulhuCompanion.importHooks is an array of
+// functions; the NPC import calls each with the new character's id.
+// Everything else is private to this script, and everything it stores is in
+// state.CohorsCthulhuCompanion.
+
+// The script's one global.
+var CohorsCthulhuCompanion = CohorsCthulhuCompanion || {}; // eslint-disable-line no-var
+CohorsCthulhuCompanion.version = '1.0.0';
+CohorsCthulhuCompanion.lastUpdated = '2026-10-08';
+CohorsCthulhuCompanion.importHooks = CohorsCthulhuCompanion.importHooks || [];
 
 on('ready', () => {
   'use strict';
+
+  // ===========================================================================
+  // CONFIGURATION - change these to suit your game, then save the script.
+  // ===========================================================================
+  const CONFIG = {
+    // Largest Momentum pool; the rules' cap is 6.
+    momentumMax: 6,
+    // Names of the pools in chat and the Turn Order. A token with this name
+    // on the players' page shows the pool on bar 1.
+    momentumLabel: 'Momentum Pool',
+    threatLabel: 'Threat Pool',
+    // Where the NPC import looks for token images: a Journal folder (as
+    // ModifyTokenImage makes them) and a page holding named tokens.
+    tokenImagesFolder: 'Token Images',
+    tokenLibraryPage: 'Token Library',
+  };
 
   // ===========================================================================
   // SHARED
@@ -38,13 +67,33 @@ on('ready', () => {
   // bare name.
   const whisperTo = (who) => String(who || '').replace(/\s*\(GM\)\s*$/, '');
 
+  const {version, lastUpdated} = CohorsCthulhuCompanion;
+  const isGMMsg = (msg) => playerIsGM(msg.playerid);
+
+  // Everything the script keeps between sessions. Versions before 1.0.0 used
+  // separate keys (state.CCMomentum, CCThreat, CCTokenActions, CCDebug,
+  // CCNpcLock); their pools and settings move here once.
+  const store = (() => {
+    const s = state.CohorsCthulhuCompanion = state.CohorsCthulhuCompanion || {};
+    const legacy = {momentum: 'CCMomentum', threat: 'CCThreat', tokenActions: 'CCTokenActions', debug: 'CCDebug'};
+    Object.keys(legacy).forEach((key) => {
+      if (state[legacy[key]] && !s[key]) { s[key] = state[legacy[key]]; }
+      delete state[legacy[key]];
+    });
+    delete state.CCNpcLock;
+    ['momentum', 'threat'].forEach((key) => {
+      if (!s[key] || typeof s[key].pool !== 'number') { s[key] = {pool: 0}; }
+    });
+    s.tokenActions = s.tokenActions || {auto: true};
+    s.debug = {on: Boolean(s.debug && s.debug.on)};
+    return s;
+  })();
+
   // Debug logging: !ccdebugon / !ccdebugoff (GM only, any case) switch it,
   // !ccdebug shows the setting. Off by default and kept across restarts;
   // errors are always logged. Each section logs under its own tag.
-  state.CCDebug = state.CCDebug || {on: false};
-  delete state.CCDebug.reply;
   const debugLog = (tag) => (text) => {
-    if (state.CCDebug.on) { log(`[${tag}] ${text}`); }
+    if (store.debug.on) { log(`[${tag}] ${text}`); }
   };
   const debug = debugLog('Cohors Cthulhu');
 
@@ -52,14 +101,36 @@ on('ready', () => {
     debug(`chat:message type=${msg.type} rolltemplate=${msg.rolltemplate} content=${JSON.stringify(msg.content)} inlinerolls=${JSON.stringify(msg.inlinerolls)}`);
     const match = /^!ccdebug(on|off)?$/i.exec(String(msg.content || '').trim());
     if (!match) { return; }
-    const isGM = playerIsGM(msg.playerid);
-    if (isGM && match[1]) { state.CCDebug.on = match[1].toLowerCase() === 'on'; }
-    const status = state.CCDebug.on ? 'ON' : 'OFF';
+    const isGM = isGMMsg(msg);
+    if (isGM && match[1]) { store.debug.on = match[1].toLowerCase() === 'on'; }
+    const status = store.debug.on ? 'ON' : 'OFF';
     if (isGM) { log(`[Cohors Cthulhu] debug logging ${status}`); }
     const text = isGM ?
       `Cohors Cthulhu debug logging is ${status}. Output goes to the API console.` :
       'Only the GM can change Cohors Cthulhu debug logging.';
     sendChat('CC Debug', `/w "${whisperTo(msg.who)}" ${text}`, null, {noarchive: true});
+  });
+
+  // !cchelp: the commands the caller can use, whispered.
+  on('chat:message', (msg) => {
+    if (msg.type !== 'api' || !/^!cchelp$/i.test(String(msg.content || '').trim())) { return; }
+    const rows = [
+      ['!momentum / !threat', 'Announce the pool'],
+    ];
+    if (isGMMsg(msg)) {
+      rows.push(
+        ['!momentum-set N / !threat-set N', 'Set the pool to N'],
+        ['!momentum-adjust N / !threat-adjust N', 'Add N (negative to subtract)'],
+        ['!cctokenactions', 'Rebuild weapon and spell token actions (selected tokens, or every character)'],
+        ['!cctokenactions clear / off / on', 'Remove them / pause / resume automatic updates'],
+        ['!ccimport handout|Name', 'Import the NPC JSON in that handout\'s GM Notes'],
+        ['!ccimport tokens', 'List the token images the import can find'],
+        ['!ccimport token|Character|Token', 'Give an existing character its token'],
+        ['!ccdebugon / !ccdebugoff / !ccdebug', 'Debug logging to the API console'],
+      );
+    }
+    const cells = rows.map(([command, effect]) => `{{${command}=${effect}}}`).join(' ');
+    sendChat('Cohors Cthulhu', `/w "${whisperTo(msg.who)}" &{template:default} {{name=Cohors Cthulhu Companion ${version}}} ${cells}`, null, {noarchive: true});
   });
 
   const formatDelta = (delta) => (delta > 0 ? `+${delta}` : `${delta}`);
@@ -135,26 +206,22 @@ on('ready', () => {
   // ===========================================================================
   {
     const debug = debugLog('CCMomentum');
-    const STATE_KEY = 'CCMomentum';
     const TURN_ORDER_ID = '-ccmomentum-pool';
-    const MAX_POOL = 6;
+    const LABEL = CONFIG.momentumLabel;
+    const MAX_POOL = CONFIG.momentumMax;
 
-    if (!state[STATE_KEY] || typeof state[STATE_KEY].pool !== 'number') {
-      state[STATE_KEY] = {pool: 0};
-    }
-
-    const getPool = () => Number(state[STATE_KEY].pool) || 0;
+    const getPool = () => Number(store.momentum.pool) || 0;
 
     const setPool = (value) => {
-      state[STATE_KEY].pool = Math.min(MAX_POOL, Math.max(0, Math.round(Number(value) || 0)));
+      store.momentum.pool = Math.min(MAX_POOL, Math.max(0, Math.round(Number(value) || 0)));
     };
 
-    const refreshDisplays = () => showPool('Momentum Pool', TURN_ORDER_ID, getPool(), MAX_POOL, debug);
+    const refreshDisplays = () => showPool(LABEL, TURN_ORDER_ID, getPool(), MAX_POOL, debug);
 
     const announce = (note) => {
       const value = getPool();
       const suffix = note ? ` (${note})` : '';
-      sendChat('Momentum Pool', `&{template:default} {{name=Momentum Pool}} {{Current=${value}/${MAX_POOL}${suffix}}}`);
+      sendChat(LABEL, `&{template:default} {{name=${LABEL}}} {{Current=${value}/${MAX_POOL}${suffix}}}`);
       refreshDisplays();
     };
 
@@ -218,7 +285,7 @@ on('ready', () => {
 
       // Testing aliases; GM-only since they change the pool.
       if ((command === '!ccmomentum-adjust' || command === '!ccmomentum-spend') && !playerIsGM(msg.playerid)) {
-        sendChat('Momentum Pool', `/w "${whisperTo(msg.who)}" Only the GM can use ${command}.`);
+        sendChat(LABEL, `/w "${whisperTo(msg.who)}" Only the GM can use ${command}.`);
         return;
       }
 
@@ -248,12 +315,12 @@ on('ready', () => {
 
       if (command === '!momentum-set') {
         if (!playerIsGM(msg.playerid)) {
-          sendChat('Momentum Pool', `/w "${whisperTo(msg.who)}" Only the GM can set the Momentum pool directly.`);
+          sendChat(LABEL, `/w "${whisperTo(msg.who)}" Only the GM can set the Momentum pool directly.`);
           return;
         }
         const value = Number(args[0]);
         if (!Number.isFinite(value)) {
-          sendChat('Momentum Pool', `/w "${whisperTo(msg.who)}" Usage: !momentum-set <number>`);
+          sendChat(LABEL, `/w "${whisperTo(msg.who)}" Usage: !momentum-set <number>`);
           return;
         }
         setPool(value);
@@ -263,12 +330,12 @@ on('ready', () => {
 
       if (command === '!momentum-adjust') {
         if (!playerIsGM(msg.playerid)) {
-          sendChat('Momentum Pool', `/w "${whisperTo(msg.who)}" Only the GM can manually adjust the Momentum pool.`);
+          sendChat(LABEL, `/w "${whisperTo(msg.who)}" Only the GM can manually adjust the Momentum pool.`);
           return;
         }
         const adjustment = Number(args[0]);
         if (!Number.isFinite(adjustment)) {
-          sendChat('Momentum Pool', `/w "${whisperTo(msg.who)}" Usage: !momentum-adjust <number, may be negative>`);
+          sendChat(LABEL, `/w "${whisperTo(msg.who)}" Usage: !momentum-adjust <number, may be negative>`);
           return;
         }
         const actualDelta = applyDelta(adjustment);
@@ -295,25 +362,21 @@ on('ready', () => {
   // ===========================================================================
   {
     const debug = debugLog('CCThreat');
-    const STATE_KEY = 'CCThreat';
     const TURN_ORDER_ID = '-ccthreat-pool';
+    const LABEL = CONFIG.threatLabel;
 
-    if (!state[STATE_KEY] || typeof state[STATE_KEY].pool !== 'number') {
-      state[STATE_KEY] = {pool: 0};
-    }
-
-    const getPool = () => Number(state[STATE_KEY].pool) || 0;
+    const getPool = () => Number(store.threat.pool) || 0;
 
     const setPool = (value) => {
-      state[STATE_KEY].pool = Math.max(0, Math.round(Number(value) || 0));
+      store.threat.pool = Math.max(0, Math.round(Number(value) || 0));
     };
 
-    const refreshDisplays = () => showPool('Threat Pool', TURN_ORDER_ID, getPool(), 0, debug);
+    const refreshDisplays = () => showPool(LABEL, TURN_ORDER_ID, getPool(), 0, debug);
 
     const announce = (note) => {
       const value = getPool();
       const suffix = note ? ` (${note})` : '';
-      sendChat('Threat Pool', `&{template:default} {{name=Threat Pool}} {{Current=${value}${suffix}}}`);
+      sendChat(LABEL, `&{template:default} {{name=${LABEL}}} {{Current=${value}${suffix}}}`);
       refreshDisplays();
     };
 
@@ -339,7 +402,7 @@ on('ready', () => {
       // e.g. `!ccthreat-adjust 2`: same as the signal. GM-only.
       if (command === '!ccthreat-adjust') {
         if (!playerIsGM(msg.playerid)) {
-          sendChat('Threat Pool', `/w "${whisperTo(msg.who)}" Only the GM can use !ccthreat-adjust.`);
+          sendChat(LABEL, `/w "${whisperTo(msg.who)}" Only the GM can use !ccthreat-adjust.`);
           return;
         }
         const adjustment = Number(args[0]);
@@ -356,12 +419,12 @@ on('ready', () => {
 
       if (command === '!threat-set') {
         if (!playerIsGM(msg.playerid)) {
-          sendChat('Threat Pool', `/w "${whisperTo(msg.who)}" Only the GM can set the Threat pool directly.`);
+          sendChat(LABEL, `/w "${whisperTo(msg.who)}" Only the GM can set the Threat pool directly.`);
           return;
         }
         const value = Number(args[0]);
         if (!Number.isFinite(value)) {
-          sendChat('Threat Pool', `/w "${whisperTo(msg.who)}" Usage: !threat-set <number>`);
+          sendChat(LABEL, `/w "${whisperTo(msg.who)}" Usage: !threat-set <number>`);
           return;
         }
         setPool(value);
@@ -371,12 +434,12 @@ on('ready', () => {
 
       if (command === '!threat-adjust') {
         if (!playerIsGM(msg.playerid)) {
-          sendChat('Threat Pool', `/w "${whisperTo(msg.who)}" Only the GM can manually adjust the Threat pool.`);
+          sendChat(LABEL, `/w "${whisperTo(msg.who)}" Only the GM can manually adjust the Threat pool.`);
           return;
         }
         const adjustment = Number(args[0]);
         if (!Number.isFinite(adjustment)) {
-          sendChat('Threat Pool', `/w "${whisperTo(msg.who)}" Usage: !threat-adjust <number, may be negative>`);
+          sendChat(LABEL, `/w "${whisperTo(msg.who)}" Usage: !threat-adjust <number, may be negative>`);
           return;
         }
         setPool(getPool() + adjustment);
@@ -411,8 +474,6 @@ on('ready', () => {
   // ===========================================================================
   {
     const debug = debugLog('CCTokenActions');
-    const STATE_KEY = 'CCTokenActions';
-    state[STATE_KEY] = state[STATE_KEY] || {auto: true};
 
     const SECTIONS = {
       weapon: {button: 'weapon-action', label: (name) => name},
@@ -491,7 +552,7 @@ on('ready', () => {
     // end.
     const pending = {};
     const schedule = (characterId) => {
-      if (!state[STATE_KEY].auto || !characterId) { return; }
+      if (!store.tokenActions.auto || !characterId) { return; }
       clearTimeout(pending[characterId]);
       pending[characterId] = setTimeout(() => {
         delete pending[characterId];
@@ -529,7 +590,7 @@ on('ready', () => {
         return;
       }
       if (arg === 'off' || arg === 'on') {
-        state[STATE_KEY].auto = arg === 'on';
+        store.tokenActions.auto = arg === 'on';
         reply(`Automatic token action updates are ${arg}.`);
         return;
       }
@@ -540,9 +601,9 @@ on('ready', () => {
 
     // API-made rows don't fire the attribute events, so imported NPCs are
     // updated through the import's hooks.
-    CCImportHooks.push(update);
+    CohorsCthulhuCompanion.importHooks.push(update);
 
-    if (state[STATE_KEY].auto) {
+    if (store.tokenActions.auto) {
       findObjs({_type: 'character'}).forEach((character) => update(character.id));
     }
   }
@@ -562,7 +623,8 @@ on('ready', () => {
   // name (or its JSON "token" name) is found: in ModifyTokenImage's Journal
   // folders ("Token Images" > <token name> > handouts with the image as
   // avatar), as a named token on a page called "Token Library", or as a
-  // custom token marker. !ccimport tokens lists the names found;
+  // custom token marker (the folder and page names are in CONFIG).
+  // !ccimport tokens lists the names found;
   // !ccimport token|<Character Name>[|<Token Name>] sets one for an existing
   // character.
   //
@@ -573,7 +635,7 @@ on('ready', () => {
   // fills in the keywords and requirements of talents and the details of
   // spells given by name only. If the formulas change, update both places.
   //
-  // Each imported character's id is passed to the CCImportHooks functions
+  // Each imported character's id is passed to the importHooks functions
   // (token actions, other scripts).
   //
   // Archetype is free text; a value outside the sheet's six options is
@@ -692,7 +754,7 @@ on('ready', () => {
     };
 
     // Token images, found by name. The API can't browse the Art Library, so
-    // they come from, in order:
+    // they come from, in order (folder and page names from CONFIG):
     //   1. ModifyTokenImage's Journal folders: "Token Images" > a folder named
     //      after the token > handouts whose avatar is the image (size: N in a
     //      handout's GM Notes sets its size, as in ModifyTokenImage);
@@ -737,7 +799,7 @@ on('ready', () => {
       } catch (err) {
         tree = [];
       }
-      const root = (Array.isArray(tree) ? tree : []).find((f) => f && typeof f === 'object' && f.n === 'Token Images');
+      const root = (Array.isArray(tree) ? tree : []).find((f) => f && typeof f === 'object' && f.n === CONFIG.tokenImagesFolder);
       const folders = root && Array.isArray(root.i) ? root.i.filter((f) => f && typeof f === 'object' && f.n) : [];
       const entries = [];
       for (const folder of folders) {
@@ -751,17 +813,20 @@ on('ready', () => {
             variant: parseTokenName(`x ${handout.get('name')}`).variant,
             name: folder.n,
             url: handout.get('avatar'),
-            source: `Token Images/${folder.n}/${handout.get('name')}`,
+            source: `${CONFIG.tokenImagesFolder}/${folder.n}/${handout.get('name')}`,
           }, size));
         }
       }
       return entries;
     };
 
+    // Lower case without spaces, for matching the Token Library page.
+    const squash = (text) => String(text || '').toLowerCase().replace(/\s+/g, '');
+
     const loadTokenLibrary = async () => {
       const entries = await journalTokenEntries();
       findObjs({_type: 'page'})
-        .filter((page) => /token\s*library/i.test(String(page.get('name') || '')))
+        .filter((page) => squash(page.get('name')).includes(squash(CONFIG.tokenLibraryPage)))
         .forEach((page) => {
           findObjs({_type: 'graphic', _pageid: page.id}).forEach((graphic) => {
             if (!graphic.get('name') || !graphic.get('imgsrc')) { return; }
@@ -1051,7 +1116,7 @@ on('ready', () => {
 
       // Token actions and other scripts' hooks (API-made rows don't fire the
       // attribute events).
-      CCImportHooks.forEach((hook) => {
+      CohorsCthulhuCompanion.importHooks.forEach((hook) => {
         try {
           hook(id);
         } catch (err) {
@@ -1162,7 +1227,7 @@ on('ready', () => {
           const where = (e) => (e.source === 'token marker' ? '' : e.source.startsWith('page') ? ' (page)' : ' (folder)');
           const names = [...new Set(library.map((e) => `${e.name}${where(e)}`))].sort();
           sendChat('CCImport', `/w "${whisperTo(msg.who)}" &{template:default} {{name=Token images (${names.length})}} ` +
-            `{{Found=${names.length ? names.join(', ') : 'none - add a Journal folder "Token Images" with a folder per token (as for ModifyTokenImage), a page named "Token Library" with named tokens, or a custom token marker set'}}}`);
+            `{{Found=${names.length ? names.join(', ') : `none - add a Journal folder "${CONFIG.tokenImagesFolder}" with a folder per token (as for ModifyTokenImage), a page named "${CONFIG.tokenLibraryPage}" with named tokens, or a custom token marker set`}}}`);
         });
         return;
       }
@@ -1212,6 +1277,13 @@ on('ready', () => {
     });
   }
 
-  log(`Cohors Cthulhu ready: Momentum pool ${state.CCMomentum.pool}/6, Threat pool ${state.CCThreat.pool}, ` +
-    `token actions ${state.CCTokenActions.auto ? 'automatic' : 'manual'}. Debug logging ${state.CCDebug.on ? 'on' : 'off'} (!ccdebugon / !ccdebugoff).`);
+  // A note to the GM on the first start after installing or updating.
+  if (store.installedVersion !== version) {
+    sendChat('Cohors Cthulhu', `/w gm Cohors Cthulhu Companion ${version} ${store.installedVersion ? `updated from ${store.installedVersion}` : 'installed'}. Type !cchelp for its commands.`, null, {noarchive: true});
+    store.installedVersion = version;
+  }
+
+  log(`Cohors Cthulhu Companion ${version} (${lastUpdated}) ready: Momentum pool ${store.momentum.pool}/${CONFIG.momentumMax}, ` +
+    `Threat pool ${store.threat.pool}, token actions ${store.tokenActions.auto ? 'automatic' : 'manual'}. ` +
+    `Debug logging ${store.debug.on ? 'on' : 'off'} (!ccdebugon / !ccdebugoff).`);
 });

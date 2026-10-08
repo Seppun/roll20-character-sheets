@@ -1616,7 +1616,7 @@ body .ui-dialog .tab-content .charsheet .cc-character .cc-footer {
   opacity: 0.6;
 }
 body .ui-dialog .tab-content .charsheet .cc-character .cc-build-css::after {
-  content: "CSS build: 2026-10-08 19:20:26 UTC";
+  content: "CSS build: 2026-10-08 21:38:35 UTC";
 }
 body .ui-dialog .tab-content .charsheet .cc-character .cc-languages textarea {
   min-height: 4rem;
@@ -2736,7 +2736,7 @@ body {
   opacity: 0.6;
 }
 .cc-character .cc-build-css::after {
-  content: "CSS build: 2026-10-08 19:20:26 UTC";
+  content: "CSS build: 2026-10-08 21:38:35 UTC";
 }
 .cc-character .cc-languages textarea {
   min-height: 4rem;

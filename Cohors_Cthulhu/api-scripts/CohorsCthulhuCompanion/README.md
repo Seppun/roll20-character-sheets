@@ -1,7 +1,9 @@
-# Cohors Cthulhu companion API script
+# Cohors Cthulhu Companion
 
-`cohors_cthulhu.js` is an optional companion Mod (API script) for the
-Cohors Cthulhu character sheet. The sheet works without it; the script
+Version 1.0.0 (2026-10-08), by Han Vanholder.
+
+`CohorsCthulhuCompanion.js` is an optional companion Mod (API script) for
+the Cohors Cthulhu character sheet. The sheet works without it; the script
 adds:
 
 - **Global Momentum and Threat pools**, kept up to date by every roll made
@@ -20,12 +22,30 @@ adds:
 
 ## Installing
 
-1. On the game's page, open **Settings** > **Mod (API) Scripts**.
-2. Click **New Script**, paste in the whole of `cohors_cthulhu.js`, and
-   click **Save Script**.
+On the game's page, open **Settings** > **Mod (API) Scripts**, then either:
 
-To update, paste the new version over the old one and save. The pools and
-settings are kept.
+- find **CohorsCthulhuCompanion** in the Mod Library and add it, or
+- click **New Script**, paste in the whole of `CohorsCthulhuCompanion.js`,
+  and click **Save Script**.
+
+On its first start the script whispers a short note to the GM, and
+`!cchelp` lists the commands (anyone can use it; players only see theirs).
+Updating keeps the pools and settings.
+
+## Configuration
+
+The CONFIG block at the start of the script holds what you may want to
+change:
+
+| Setting | Default | Meaning |
+| --- | --- | --- |
+| `momentumMax` | `6` | Largest Momentum pool |
+| `momentumLabel`, `threatLabel` | `Momentum Pool`, `Threat Pool` | The pools' names in chat and the Turn Order, and the names of the tokens that show them |
+| `tokenImagesFolder` | `Token Images` | Journal folder the NPC import takes token images from |
+| `tokenLibraryPage` | `Token Library` | Page whose named tokens the NPC import can use |
+
+Everything the script keeps between sessions is in
+`state.CohorsCthulhuCompanion`.
 
 ## Momentum and Threat pools
 
@@ -56,7 +76,7 @@ and the Complications.
 - **Adversary NPCs** use Threat instead of Momentum: their extra successes
   add to the Threat pool, and the d20s and extra damage dice they buy are
   paid from it. Allied NPCs use Momentum like player characters.
-- The pool never drops below 0. The GM's other Threat spends are made with
+- Neither pool drops below 0. The GM's other Threat spends are made with
   `!threat-adjust`.
 
 Every change is announced in chat. The pools also show in two places
@@ -65,8 +85,8 @@ without opening chat:
 - the **Turn Order**, as a "Momentum Pool" and a "Threat Pool" entry (no
   setup needed; added at the end and updated in place, so they never
   change whose turn it is);
-- bar 1 of any token on the current page named **Momentum Pool** or
-  **Threat Pool** (optional).
+- bar 1 of any token on the players' page named **Momentum Pool** or
+  **Threat Pool** (optional; the names are in CONFIG).
 
 | Command | Who | Effect |
 | --- | --- | --- |
@@ -94,11 +114,11 @@ left alone.
 The import turns NPC stat blocks into ready-to-play characters:
 
 1. **Write the NPC as JSON**: one object, or an array of several, in the
-   format described in
-   [`npc-import/FORMAT.md`](../npc-import/FORMAT.md), with a worked example
-   in `npc-import/examples/subura_street_thug.json`. The JSON Schema in
-   `npc-import/schema/npc.schema.json` lets any JSON Schema validator check
-   a file before you import it.
+   format described in the sheet's
+   [`npc-import/FORMAT.md`](https://github.com/Roll20/roll20-character-sheets/tree/master/Cohors_Cthulhu/npc-import/FORMAT.md), with a worked example in
+   [`examples/subura_street_thug.json`](https://github.com/Roll20/roll20-character-sheets/tree/master/Cohors_Cthulhu/npc-import/examples/subura_street_thug.json).
+   The JSON Schema in [`schema/npc.schema.json`](https://github.com/Roll20/roll20-character-sheets/tree/master/Cohors_Cthulhu/npc-import/schema/npc.schema.json)
+   lets any JSON Schema validator check a file before you import it.
 2. **Paste the JSON into a handout's GM Notes**, then run (GM only):
    ```
    !ccimport handout|<Handout Name>
@@ -121,12 +141,12 @@ If the game has a token image with the NPC's name (or the name in the
 JSON's `token` field), the import also sets the NPC's default token and
 avatar. It looks for the image, in order:
 
-1. in the Journal, in a folder named **Token Images** with a folder per
-   token holding handouts that use the image as their avatar. This is
-   ModifyTokenImage's layout, so its folders work as they are; you can
-   also make them by hand. `size: 2` in such a handout's GM Notes makes
+1. in the Journal, in a folder named **Token Images** (see CONFIG) with a
+   folder per token holding handouts that use the image as their avatar.
+   This is ModifyTokenImage's layout, so its folders work as they are; you
+   can also make them by hand. `size: 2` in such a handout's GM Notes makes
    the token 2 by 2 squares;
-2. among named tokens on a page called **Token Library**;
+2. among named tokens on a page called **Token Library** (see CONFIG);
 3. among custom token markers (uploading a folder of PNGs as a marker set
    names each image after its file).
 
@@ -135,8 +155,8 @@ avatar. It looks for the image, in order:
 | `!ccimport tokens` | List the token images the import can find |
 | `!ccimport token\|<Character Name>[\|<Token Name>]` | Give an existing character its token |
 
-See the Token section of [`npc-import/FORMAT.md`](../npc-import/FORMAT.md)
-for the JSON side.
+See the Token section of [`npc-import/FORMAT.md`](https://github.com/Roll20/roll20-character-sheets/tree/master/Cohors_Cthulhu/npc-import/FORMAT.md) for
+the JSON side.
 
 ## Debug logging
 
@@ -154,6 +174,22 @@ Momentum and Threat, and each NPC import. Errors are always logged.
 
 ## For other scripts
 
-Other scripts can act on each imported NPC: add a function to the global
-`CCImportHooks` array, and the import calls it with the new character's
-id.
+The script's only global is `CohorsCthulhuCompanion`. Other scripts can act
+on each imported NPC: add a function to its `importHooks` array, and the
+import calls it with the new character's id.
+
+```js
+on('ready', () => {
+  CohorsCthulhuCompanion.importHooks.push((characterId) => {
+    log(`imported ${getObj('character', characterId).get('name')}`);
+  });
+});
+```
+
+## Changelog
+
+- **1.0.0** (2026-10-08): first release.
+
+## License
+
+MIT, like every script in Roll20's API scripts repository.

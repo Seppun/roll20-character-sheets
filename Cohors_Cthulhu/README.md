@@ -112,8 +112,9 @@ Each tier changes the sheet like this:
 
 ## Companion API script (optional)
 
-`api-scripts/cohors_cthulhu.js` is an optional companion Mod (API script).
-The sheet doesn't need it. It adds:
+The Cohors Cthulhu Companion
+(`api-scripts/CohorsCthulhuCompanion/CohorsCthulhuCompanion.js`) is an
+optional companion Mod (API script). The sheet doesn't need it. It adds:
 
 - **Global Momentum and Threat pools**, kept up to date by every roll from
   the sheet and shown in chat and the Turn Order.
@@ -124,7 +125,7 @@ The sheet doesn't need it. It adds:
 
 Mods need a Roll20 Pro subscription for the game's creator. The script
 needs no other scripts. Installation, commands and details are in
-[`api-scripts/README.md`](./api-scripts/README.md).
+[its README](./api-scripts/CohorsCthulhuCompanion/README.md).
 
 ## Credits
 
@@ -261,7 +262,7 @@ the first time the sheet is opened.
    ```pug
    option(value='Trident')
    ```
-3. **The companion API script** (`api-scripts/cohors_cthulhu.js`): copy the
+3. **The companion API script** (`CohorsCthulhuCompanion.js`): copy the
    same profile into the `ccWeaponProfiles` table in its NPC IMPORT
    section, so imported NPCs can name the weapon (then update the script
    in Roll20).
@@ -281,7 +282,7 @@ the first time the sheet is opened.
    ```pug
    option(value='Lorica Plumata')
    ```
-3. **The companion API script** (`api-scripts/cohors_cthulhu.js`): copy the
+3. **The companion API script** (`CohorsCthulhuCompanion.js`): copy the
    profile into the `ccArmorProfiles` table in its NPC IMPORT section (then
    update the script in Roll20).
 4. *Optional*: add it to the known-armor list in `npc-import/FORMAT.md`.
