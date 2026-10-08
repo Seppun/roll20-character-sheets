@@ -1,9 +1,9 @@
 # NPC interchange format
 
 This is the data format for getting an NPC into the Cohors Cthulhu Roll20
-game: write it, then import it with the API script,
-`api-scripts/cohors_cthulhu.js` (see the main `README.md`'s "Importing
-NPCs" section for that last step). The machine-checkable version of
+game: write it, then import it with the optional companion API script,
+`api-scripts/cohors_cthulhu.js` (see "Importing NPCs" in
+[`api-scripts/README.md`](../api-scripts/README.md) for that last step). The machine-checkable version of
 everything below lives in [`schema/npc.schema.json`](./schema/npc.schema.json);
 this file is the walkthrough.
 

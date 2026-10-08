@@ -6,38 +6,29 @@ Modiphius's 2d20 System.
 
 Maintained by Han Vanholder.
 
-## Installing the sheet
+## Getting the sheet
 
-The compiled `Cohors_Cthulhu.html` and `Cohors_Cthulhu.css` at the root of
-this folder are what actually get pasted into Roll20, as a Custom
-character sheet:
+Choose **Cohors Cthulhu** as the character sheet when you create a game,
+or later on the game's page under **Settings** > **Game Settings** >
+**Character Sheet Template**. There's nothing to download or paste. (Only
+a sheet you changed yourself needs pasting in; see "Modifying the sheet"
+below.)
 
-1. In your Roll20 game, open **Game Settings** > **Game Details**, and
-   scroll to **Character Sheet Template**.
-2. Choose **Custom** from the dropdown.
-3. Paste the full contents of `Cohors_Cthulhu.html` into the **Sheet
-   Layout** box.
-4. Paste the full contents of `Cohors_Cthulhu.css` into the **Sheet
-   Style** box.
-5. Save Changes.
-
-Every character in the game now uses this sheet. If you've built from
-source (see "Building from source" below), always paste both files
-together from the same build - mixing an old HTML paste with a newer CSS
-paste (or vice versa) can leave the sheet out of sync with itself. The
-sheet's footer prints a build timestamp (`HTML build: ...` / `CSS build:
-...`) on both the page and in a hidden CSS rule - if those two timestamps
-ever differ, you pasted a stale copy of one of the two files.
+The sheet works on its own in any game. An optional companion API script
+adds shared Momentum and Threat pools, token actions and NPC import; see
+"Companion API script (optional)" below.
 
 ## Using the sheet
 
-The sheet has three tabs: **Character** (identity, Stress/Fatigue/Courage/
-Fortune, Attributes, Skills, Weapons, Armor, Talents, Experience),
-**Spells**, and **Notes** (Traits, History, Personal Agenda, Journal,
-Belongings).
+The sheet has three tabs: **Character** (identity, Personal Truths &
+Scars, Stress/Fatigue/Courage/Fortune, Attributes, Skills, Weapons, Armor,
+Talents, Languages, Experience), **Spells**, and **Notes** (Traits,
+History, Personal Agenda, Belongings, Journal). The **Player / NPC** switch
+next to the tabs turns the sheet into an NPC sheet (see "NPC sheets"
+below).
 
 - **Rolling**: click an Attribute's name, a Skill's name, a specific
-  Focus, a Weapon's die icon, or a Spell's cast icon to roll it. Each
+  Focus, a Weapon's roll button, or a Spell's cast button to roll it. Each
   roll prompts for Difficulty, Complication range, and how many
   additional d20s to buy, then posts a single chat card with the dice,
   target number, successes, and (for Weapons/Spells) damage or cost
@@ -47,6 +38,9 @@ Belongings).
   many extra damage dice to buy (0-3): each adds one Challenge Die to the
   damage for 1 Momentum, counted and paid only if the attack hits. The
   Momentum the attack itself generates can pay for them.
+- **Momentum and Threat**: each roll card shows the Momentum the roll
+  generated and spent, and its Complications, so the group can keep the
+  pools by hand. The companion API script can keep them automatically.
 - **Macro bar**: drag any roll button (Attribute, Skill, Focus, Fatigue
   resist, Weapon or Spell) onto the macro bar to roll it from there. A
   weapon or spell added since the sheet was last opened is draggable once
@@ -59,179 +53,35 @@ Belongings).
   boxes are greyed out and disabled once Fatigue reaches that limit.
   "Max" shows the character's raw Stress capacity; "Current Max" shows
   that same number reduced by current Fatigue.
+- **Identity**: Culture, Caste and Archetype are dropdowns, and the
+  Specialization dropdown offers the two specializations of the chosen
+  archetype.
 - **Weapons, Armor, and Talents**: picking a name from the dropdown fills
   in that row's stock stats automatically - every field stays freely
   editable afterward for house-ruled or modified equipment. A player
   character's Talent dropdown lists only the talents whose requirements
   the character meets (archetype, specialization, culture, caste, skill
-  ranks and prerequisite talents).
+  ranks and prerequisite talents). The sheet holds the mechanics only:
+  talent descriptions and spell text are typed in by the players.
 - **Dark Mode**: supported via Roll20's own per-player Dark Mode toggle.
 - **Printing / Download as PDF**: if your Roll20 account has print
   support available, a Print button appears on the character sheet
   dialog itself (enabled by this sheet's `sheet.json`). It prints all
   three tabs stacked one after another (not just whichever tab you had
-  open), with interactive-only chrome (tab buttons, "Modify"/"+Add Item"
-  controls, the build-timestamp footer) hidden, Dark Mode forced off, and
-  light-on-dark banners/headers swapped to dark-on-white so they stay
-  legible on paper.
-
-## Global Momentum and Threat pools (API script)
-
-Momentum and Threat in the 2d20 System are shared, game-wide resources,
-not per-character stats - neither can live as an attribute on this (or
-any) character sheet, since each character's sheet is its own isolated
-set of attributes with no visibility into any other character's, let
-alone a GM-only pool. The Roll20 API script in
-`api-scripts/cohors_cthulhu.js` maintains both pools, kept in sync
-automatically by every roll made from this sheet
-(Attribute/Skill/Focus/Weapon/Spell). The same script also runs the token
-actions and NPC import described below.
-
-- **Momentum** increases by the Momentum a passed roll generates, and
-  decreases by Extra Momentum declared spent on a spell or a Fatigue
-  resist, and by extra damage dice bought on a successful attack (1 each,
-  up to 3; adversary NPCs pay in Threat). Capped at 6 in
-  either direction (the Momentum pool can never exceed 6).
-  Announcements report the amount the pool actually changed by, and
-  Momentum that doesn't fit is reported as lost (e.g. "6/6 (+1, 2 lost -
-  pool full)").
-- **Buying additional d20s** (any roll type, up to 3 extra dice) costs 1
-  Momentum for the first, 2 for the second and 3 for the third (so 2 dice
-  cost 3 and 3 dice cost 6). Adversary NPCs pay the same in Threat. The
-  dice are paid before anything else, since they're bought before the
-  roll.
-- **Spending more than the pool holds** is still allowed, for bought d20s
-  and for whatever a roll spends beyond the Momentum it generated (extra
-  damage dice, a spell's Extra Momentum, removing Fatigue): whatever the
-  pool comes up short generates an equal amount of Threat instead. Only the
-  API script (not the character sheet) knows the pool's current value, so
-  it decides. For example, with 1 Momentum in the pool, an attack that
-  generates 2 can buy 3 extra damage dice and leaves the pool at 0; with
-  an empty pool and 1 generated, the same 3 dice add 2 Threat.
-- **Threat** increases by the Complications a roll generates (
-  each Complication generates 1 point of Threat for the GM), plus any
-  shortfall from spending more Momentum than the pool holds (above). There's no automatic
-  decrease otherwise - the rules never have a player spend Threat from their own
-  sheet, only the GM spends it (buying NPCs extra d20s, directorial
-  effects), which happens in narration rather than on this sheet, so
-  `!threat-adjust` (GM only) is the only way the pool goes down.
-
-### Installing the API script
-
-The script is a **separate piece from the character sheet itself** - it
-isn't part of the compiled `Cohors_Cthulhu.html`/`.css`, and it isn't
-pasted into the Custom Sheet Layout/Style boxes above. Instead, in a
-Pro-tier game with the API sandbox enabled:
-
-1. **Game Settings** > **API Scripts** > **New Script**.
-2. Paste in the whole contents of `api-scripts/cohors_cthulhu.js`, Save
-   Script.
-
-Earlier versions came as five separate scripts (`ccmomentum.js`,
-`ccthreat.js`, `ccimport.js`, `ccnpclock.js`, `cctokenactions.js`). If
-your game has those, delete them when you add this one, or every command
-and roll is handled twice (and `ccnpclock.js` would undo the Player/NPC
-switch). The pools and settings carry over.
-
-Without the script installed, the hidden signals just render (and
-immediately hide) a roll template card nobody looks at - rolling still
-works fine, there's just no shared pool.
-
-### Using the pools
-
-Both pools post to chat on every change, plus two passive displays that
-don't require re-opening chat: a custom entry in the Turn Order tracker
-(needs no setup, one row per pool, added at the end and updated in place so
-it never changes whose turn it is), and, if the GM
-places a token/graphic named "Momentum Pool" or "Threat Pool" on the
-current page, that token's bar1 is kept in sync too.
-
-Chat commands once installed:
-
-| Command | Who | Effect |
-| --- | --- | --- |
-| `!momentum` / `!threat` | anyone | Announce the current pool value |
-| `!momentum-set N` / `!threat-set N` | GM only | Set the pool to an exact value |
-| `!momentum-adjust N` / `!threat-adjust N` | GM only | Add N (negative to subtract) - how a GM spends Threat outside of NPC rolls (adversary NPC rolls on the sheet settle their own Threat) |
-| `!ccdebugon` / `!ccdebugoff` | GM only | Turn the API script's debug logging on or off (any capitalization works). `!ccdebug` shows the current setting. |
-
-Debug logging is off by default and stays as set across sandbox restarts.
-When on, the script writes what it did to the API console (Game Settings >
-API Scripts), tagged by part (`[CCMomentum]`, `[CCImport]`, ...): every
-chat message it sees, the pool before and after each signal or command,
-how a spend was split between Momentum and Threat, and each NPC import.
-Errors are always logged.
-
-## Token actions (API script)
-
-The API script (`api-scripts/cohors_cthulhu.js`) puts each character's
-weapons and spells in the token action bar: select a token and click an
-attack or "Cast <spell>" to roll it, exactly as from the sheet. It keeps
-those token actions in step with the sheet as weapons and spells are
-added, renamed or deleted, and adds them for imported NPCs. It only manages the abilities it creates; your own
-abilities and macros are left alone.
-
-| Command (GM only) | Effect |
-| --- | --- |
-| `!cctokenactions` | Rebuild for the selected tokens' characters, or every character if none is selected |
-| `!cctokenactions clear` | Remove them (selected, or every character) |
-| `!cctokenactions off` / `on` | Pause or resume the automatic updates |
-
-## Importing NPCs
-
-Hand-typing a full stat block for every NPC gets old fast, so `npc-import/`
-holds a small pipeline for turning an NPC's stat block into a ready-to-play
-Roll20 character:
-
-1. **Get the NPC into this game's interchange format** - a JSON object (or
-   array of several) described in full in
-   [`npc-import/FORMAT.md`](./npc-import/FORMAT.md), with a worked example
-   in `npc-import/examples/subura_street_thug.json`. The JSON Schema in
-   `npc-import/schema/npc.schema.json` lets any JSON Schema validator check
-   a file before you import it.
-2. **Install the API script**, `api-scripts/cohors_cthulhu.js` (see
-   "Installing the API script" above).
-3. **Import it**: paste the NPC JSON (one object, or a JSON array for
-   several at once) into a Handout's **GM Notes**, then in chat run:
-   ```
-   !ccimport handout|<Handout Name>
-   ```
-   You'll get a whispered summary naming every NPC created and anything
-   worth a second look. The first time you actually **open** an imported
-   character's sheet in Roll20, it also self-corrects: Base Armour/Total
-   Armor/Courage/Max Stress recompute for real (rather than the script's own
-   best-effort copy made at import time), and any Talent given by name only
-   gets its Keywords and Requirements filled in automatically - see
-   `ccRecomputeOnOpen` in `source/views/_global_sheetworker.pug` for the
-   mechanism. Give `description` in the JSON for any text you want on the
-   sheet.
-
-**Tokens.** If the game has a token image with the NPC's name (or the name
-in the JSON's `token` field), the import also sets the NPC's default token
-and avatar. It looks in ModifyTokenImage's Journal folders (`Token Images`
-> a folder per token > handouts with the image as avatar), then for named
-tokens on a page called "Token Library", then for custom token markers
-(uploading a folder of PNGs as a marker set names each image after its
-file). `!ccimport tokens` lists the
-names found, and `!ccimport token|<Character Name>` gives an NPC imported
-earlier its token. See the Token section of `npc-import/FORMAT.md`.
-
-Imported NPCs open as the profile's own tier (Trooper, Toughened or
-Nemesis - see NPC sheets below), with the stat block's Stress,
-Injuries, Armor, Courage and Power, its attacks (including mental attacks),
-special rules, spells and escalation options filled in.
+  open), with interactive-only chrome (tab buttons, the Player/NPC switch,
+  "Modify"/"+Add Item" controls, the build-timestamp footer) hidden, Dark
+  Mode forced off, and light-on-dark banners/headers swapped to
+  dark-on-white so they stay legible on paper.
 
 ## NPC sheets
 
 The **Player / NPC** switch at the top right of the sheet, level with the
-tabs, turns any character into an NPC and back. It works without the API
-script, so NPC sheets don't need a Pro game. On an NPC sheet, the tier
+tabs, turns any character into an NPC and back. On an NPC sheet, the tier
 buttons under the banner pick **Trooper**, **Toughened** or **Nemesis**:
 
 - Switching to NPC starts as Toughened the first time, and brings back the
   last tier after that. Switching back to Player hides the NPC fields but
   keeps what's in them.
-- Imported NPCs open with the switch on NPC and the tier from their JSON.
 - Anyone who can edit a sheet can flip its switch, including players on
   their own characters (a sheet can't tell the GM from a player).
 
@@ -249,15 +99,32 @@ Each tier changes the sheet like this:
     each rule postable to chat. Extraordinary [Attribute] X adds automatic
     successes, and Brutal makes melee attacks roll Brawn.
 - **Adversary rolls use Threat**: extra d20s cost Threat instead of
-  Momentum (same 1/2/3 escalation, up to three dice) and extra successes go
-  to the Threat pool, through the same
-  API script. Allies roll with Momentum like a PC.
+  Momentum (same 1/2/3 escalation, up to three dice), and the card reports
+  the Threat the roll generates and spends. Allies roll with Momentum like
+  a player character.
 - **Weapons & Attacks** has a Type column; a Mental attack rolls Will +
   Persuasion or Survival at difficulty 1. An NPC's damage is used as
-  given in its stat block (it already includes bonus damage), unlike a PC's.
+  given in its stat block (it already includes bonus damage), unlike a
+  player character's.
 - **Mythos spells**: the Spells tab offers the Tome of Cthulhu, Compendium
   of Mormo, Grimoire of Nyarlathotep and Spellbook of Yog-Sothoth, plus NPC
   Spellcaster types, only on NPC sheets.
+
+## Companion API script (optional)
+
+`api-scripts/cohors_cthulhu.js` is an optional companion Mod (API script).
+The sheet doesn't need it. It adds:
+
+- **Global Momentum and Threat pools**, kept up to date by every roll from
+  the sheet and shown in chat and the Turn Order.
+- **Token actions** for each character's weapons and spells.
+- **NPC import**: NPCs written as JSON (format in
+  [`npc-import/FORMAT.md`](./npc-import/FORMAT.md)) become ready-to-play
+  characters, with their tokens.
+
+Mods need a Roll20 Pro subscription for the game's creator. The script
+needs no other scripts. Installation, commands and details are in
+[`api-scripts/README.md`](./api-scripts/README.md).
 
 ## Credits
 
@@ -272,7 +139,7 @@ Each tier changes the sheet like this:
   used under the [Unsplash+ License](https://unsplash.com/plus/license),
   made seamless and softened for this sheet (`images/plaster-texture.jpg`).
 
-## Building from source
+## Modifying the sheet
 
 This sheet is built with [k-scaffold](https://kurohyou-studios.github.io/k-scaffold/),
 a PUG/SCSS framework for Roll20 character sheets.
@@ -302,18 +169,35 @@ npm run start
 
 All source files live in `source/`. The compiled `Cohors_Cthulhu.html` and
 `Cohors_Cthulhu.css` are generated at the root of this folder and should not
-be edited directly - re-run the build and re-paste them into Roll20
-instead (see "Installing the sheet" above).
+be edited directly - change the source and rebuild instead.
 
-## Adding spells, weapons, armor and talents
+### Trying your changes in Roll20
+
+A changed sheet runs in a game as a Custom sheet (Custom sheets need a
+Roll20 Pro subscription):
+
+1. On the game's page, open **Settings** > **Game Settings**, and scroll to
+   **Character Sheet Template**.
+2. Choose **Custom** from the dropdown.
+3. Paste the full contents of `Cohors_Cthulhu.html` into the **HTML
+   Layout** tab.
+4. Paste the full contents of `Cohors_Cthulhu.css` into the **CSS
+   Styling** tab.
+5. Save Changes.
+
+Every character in the game now uses this sheet. Always paste both files
+from the same build - mixing an old HTML paste with a newer CSS paste (or
+vice versa) can leave the sheet out of sync with itself. The sheet's
+footer prints a build timestamp (`HTML build: ...` / `CSS build: ...`)
+from each file; if the two differ, one of the pastes is stale.
+
+### Adding spells, weapons, armor and talents
 
 Every list on the sheet comes from data in `source/`. After any change below,
 run `npm run build` and re-paste `Cohors_Cthulhu.html` (and
-`Cohors_Cthulhu.css`) into Roll20. The sheet holds the mechanics only:
-talent descriptions and spell or special-rule text aren't part of it, and
-players type their own.
+`Cohors_Cthulhu.css`) into Roll20.
 
-### A new spell
+#### A new spell
 
 1. **`source/data/spells.json`**: add an entry under its tradition's key
    (`runic`, `oracular`, `celtic`, or the NPC-only Mythos tomes `cthulhu`,
@@ -352,7 +236,7 @@ Imported NPCs need nothing else: spells given by name in an NPC import file
 get their skill, difficulty, cost, duration and category from `spells.json`
 the first time the sheet is opened.
 
-### A new weapon
+#### A new weapon
 
 1. **`source/views/panels/_weapons_panel.pug`**, at the top: add a profile
    to `ccMeleeWeapons` or `ccRangedWeapons`:
@@ -377,13 +261,14 @@ the first time the sheet is opened.
    ```pug
    option(value='Trident')
    ```
-3. **`api-scripts/cohors_cthulhu.js`**: copy the same profile into the
-   `ccWeaponProfiles` table in its NPC IMPORT section, so imported NPCs can
-   name the weapon (then replace the script in Roll20).
+3. **The companion API script** (`api-scripts/cohors_cthulhu.js`): copy the
+   same profile into the `ccWeaponProfiles` table in its NPC IMPORT
+   section, so imported NPCs can name the weapon (then update the script
+   in Roll20).
 4. *Optional*: add the name to the known-weapons list in
    `npc-import/FORMAT.md`.
 
-### New armor
+#### New armor
 
 1. **`source/views/panels/_armor_panel.pug`**, at the top: add a profile to
    `ccArmorProfiles`:
@@ -396,12 +281,12 @@ the first time the sheet is opened.
    ```pug
    option(value='Lorica Plumata')
    ```
-3. **`api-scripts/cohors_cthulhu.js`**: copy the profile into the
-   `ccArmorProfiles` table in its NPC IMPORT section (then replace the
-   script in Roll20).
+3. **The companion API script** (`api-scripts/cohors_cthulhu.js`): copy the
+   profile into the `ccArmorProfiles` table in its NPC IMPORT section (then
+   update the script in Roll20).
 4. *Optional*: add it to the known-armor list in `npc-import/FORMAT.md`.
 
-### A new talent
+#### A new talent
 
 1. **`source/data/talents.json`**: add an entry; that's all. The Talents
    name list is generated from this file and sorted automatically:
@@ -437,6 +322,7 @@ the first time the sheet is opened.
    type their talents freely, with every talent suggested.
 
 Talents given by name in an NPC import file get their keywords and
-requirements from `talents.json` the first time the sheet is opened, so the import needs no change. A talent
-that changes a calculated value (like Unyielding's +3 Max Stress) also needs
-code: see `ccStressMaxBase` in `source/views/panels/_vitals_panel.pug`.
+requirements from `talents.json` the first time the sheet is opened, so the
+companion script needs no change. A talent that changes a calculated value
+(like Unyielding's +3 Max Stress) also needs code: see `ccStressMaxBase` in
+`source/views/panels/_vitals_panel.pug`.

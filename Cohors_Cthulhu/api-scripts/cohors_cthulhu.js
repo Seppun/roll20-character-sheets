@@ -1,20 +1,16 @@
 // api-scripts/cohors_cthulhu.js
-// Cohors Cthulhu - API script
+// Cohors Cthulhu - companion API script (optional)
 //
-// Everything the sheet does through Roll20's API, in one script. Each section
-// below explains its part:
+// Adds to the Cohors Cthulhu character sheet what a sheet can't do on its
+// own. Each section below explains its part:
 //   MOMENTUM POOL  - the party's shared Momentum (0-6), kept in step by rolls
 //   THREAT POOL    - the GM's Threat, kept in step by rolls
 //   TOKEN ACTIONS  - a token action for every weapon and spell
 //   NPC IMPORT     - characters from NPC JSON (npc-import/FORMAT.md)
-// The sheet works without it, minus these features; its Player/NPC switch
-// needs no script.
+// The sheet works without it. Documentation: api-scripts/README.md.
 //
-// INSTALL: Game Settings > API Scripts > New Script, paste this file, Save
-// Script. Needs a Pro game. It replaces the separate scripts ccmomentum.js,
-// ccthreat.js, ccnpclock.js, cctokenactions.js and ccimport.js: delete those
-// from the game, or their commands and events run twice (and ccnpclock.js
-// would undo the Player/NPC switch). The pools and settings carry over.
+// INSTALL: Settings > Mod (API) Scripts > New Script, paste this file, Save
+// Script. Needs a Pro game; no other scripts are needed.
 //
 // CHAT COMMANDS:
 //   !momentum / !threat                  - announce the pool
