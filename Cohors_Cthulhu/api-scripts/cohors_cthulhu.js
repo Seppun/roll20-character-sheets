@@ -5,16 +5,16 @@
 // below explains its part:
 //   MOMENTUM POOL  - the party's shared Momentum (0-6), kept in step by rolls
 //   THREAT POOL    - the GM's Threat, kept in step by rolls
-//   NPC LOCK       - keeps the NPC types GM-only, through GM Notes
 //   TOKEN ACTIONS  - a token action for every weapon and spell
 //   NPC IMPORT     - characters from NPC JSON (npc-import/FORMAT.md)
-// The sheet works without it, minus these features.
+// The sheet works without it, minus these features; its Player/NPC switch
+// needs no script.
 //
 // INSTALL: Game Settings > API Scripts > New Script, paste this file, Save
 // Script. Needs a Pro game. It replaces the separate scripts ccmomentum.js,
 // ccthreat.js, ccnpclock.js, cctokenactions.js and ccimport.js: delete those
-// from the game, or their commands and events run twice. The pools and
-// settings carry over.
+// from the game, or their commands and events run twice (and ccnpclock.js
+// would undo the Player/NPC switch). The pools and settings carry over.
 //
 // CHAT COMMANDS:
 //   !momentum / !threat                  - announce the pool
@@ -390,145 +390,6 @@ on('ready', () => {
 
     // Re-show the Turn Order entry and token on script load.
     refreshDisplays();
-  }
-
-  // ===========================================================================
-  // NPC LOCK
-  //
-  // Keeps the NPC types (Trooper / Toughened / Nemesis) GM-only. Sheets can't
-  // tell the GM from a player, but only the GM can read GM Notes, so those
-  // decide:
-  //   - GM Notes containing the word NPC unlock the Character Type selector.
-  //   - "NPC: Trooper", "NPC: Toughened" or "NPC: Nemesis" also set that tier.
-  //   - Anything else locks it: the selector is hidden and any NPC type is
-  //     reset to Player Character (other data is untouched).
-  // Sets the hidden npc_unlocked attribute and corrects character_type
-  // whenever the character, its character_type or its npc_unlocked changes,
-  // and for every character on startup. The NPC import writes
-  // "NPC: <Tier>" into imported NPCs' GM Notes.
-  //
-  // First run only: characters with an NPC type, no controlling player and no
-  // marker get "NPC" added to their GM Notes; player-controlled ones are
-  // reset.
-  // ===========================================================================
-  {
-    const debug = debugLog('CCNpcLock');
-    const STATE_KEY = 'CCNpcLock';
-    const NPC_TIERS = ['trooper', 'toughened', 'nemesis'];
-    const LEGACY_NPC_TYPES = ['cannon_fodder', 'npc'];
-
-    // GM Notes are rich-text HTML; only the words matter here.
-    const notesText = (raw) => String(raw || '')
-      .replace(/<[^>]+>/g, ' ')
-      .replace(/&nbsp;/gi, ' ')
-      .replace(/&amp;/gi, '&');
-
-    // "NPC" as a whole word unlocks; "NPC: Toughened" (or "NPC - Toughened",
-    // "NPC Toughened") also names the tier.
-    const parseNotes = (raw) => {
-      const match = notesText(raw).match(/\bNPC\b(?:\s*[:\-]?\s*(trooper|toughened|nemesis)\b)?/i);
-      return match ? {npc: true, tier: match[1] ? match[1].toLowerCase() : null} : {npc: false, tier: null};
-    };
-
-    const getAttrValue = (characterId, name) => {
-      const attr = findObjs({type: 'attribute', characterid: characterId, name})[0];
-      return attr ? String(attr.get('current')) : '';
-    };
-
-    // setWithWorker so the sheet's calculations react as if changed on the
-    // sheet.
-    const setAttrValue = (characterId, name, value) => {
-      let attr = findObjs({type: 'attribute', characterid: characterId, name})[0];
-      if (!attr) {
-        attr = createObj('attribute', {characterid: characterId, name, current: ''});
-      }
-      attr.setWithWorker({current: String(value)});
-    };
-
-    const whisperGM = (text) => sendChat('NPC Lock', `/w gm ${text}`, null, {noarchive: true});
-
-    const enforce = (character, notes) => {
-      const id = character.id;
-      const {npc, tier} = parseNotes(notes);
-      const type = getAttrValue(id, 'character_type') || 'pc';
-      const unlocked = getAttrValue(id, 'npc_unlocked') === '1';
-
-      const npcType = NPC_TIERS.includes(type) || LEGACY_NPC_TYPES.includes(type);
-      const changes = npc ?
-        [!unlocked && 'unlock', tier && type !== tier && `type -> ${tier}`] :
-        [unlocked && 'lock', npcType && 'type -> pc'];
-      debug(`"${character.get('name')}" (${id}): GM Notes ${npc ? `mark it NPC${tier ? ` (${tier})` : ''}` : 'have no NPC mark'}; ` +
-        `type ${type}, unlocked ${unlocked}; ${changes.filter(Boolean).join(', ') || 'no change'}`);
-
-      if (npc) {
-        if (!unlocked) { setAttrValue(id, 'npc_unlocked', 1); }
-        if (tier && type !== tier) { setAttrValue(id, 'character_type', tier); }
-        return;
-      }
-
-      if (unlocked) { setAttrValue(id, 'npc_unlocked', 0); }
-      if (npcType) {
-        setAttrValue(id, 'character_type', 'pc');
-        whisperGM(`${character.get('name')} was reset to Player Character - its GM Notes don't mark it as an NPC (add "NPC" or "NPC: Toughened" to them to allow it).`);
-      }
-    };
-
-    // character.get('gmnotes') is asynchronous - it needs a callback.
-    const check = (character) => {
-      if (!character) { return; }
-      character.get('gmnotes', (notes) => enforce(character, notes));
-    };
-
-    // First-run migration (see the section comment).
-    const grandfatherExistingNpcs = (characters, done) => {
-      state[STATE_KEY] = state[STATE_KEY] || {};
-      if (state[STATE_KEY].migrated) { done(); return; }
-      debug(`first run: checking ${characters.length} characters for unmarked NPCs`);
-      let pending = characters.length;
-      const finish = () => {
-        pending -= 1;
-        if (pending <= 0) {
-          state[STATE_KEY].migrated = true;
-          done();
-        }
-      };
-      if (!pending) { finish(); return; }
-      characters.forEach((character) => {
-        const type = getAttrValue(character.id, 'character_type');
-        const isNpcType = NPC_TIERS.includes(type) || LEGACY_NPC_TYPES.includes(type);
-        const playerControlled = String(character.get('controlledby') || '').trim() !== '';
-        if (!isNpcType || playerControlled) { finish(); return; }
-        character.get('gmnotes', (notes) => {
-          if (!parseNotes(notes).npc) {
-            character.set('gmnotes', `${notes ? `${notes}<p>NPC</p>` : 'NPC'}`);
-            log(`[CCNpcLock] marked existing NPC "${character.get('name')}" with "NPC" in its GM Notes`);
-          }
-          finish();
-        });
-      });
-    };
-
-    const characters = findObjs({type: 'character'});
-    debug(`startup: checking ${characters.length} characters`);
-    grandfatherExistingNpcs(characters, () => characters.forEach(check));
-
-    // Any change to the character, including its GM Notes. (API scripts'
-    // changes don't fire these.)
-    on('change:character', (character) => {
-      debug(`change:character "${character.get('name')}"`);
-      check(character);
-    });
-
-    // Type or unlock flag changed directly, e.g. on the Attributes &
-    // Abilities tab.
-    const onAttribute = (attr) => {
-      const name = attr.get('name');
-      if (name !== 'character_type' && name !== 'npc_unlocked') { return; }
-      debug(`${name} = ${attr.get('current')} on character ${attr.get('characterid')}`);
-      check(getObj('character', attr.get('characterid')));
-    };
-    on('change:attribute', onAttribute);
-    on('add:attribute', onAttribute);
   }
 
   // ===========================================================================
@@ -1038,10 +899,8 @@ on('ready', () => {
         npcType = 'toughened';
       }
       setAttr(id, 'character_type', npcType);
-      // Marks it as an NPC for the NPC lock (GM Notes are GM-only) and
-      // unlocks Character Type.
-      character.set('gmnotes', `NPC: ${ccCapitalize(npcType)}`);
-      setAttr(id, 'npc_unlocked', 1);
+      // The sheet's Player/NPC switch.
+      setAttr(id, 'npc_sheet', 1);
       setAttr(id, 'spells_type_marker', 'npc');
       setAttr(id, 'npc_allegiance', npc.allegiance === 'ally' ? 'ally' : 'adversary');
 

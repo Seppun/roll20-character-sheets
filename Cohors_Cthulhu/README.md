@@ -85,7 +85,7 @@ alone a GM-only pool. The Roll20 API script in
 `api-scripts/cohors_cthulhu.js` maintains both pools, kept in sync
 automatically by every roll made from this sheet
 (Attribute/Skill/Focus/Weapon/Spell). The same script also runs the token
-actions, NPC import and NPC lock described below.
+actions and NPC import described below.
 
 - **Momentum** increases by the Momentum a passed roll generates, and
   decreases by Extra Momentum declared spent on a spell or a Fatigue
@@ -130,7 +130,8 @@ Pro-tier game with the API sandbox enabled:
 Earlier versions came as five separate scripts (`ccmomentum.js`,
 `ccthreat.js`, `ccimport.js`, `ccnpclock.js`, `cctokenactions.js`). If
 your game has those, delete them when you add this one, or every command
-and roll is handled twice. The pools and settings carry over.
+and roll is handled twice (and `ccnpclock.js` would undo the Player/NPC
+switch). The pools and settings carry over.
 
 Without the script installed, the hidden signals just render (and
 immediately hide) a roll template card nobody looks at - rolling still
@@ -157,8 +158,9 @@ Chat commands once installed:
 Debug logging is off by default and stays as set across sandbox restarts.
 When on, the script writes what it did to the API console (Game Settings >
 API Scripts), tagged by part (`[CCMomentum]`, `[CCImport]`, ...): every
-chat message it sees, the pool before and after each signal or command, how a spend was split between Momentum and
-Threat, each NPC import, and each NPC Lock check. Errors are always logged.
+chat message it sees, the pool before and after each signal or command,
+how a spend was split between Momentum and Threat, and each NPC import.
+Errors are always logged.
 
 ## Token actions (API script)
 
@@ -221,21 +223,17 @@ special rules, spells and escalation options filled in.
 
 ## NPC sheets
 
-The Character Type selector at the top of the Character tab switches a
-character between Player Character and the three NPC tiers (Trooper, Toughened, Nemesis).
-It's **GM-only**, controlled by the character's GM Notes (which players
-can't see or edit) through the API script (`api-scripts/cohors_cthulhu.js`):
+The **Player / NPC** switch at the top right of the sheet, level with the
+tabs, turns any character into an NPC and back. It works without the API
+script, so NPC sheets don't need a Pro game. On an NPC sheet, the tier
+buttons under the banner pick **Trooper**, **Toughened** or **Nemesis**:
 
-- Put **NPC** anywhere in a character's GM Notes to show the selector on
-  that sheet. **NPC: Trooper**, **NPC: Toughened** or **NPC: Nemesis**
-  also sets (and keeps) that tier.
-- Without it, the selector is hidden, and an NPC type is reset to Player
-  Character - including one a player sets through the Attributes &
-  Abilities tab. The GM gets a whisper when that happens.
-- The NPC import writes `NPC: <Tier>` into every imported NPC's GM Notes.
-- On its first run, the script adds "NPC" to the GM Notes of existing NPCs
-  that no player controls, so they keep working. Without the script,
-  nobody can switch a sheet to an NPC type except by importing it.
+- Switching to NPC starts as Toughened the first time, and brings back the
+  last tier after that. Switching back to Player hides the NPC fields but
+  keeps what's in them.
+- Imported NPCs open with the switch on NPC and the tier from their JSON.
+- Anyone who can edit a sheet can flip its switch, including players on
+  their own characters (a sheet can't tell the GM from a player).
 
 Each tier changes the sheet like this:
 

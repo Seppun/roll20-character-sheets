@@ -21,6 +21,8 @@
   --cc-stone-light: #f2e4d3;
   --cc-stone-dark: #edd9c1;
   --cc-stone-bezel: #8a7252;
+  /* Player/NPC switch: knob, rim and the chosen side's label. */
+  --cc-switch: #8a1c2b;
 }
 
 @mixin dark {
@@ -32,4 +34,6 @@
   --cc-banner-text: #f2e9d8;
   --cc-rule: #7a1a28;
   --cc-rule-soft: rgba(122, 26, 40, 0.4);
+  /* Lighter than --cc-rule so the switch reads on the dark page. */
+  --cc-switch: #d4808b;
 }

@@ -211,6 +211,8 @@ body {
   --cc-stone-light: #f2e4d3;
   --cc-stone-dark: #edd9c1;
   --cc-stone-bezel: #8a7252;
+  /* Player/NPC switch: knob, rim and the chosen side's label. */
+  --cc-switch: #8a1c2b;
   /* Base text size for elements without their own font-size. */
   font-size: 14px;
 }
@@ -1253,6 +1255,76 @@ body .ui-dialog .tab-content .charsheet .tabs__button.k-active-button {
   color: var(--cc-banner-text);
   border-color: var(--cc-banner);
 }
+body .ui-dialog .tab-content .charsheet {
+  /* Player/NPC switch (Cohors_Cthulhu.pug): top right, level with the tab
+     buttons. The transparent checkbox on top takes the clicks. */
+}
+body .ui-dialog .tab-content .charsheet main {
+  position: relative;
+}
+body .ui-dialog .tab-content .charsheet .cc-sheet-mode {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  height: 1.8rem;
+  font-family: var(--cc-body-font);
+  font-weight: bold;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+body .ui-dialog .tab-content .charsheet {
+  /* input. outranks k-scaffold's input[type=checkbox] sizing. */
+}
+body .ui-dialog .tab-content .charsheet .cc-sheet-mode input.cc-sheet-mode-input {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 1;
+}
+body .ui-dialog .tab-content .charsheet .cc-sheet-mode-option {
+  color: var(--cc-ink);
+  opacity: 0.45;
+}
+body .ui-dialog .tab-content .charsheet .cc-sheet-mode-input:not(:checked) ~ .cc-sheet-mode-player,
+body .ui-dialog .tab-content .charsheet .cc-sheet-mode-input:checked ~ .cc-sheet-mode-npc {
+  color: var(--cc-switch);
+  opacity: 1;
+}
+body .ui-dialog .tab-content .charsheet .cc-sheet-mode-track {
+  position: relative;
+  box-sizing: border-box;
+  width: 2rem;
+  height: 1rem;
+  border: 1px solid var(--cc-switch);
+  border-radius: 0.5rem;
+  background: var(--cc-parchment-dark);
+  /* The knob: left for Player, right for NPC. */
+}
+body .ui-dialog .tab-content .charsheet .cc-sheet-mode-track::after {
+  content: "";
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  width: calc(1rem - 4px);
+  height: calc(1rem - 4px);
+  border-radius: 50%;
+  background: var(--cc-switch);
+  transition: left 0.15s;
+}
+body .ui-dialog .tab-content .charsheet .cc-sheet-mode-input:checked ~ .cc-sheet-mode-track::after {
+  left: calc(1rem + 1px);
+}
 body .ui-dialog .tab-content .charsheet .cc-banner {
   /* Brush-stroke ribbon (images/banner-brush.png) loaded by URL; a data:
      URI breaks roll-template styling. No background-color, so the ribbon's
@@ -1474,9 +1546,11 @@ body .ui-dialog .tab-content .charsheet {
 }
 @media print {
   body .ui-dialog .tab-content .charsheet {
-    /* Hide tab navigation, repeating-section controls and the build footer. */
+    /* Hide tab navigation, the Player/NPC switch, repeating-section controls
+       and the build footer. */
   }
   body .ui-dialog .tab-content .charsheet .tabs__header,
+  body .ui-dialog .tab-content .charsheet .cc-sheet-mode,
   body .ui-dialog .tab-content .charsheet .repcontrol_add,
   body .ui-dialog .tab-content .charsheet .repcontrol_edit,
   body .ui-dialog .tab-content .charsheet .cc-footer {
@@ -1542,16 +1616,17 @@ body .ui-dialog .tab-content .charsheet .cc-character .cc-footer {
   opacity: 0.6;
 }
 body .ui-dialog .tab-content .charsheet .cc-character .cc-build-css::after {
-  content: "CSS build: 2026-10-07 23:59:55 UTC";
+  content: "CSS build: 2026-10-08 18:55:55 UTC";
 }
 body .ui-dialog .tab-content .charsheet .cc-character .cc-languages textarea {
   min-height: 4rem;
 }
-body .ui-dialog .tab-content .charsheet .cc-character .cc-npc-unlock-flag,
 body .ui-dialog .tab-content .charsheet .cc-character .cc-character-type {
   display: none;
 }
-body .ui-dialog .tab-content .charsheet .cc-character .cc-npc-unlock-flag:checked ~ .cc-character-type {
+body .ui-dialog .tab-content .charsheet .cc-character #cc-character-type-trooper:checked ~ .cc-character-type,
+body .ui-dialog .tab-content .charsheet .cc-character #cc-character-type-toughened:checked ~ .cc-character-type,
+body .ui-dialog .tab-content .charsheet .cc-character #cc-character-type-nemesis:checked ~ .cc-character-type {
   display: flex;
   margin-bottom: 0.4rem;
 }
@@ -1582,7 +1657,6 @@ body .ui-dialog .tab-content .charsheet .cc-character .cc-character-type-label:f
 body .ui-dialog .tab-content .charsheet .cc-character .cc-character-type-label:last-of-type {
   border-radius: 0 4px 4px 0;
 }
-body .ui-dialog .tab-content .charsheet .cc-character #cc-character-type-pc:checked ~ .cc-character-type label[for=cc-character-type-pc],
 body .ui-dialog .tab-content .charsheet .cc-character #cc-character-type-trooper:checked ~ .cc-character-type label[for=cc-character-type-trooper],
 body .ui-dialog .tab-content .charsheet .cc-character #cc-character-type-toughened:checked ~ .cc-character-type label[for=cc-character-type-toughened],
 body .ui-dialog .tab-content .charsheet .cc-character #cc-character-type-nemesis:checked ~ .cc-character-type label[for=cc-character-type-nemesis] {
@@ -2628,6 +2702,8 @@ body.sheet-darkmode {
   --cc-banner-text: #f2e9d8;
   --cc-rule: #7a1a28;
   --cc-rule-soft: rgba(122, 26, 40, 0.4);
+  /* Lighter than --cc-rule so the switch reads on the dark page. */
+  --cc-switch: #d4808b;
 }
 body {
   /* Force the light palette when printing. The values are repeated with
@@ -2660,16 +2736,17 @@ body {
   opacity: 0.6;
 }
 .cc-character .cc-build-css::after {
-  content: "CSS build: 2026-10-07 23:59:55 UTC";
+  content: "CSS build: 2026-10-08 18:55:55 UTC";
 }
 .cc-character .cc-languages textarea {
   min-height: 4rem;
 }
-.cc-character .cc-npc-unlock-flag,
 .cc-character .cc-character-type {
   display: none;
 }
-.cc-character .cc-npc-unlock-flag:checked ~ .cc-character-type {
+.cc-character #cc-character-type-trooper:checked ~ .cc-character-type,
+.cc-character #cc-character-type-toughened:checked ~ .cc-character-type,
+.cc-character #cc-character-type-nemesis:checked ~ .cc-character-type {
   display: flex;
   margin-bottom: 0.4rem;
 }
@@ -2700,7 +2777,6 @@ body {
 .cc-character .cc-character-type-label:last-of-type {
   border-radius: 0 4px 4px 0;
 }
-.cc-character #cc-character-type-pc:checked ~ .cc-character-type label[for=cc-character-type-pc],
 .cc-character #cc-character-type-trooper:checked ~ .cc-character-type label[for=cc-character-type-trooper],
 .cc-character #cc-character-type-toughened:checked ~ .cc-character-type label[for=cc-character-type-toughened],
 .cc-character #cc-character-type-nemesis:checked ~ .cc-character-type label[for=cc-character-type-nemesis] {

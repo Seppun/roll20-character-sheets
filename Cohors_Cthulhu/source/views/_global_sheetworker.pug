@@ -102,7 +102,7 @@
     }
   };
 
-  // NPC tiers; see the Character Type selector in views/_character.pug.
+  // NPC tiers; see the Character Type radios in views/_character.pug.
   const ccNpcTiers = ['trooper', 'toughened', 'nemesis'];
   const ccIsNpc = (attributes) => ccNpcTiers.includes(attributes.character_type);
 
@@ -305,6 +305,8 @@
     if (legacyTypes[attributes.character_type]) {
       attributes.character_type = legacyTypes[attributes.character_type];
     }
+    // The Player/NPC switch, for sheets from before it and imported NPCs.
+    attributes.npc_sheet = calcNpcSheet({attributes});
 
     attributes.base_armour = calcBaseArmour({attributes});
     attributes.total_armor = calcTotalArmor({attributes});
