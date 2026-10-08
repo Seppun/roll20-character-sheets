@@ -2423,6 +2423,20 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
     'Spheres of Yog-Sothoth': 1,
   };
   
+  // Each skill's magic focus. A caster who has the focus for a spell's skill
+  // rolls it as a focus roll: every die at or under the skill's ranks is a
+  // critical success.
+  const ccMagicFocuses = {
+    academia: 'Religion',
+    fighting: 'War Magic',
+    medicine: 'Faith Healing',
+    observation: 'Instincts',
+    persuasion: 'Invocation',
+    resilience: 'Discipline',
+    survival: 'Mysticism',
+    tactics: 'Omen Reading',
+  };
+  
   // Casting roll: Spellcasting Attribute + the spell's Skill vs its
   // Difficulty, with the Cost rolled in the same message. The cost is paid
   // whether or not the spell succeeds.
@@ -2433,6 +2447,13 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
     const skillName = attributes[`${prefix}skill`] || '';
     const skillSlug = skillName.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
     const skillRanks = Number(attributes[`${skillSlug}_ranks`]) || 0;
+    // The focus checkbox's attribute, named as in components/_focus.pug. A
+    // ticked box holds "on" (no value attribute) or 1 (imported NPCs).
+    const focusName = ccMagicFocuses[skillSlug] || '';
+    const focusSlug = focusName.toLowerCase().replace(/[^a-z0-9]+/g, '_');
+    const hasFocus = Boolean(focusName && attributes[`${skillSlug}_focus_${focusSlug}_known`]);
+    // A natural 1 is always a critical success.
+    const critMax = hasFocus ? Math.max(1, skillRanks) : 1;
   
     const castAttr = (attributes.spellcasting_attribute || '').toLowerCase();
     const attributeRating = Number(attributes[`${castAttr}_rating`]) || 0;
@@ -2458,7 +2479,7 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
     const rollString = '&{template:ccskill} ' +
       `{{character_name=@{character_name}}} ` +
       `{{skill=${spellName}}} ` +
-      (skillName ? `{{focus=${skillName}}} ` : '') +
+      (skillName ? `{{focus=${skillName}${hasFocus ? `: ${focusName}` : ''}}} ` : '') +
       `{{attribute_choice=[[0+${attributeRating}]]}} ` +
       `{{difficulty=[[0+${difficultyQuery}]]}} ` +
       `{{complication_range=[[0+${complicationQuery}]]}} ` +
@@ -2492,12 +2513,14 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
   
       const dice = ccTestDice(roll.results.roll1);
   
-      // Crit only on a natural 1: no Focus applies. A natural 1 is also an
-      // Effect, used for the Dabbling power boost.
+      // Crits on a die <= critMax (the skill's ranks with its magic focus,
+      // else 1). A natural 1 is also an Effect, used for the Dabbling power
+      // boost.
       const targetNumber = attributeRating + skillRanks;
       const complicationThreshold = 21 - complicationRange;
       const castingEffectCount = dice.filter((d) => d <= 1).length;
-      const successCount = dice.filter((d) => d <= targetNumber).length + castingEffectCount + autoSuccesses;
+      const critCount = dice.filter((d) => d <= critMax).length;
+      const successCount = dice.filter((d) => d <= targetNumber).length + critCount + autoSuccesses;
       const complicationCount = dice.filter((d) => d >= complicationThreshold).length;
       const passed = successCount >= difficulty;
   
@@ -2518,7 +2541,10 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
       const effectsSummary = effectCount > 0 ?
         `${effectCount}x Effect${costEffects.length ? ` - ${costEffects.join(', ')}` : ''}` :
         'No Effects triggered';
-      const costThreatGenerated = effectCount * (ccSpellCostThreatPerEffect[spellName] || 0);
+      // Threat from the Cost's Effects is the GM's gain, so an adversary's
+      // spell generates none.
+      const costThreatGenerated = ccIsAdversary(attributes) ? 0 :
+        effectCount * (ccSpellCostThreatPerEffect[spellName] || 0);
   
       const spellBonusMomentum = passed ? Math.max(0, successCount - difficulty) : 0;
       const spellBonusDiceCount = Math.max(0, dice.length - 2);

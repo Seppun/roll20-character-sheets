@@ -38,6 +38,13 @@ below).
   many extra damage dice to buy (0-3): each adds one Challenge Die to the
   damage for 1 Momentum, counted and paid only if the attack hits. The
   Momentum the attack itself generates can pay for them.
+- **Casting with a magic focus**: a spell's casting roll counts as a focus
+  roll when the caster has the magic focus of the spell's skill - Academia
+  (Religion), Fighting (War Magic), Medicine (Faith Healing), Observation
+  (Instincts), Persuasion (Invocation), Resilience (Discipline), Survival
+  (Mysticism) or Tactics (Omen Reading). Each die at or under the skill's
+  ranks is then a critical success; without it, only a natural 1 is. The
+  card names the focus, e.g. "Survival: Mysticism".
 - **Momentum and Threat**: each roll card shows the Momentum the roll
   generated and spent, and its Complications, so the group can keep the
   pools by hand. The companion API script can keep them automatically.
@@ -100,8 +107,9 @@ Each tier changes the sheet like this:
     successes, and Brutal makes melee attacks roll Brawn.
 - **Adversary rolls use Threat**: extra d20s cost Threat instead of
   Momentum (same 1/2/3 escalation, up to three dice), and the card reports
-  the Threat the roll generates and spends. Allies roll with Momentum like
-  a player character.
+  the Threat the roll generates and spends. Effects on an adversary's spell
+  Cost don't generate Threat, as they do for player characters. Allies roll
+  with Momentum like a player character.
 - **Weapons & Attacks** has a Type column; a Mental attack rolls Will +
   Persuasion or Survival at difficulty 1. An NPC's damage is used as
   given in its stat block (it already includes bonus damage), unlike a
