@@ -390,6 +390,16 @@
       display: none !important;
     }
 
+    /* Spell Effect and Momentum print whether or not their info icon is
+       pressed; the icon itself doesn't. */
+    .cc-spell-info-toggle {
+      display: none !important;
+    }
+
+    .cc-spell-info-toggle ~ .cc-spell-collapse-content {
+      display: block !important;
+    }
+
     /* Show every tab, stacked. k-scaffold hides inactive tabs with an
        !important :not(.k-active-tab) rule; doubling the class matches its
        specificity, and this rule compiles later. */

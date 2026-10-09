@@ -38,6 +38,11 @@ below).
   many extra damage dice to buy (0-3): each adds one Challenge Die to the
   damage for 1 Momentum, counted and paid only if the attack hits. The
   Momentum the attack itself generates can pay for them.
+- **Spells**: choosing a spell fills in its mechanics and clears whatever
+  the row held for the previous spell, typed text included. The round "i"
+  button under a spell's fields shows its Effect and Momentum text: maroon
+  while open, light while closed (closed by default; printing always
+  shows them).
 - **Attack spells**: a spell with a Damage & Effects entry rolls damage
   with its casting roll, as a weapon does: the base rating in Challenge
   Dice, plus the effects. The prompt "Extra Momentum spent on Spell
@@ -72,7 +77,9 @@ below).
   archetype.
 - **Weapons, Armor, and Talents**: picking a name from the dropdown fills
   in that row's stock stats automatically - every field stays freely
-  editable afterward for house-ruled or modified equipment. A player
+  editable afterward for house-ruled or modified equipment. (NPC sheets
+  use a type-in field with suggestions for Weapons, Armor and Talents, so
+  they can carry claws, chitin and the like.) A player
   character's Talent dropdown lists only the talents whose requirements
   the character meets (archetype, specialization, culture, caste, skill
   ranks and prerequisite talents). The sheet holds the mechanics only:
@@ -300,7 +307,14 @@ the first time the sheet is opened.
    ```js
    'Lorica Plumata': {resistance: '3', qualities: 'Heavy'},
    ```
-2. Same file: add the name to `datalist#cc-armor-options`:
+2. Same file: add the name to the **players' dropdown** (the `+select` with
+   class `.cc-armor-name-select`, written out one option at a time) and to
+   the **NPC suggestion list** (`datalist#cc-armor-options`):
+
+   ```pug
+   +option({value: 'Lorica Plumata'})
+     | Lorica Plumata
+   ```
 
    ```pug
    option(value='Lorica Plumata')

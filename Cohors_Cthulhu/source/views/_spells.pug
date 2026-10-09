@@ -318,10 +318,18 @@
             .cc-field.cc-spell-damage
               span Damage &amp; Effects
               +text({name: 'damage effects', trigger: {triggeredFuncs: ['ccUpdateSpellAttack']}})
-          //- Effect and Momentum collapse behind the eagle toggle, a styled
-          //- checkbox that is a sibling of the content, so no JS is needed.
-          //- Per row, so each spell collapses on its own.
-          +checkbox({name: 'effect collapsed', value: 1}).cc-spell-collapse-toggle
+          //- Effect and Momentum show behind the info button. Its click
+          //- flips two hidden radio markers (ccToggleSpellInfo), which CSS
+          //- reads as siblings, so the button and the text follow the state:
+          //- open = maroon button, text shown; closed (default) = light
+          //- button, text hidden. Per row, so each spell opens on its own.
+          +radio({name: 'effect open', value: 'closed', checked: ''}).cc-spell-info-closed
+          +radio({name: 'effect open', value: 'open'}).cc-spell-info-open
+          +action({
+            name: 'effect toggle',
+            class: 'cc-spell-info-toggle',
+            trigger: {triggeredFuncs: ['ccToggleSpellInfo']}
+          })(title='Show or hide the spell effect and momentum')
           .cc-spell-collapse-content
             .cc-field
               span Spell Effect
@@ -479,40 +487,44 @@
       }
     }
 
-    // Fold toggle: a native checkbox with its appearance stripped and a BMP
-    // triangle glyph drawn in :before. Checked = collapsed; the glyph
-    // rotates.
-    .cc-spell-collapse-toggle {
-      appearance: none;
-      -webkit-appearance: none;
-      background: none;
-      border: none;
-      width: auto;
-      height: auto;
+    // Info button: the circled-i icon (U+24D8) drawn from the font. Closed =
+    // light, Effect and Momentum hidden; open = solid maroon, shown. The
+    // hidden radio markers carry the state.
+    .cc-spell-info-closed,
+    .cc-spell-info-open {
+      display: none;
+    }
+
+    .cc-spell-info-toggle {
+      display: inline-block;
       margin: 0 0 0.2rem;
       padding: 0;
+      background: none;
+      border: none;
+      color: var(--cc-rule-soft);
       cursor: pointer;
-      font-size: 1rem;
+      font-size: 1.3rem;
       line-height: 1;
 
       &:before {
-        content: '\25BE';
-        display: inline-block;
-        opacity: 0.8;
-        transition: transform 150ms ease;
+        content: '\24D8';
       }
 
-      &:hover:before {
-        opacity: 1;
-      }
-
-      &:checked:before {
-        transform: rotate(180deg);
+      &:hover {
+        color: var(--cc-rule);
       }
     }
 
-    .cc-spell-collapse-toggle:checked ~ .cc-spell-collapse-content {
+    .cc-spell-info-open:checked ~ .cc-spell-info-toggle {
+      color: var(--cc-banner);
+    }
+
+    .cc-spell-collapse-content {
       display: none;
+    }
+
+    .cc-spell-info-open:checked ~ .cc-spell-collapse-content {
+      display: block;
     }
 
     .cc-spell-textarea {
@@ -566,18 +578,24 @@
 
   // Spell data keyed by tradition, then name (source/data/spells.json).
   const ccSpellbooks = !{JSON.stringify(ccSpellbooks)};
+  // Every field a spell fills or the player types into its row.
+  const ccSpellFields = ['skill', 'difficulty', 'cost', 'duration', 'category', 'damage_effects', 'effect', 'momentum'];
+
+  // Choosing a different spell clears the row's other fields, so nothing is
+  // left over from the previous spell, then fills in the new spell's
+  // mechanics. Each stays editable afterwards.
   const ccApplySpellPreset = ({trigger, attributes}) => {
     const [section, rowID] = k.parseRepeatName(trigger.name);
     const prefix = `${section}_${rowID}_`;
     const tradition = attributes.magical_tradition;
     const book = tradition && ccSpellbooks[tradition];
     const profile = book && book[attributes[`${prefix}name`]];
-    if (!profile) { return; }
-    Object.keys(profile).forEach((field) => {
+    ccSpellFields.forEach((field) => {
+      if (attributes[`${prefix}${field}`]) { attributes[`${prefix}${field}`] = ''; }
+    });
+    Object.keys(profile || {}).forEach((field) => {
       attributes[`${prefix}${field}`] = profile[field];
     });
-    // A spell without damage clears the previous spell's.
-    if (!profile.damage_effects) { attributes[`${prefix}damage_effects`] = ''; }
     ccSetSpellAttackMarker(attributes, prefix);
   };
   k.registerFuncs({ccApplySpellPreset});
@@ -597,6 +615,14 @@
     ccSetSpellAttackMarker(attributes, `${section}_${rowID}_`);
   };
   k.registerFuncs({ccUpdateSpellAttack});
+
+  // The info button: flips the row's open/closed marker.
+  const ccToggleSpellInfo = ({trigger, attributes}) => {
+    const [section, rowID] = k.parseRepeatName(trigger.name);
+    const key = `${section}_${rowID}_effect_open`;
+    attributes[key] = attributes[key] === 'open' ? 'closed' : 'open';
+  };
+  k.registerFuncs({ccToggleSpellInfo});
 
   // The leading number of a free-text Difficulty.
   const ccParseLeadingNumber = (text) => {

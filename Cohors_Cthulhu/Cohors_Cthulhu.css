@@ -1557,6 +1557,16 @@ body .ui-dialog .tab-content .charsheet {
     display: none !important;
   }
   body .ui-dialog .tab-content .charsheet {
+    /* Spell Effect and Momentum print whether or not their info icon is
+       pressed; the icon itself doesn't. */
+  }
+  body .ui-dialog .tab-content .charsheet .cc-spell-info-toggle {
+    display: none !important;
+  }
+  body .ui-dialog .tab-content .charsheet .cc-spell-info-toggle ~ .cc-spell-collapse-content {
+    display: block !important;
+  }
+  body .ui-dialog .tab-content .charsheet {
     /* Show every tab, stacked. k-scaffold hides inactive tabs with an
        !important :not(.k-active-tab) rule; doubling the class matches its
        specificity, and this rule compiles later. */
@@ -1616,7 +1626,7 @@ body .ui-dialog .tab-content .charsheet .cc-character .cc-footer {
   opacity: 0.6;
 }
 body .ui-dialog .tab-content .charsheet .cc-character .cc-build-css::after {
-  content: "CSS build: 2026-10-09 01:03:45 UTC";
+  content: "CSS build: 2026-10-09 02:44:21 UTC";
 }
 body .ui-dialog .tab-content .charsheet .cc-character .cc-languages textarea {
   min-height: 4rem;
@@ -1823,33 +1833,35 @@ body .ui-dialog .tab-content .charsheet .cc-spells .cc-spell-cast:hover {
   border-color: var(--cc-banner);
   color: var(--cc-banner-text);
 }
-body .ui-dialog .tab-content .charsheet .cc-spells .cc-spell-collapse-toggle {
-  appearance: none;
-  -webkit-appearance: none;
-  background: none;
-  border: none;
-  width: auto;
-  height: auto;
+body .ui-dialog .tab-content .charsheet .cc-spells .cc-spell-info-closed,
+body .ui-dialog .tab-content .charsheet .cc-spells .cc-spell-info-open {
+  display: none;
+}
+body .ui-dialog .tab-content .charsheet .cc-spells .cc-spell-info-toggle {
+  display: inline-block;
   margin: 0 0 0.2rem;
   padding: 0;
+  background: none;
+  border: none;
+  color: var(--cc-rule-soft);
   cursor: pointer;
-  font-size: 1rem;
+  font-size: 1.3rem;
   line-height: 1;
 }
-body .ui-dialog .tab-content .charsheet .cc-spells .cc-spell-collapse-toggle:before {
-  content: "▾";
-  display: inline-block;
-  opacity: 0.8;
-  transition: transform 150ms ease;
+body .ui-dialog .tab-content .charsheet .cc-spells .cc-spell-info-toggle:before {
+  content: "ⓘ";
 }
-body .ui-dialog .tab-content .charsheet .cc-spells .cc-spell-collapse-toggle:hover:before {
-  opacity: 1;
+body .ui-dialog .tab-content .charsheet .cc-spells .cc-spell-info-toggle:hover {
+  color: var(--cc-rule);
 }
-body .ui-dialog .tab-content .charsheet .cc-spells .cc-spell-collapse-toggle:checked:before {
-  transform: rotate(180deg);
+body .ui-dialog .tab-content .charsheet .cc-spells .cc-spell-info-open:checked ~ .cc-spell-info-toggle {
+  color: var(--cc-banner);
 }
-body .ui-dialog .tab-content .charsheet .cc-spells .cc-spell-collapse-toggle:checked ~ .cc-spell-collapse-content {
+body .ui-dialog .tab-content .charsheet .cc-spells .cc-spell-collapse-content {
   display: none;
+}
+body .ui-dialog .tab-content .charsheet .cc-spells .cc-spell-info-open:checked ~ .cc-spell-collapse-content {
+  display: block;
 }
 body .ui-dialog .tab-content .charsheet .cc-spells .cc-spell-textarea {
   font-size: 12px;
@@ -2383,8 +2395,12 @@ body .ui-dialog .tab-content .charsheet .cc-character #cc-character-type-nemesis
 body .ui-dialog .tab-content .charsheet .cc-character .cc-rep-armor .cc-rep-header,
 body .ui-dialog .tab-content .charsheet .cc-character .cc-rep-armor fieldset,
 body .ui-dialog .tab-content .charsheet .cc-character .cc-rep-armor .repcontainer .repitem {
-  grid-template-columns: 1.6rem 1.5fr 1fr 2.5fr;
+  grid-template-columns: 1.5fr 1fr 2.5fr;
   align-items: center;
+}
+body .ui-dialog .tab-content .charsheet .cc-character .cc-rep-armor .cc-npc-col,
+body .ui-dialog .tab-content .charsheet .cc-character .cc-rep-armor .cc-armor-name-text {
+  display: none;
 }
 body .ui-dialog .tab-content .charsheet .cc-character .cc-rep-armor .cc-armor-apply {
   background: none;
@@ -2401,6 +2417,37 @@ body .ui-dialog .tab-content .charsheet .cc-character .cc-rep-armor .cc-armor-ap
 }
 body .ui-dialog .tab-content .charsheet .cc-character .cc-rep-armor .cc-armor-apply:hover:before {
   opacity: 1;
+}
+body .ui-dialog .tab-content .charsheet .cc-character #cc-character-type-trooper:checked ~ .cc-armor .cc-rep-armor .cc-rep-header,
+body .ui-dialog .tab-content .charsheet .cc-character #cc-character-type-trooper:checked ~ .cc-armor .cc-rep-armor fieldset,
+body .ui-dialog .tab-content .charsheet .cc-character #cc-character-type-trooper:checked ~ .cc-armor .cc-rep-armor .repcontainer .repitem,
+body .ui-dialog .tab-content .charsheet .cc-character #cc-character-type-toughened:checked ~ .cc-armor .cc-rep-armor .cc-rep-header,
+body .ui-dialog .tab-content .charsheet .cc-character #cc-character-type-toughened:checked ~ .cc-armor .cc-rep-armor fieldset,
+body .ui-dialog .tab-content .charsheet .cc-character #cc-character-type-toughened:checked ~ .cc-armor .cc-rep-armor .repcontainer .repitem,
+body .ui-dialog .tab-content .charsheet .cc-character #cc-character-type-nemesis:checked ~ .cc-armor .cc-rep-armor .cc-rep-header,
+body .ui-dialog .tab-content .charsheet .cc-character #cc-character-type-nemesis:checked ~ .cc-armor .cc-rep-armor fieldset,
+body .ui-dialog .tab-content .charsheet .cc-character #cc-character-type-nemesis:checked ~ .cc-armor .cc-rep-armor .repcontainer .repitem {
+  grid-template-columns: 1.6rem 1.5fr 1fr 2.5fr;
+}
+body .ui-dialog .tab-content .charsheet .cc-character #cc-character-type-trooper:checked ~ .cc-armor .cc-rep-armor .cc-npc-col,
+body .ui-dialog .tab-content .charsheet .cc-character #cc-character-type-toughened:checked ~ .cc-armor .cc-rep-armor .cc-npc-col,
+body .ui-dialog .tab-content .charsheet .cc-character #cc-character-type-nemesis:checked ~ .cc-armor .cc-rep-armor .cc-npc-col {
+  display: block;
+}
+body .ui-dialog .tab-content .charsheet .cc-character #cc-character-type-trooper:checked ~ .cc-armor .cc-rep-armor .cc-armor-apply.cc-npc-col,
+body .ui-dialog .tab-content .charsheet .cc-character #cc-character-type-toughened:checked ~ .cc-armor .cc-rep-armor .cc-armor-apply.cc-npc-col,
+body .ui-dialog .tab-content .charsheet .cc-character #cc-character-type-nemesis:checked ~ .cc-armor .cc-rep-armor .cc-armor-apply.cc-npc-col {
+  display: inline-block;
+}
+body .ui-dialog .tab-content .charsheet .cc-character #cc-character-type-trooper:checked ~ .cc-armor .cc-rep-armor .cc-armor-name-text,
+body .ui-dialog .tab-content .charsheet .cc-character #cc-character-type-toughened:checked ~ .cc-armor .cc-rep-armor .cc-armor-name-text,
+body .ui-dialog .tab-content .charsheet .cc-character #cc-character-type-nemesis:checked ~ .cc-armor .cc-rep-armor .cc-armor-name-text {
+  display: block;
+}
+body .ui-dialog .tab-content .charsheet .cc-character #cc-character-type-trooper:checked ~ .cc-armor .cc-rep-armor .cc-armor-name-select,
+body .ui-dialog .tab-content .charsheet .cc-character #cc-character-type-toughened:checked ~ .cc-armor .cc-rep-armor .cc-armor-name-select,
+body .ui-dialog .tab-content .charsheet .cc-character #cc-character-type-nemesis:checked ~ .cc-armor .cc-rep-armor .cc-armor-name-select {
+  display: none;
 }
 body .ui-dialog .tab-content .charsheet .cc-character .cc-rep-talents .cc-rep-header,
 body .ui-dialog .tab-content .charsheet .cc-character .cc-rep-talents fieldset,
@@ -2743,7 +2790,7 @@ body {
   opacity: 0.6;
 }
 .cc-character .cc-build-css::after {
-  content: "CSS build: 2026-10-09 01:03:45 UTC";
+  content: "CSS build: 2026-10-09 02:44:21 UTC";
 }
 .cc-character .cc-languages textarea {
   min-height: 4rem;
@@ -2951,33 +2998,35 @@ body {
   border-color: var(--cc-banner);
   color: var(--cc-banner-text);
 }
-.cc-spells .cc-spell-collapse-toggle {
-  appearance: none;
-  -webkit-appearance: none;
-  background: none;
-  border: none;
-  width: auto;
-  height: auto;
+.cc-spells .cc-spell-info-closed,
+.cc-spells .cc-spell-info-open {
+  display: none;
+}
+.cc-spells .cc-spell-info-toggle {
+  display: inline-block;
   margin: 0 0 0.2rem;
   padding: 0;
+  background: none;
+  border: none;
+  color: var(--cc-rule-soft);
   cursor: pointer;
-  font-size: 1rem;
+  font-size: 1.3rem;
   line-height: 1;
 }
-.cc-spells .cc-spell-collapse-toggle:before {
-  content: "▾";
-  display: inline-block;
-  opacity: 0.8;
-  transition: transform 150ms ease;
+.cc-spells .cc-spell-info-toggle:before {
+  content: "ⓘ";
 }
-.cc-spells .cc-spell-collapse-toggle:hover:before {
-  opacity: 1;
+.cc-spells .cc-spell-info-toggle:hover {
+  color: var(--cc-rule);
 }
-.cc-spells .cc-spell-collapse-toggle:checked:before {
-  transform: rotate(180deg);
+.cc-spells .cc-spell-info-open:checked ~ .cc-spell-info-toggle {
+  color: var(--cc-banner);
 }
-.cc-spells .cc-spell-collapse-toggle:checked ~ .cc-spell-collapse-content {
+.cc-spells .cc-spell-collapse-content {
   display: none;
+}
+.cc-spells .cc-spell-info-open:checked ~ .cc-spell-collapse-content {
+  display: block;
 }
 .cc-spells .cc-spell-textarea {
   font-size: 12px;
@@ -3520,8 +3569,12 @@ body {
 .cc-character .cc-rep-armor .cc-rep-header,
 .cc-character .cc-rep-armor fieldset,
 .cc-character .cc-rep-armor .repcontainer .repitem {
-  grid-template-columns: 1.6rem 1.5fr 1fr 2.5fr;
+  grid-template-columns: 1.5fr 1fr 2.5fr;
   align-items: center;
+}
+.cc-character .cc-rep-armor .cc-npc-col,
+.cc-character .cc-rep-armor .cc-armor-name-text {
+  display: none;
 }
 .cc-character .cc-rep-armor .cc-armor-apply {
   background: none;
@@ -3538,6 +3591,38 @@ body {
 }
 .cc-character .cc-rep-armor .cc-armor-apply:hover:before {
   opacity: 1;
+}
+
+.cc-character #cc-character-type-trooper:checked ~ .cc-armor .cc-rep-armor .cc-rep-header,
+.cc-character #cc-character-type-trooper:checked ~ .cc-armor .cc-rep-armor fieldset,
+.cc-character #cc-character-type-trooper:checked ~ .cc-armor .cc-rep-armor .repcontainer .repitem,
+.cc-character #cc-character-type-toughened:checked ~ .cc-armor .cc-rep-armor .cc-rep-header,
+.cc-character #cc-character-type-toughened:checked ~ .cc-armor .cc-rep-armor fieldset,
+.cc-character #cc-character-type-toughened:checked ~ .cc-armor .cc-rep-armor .repcontainer .repitem,
+.cc-character #cc-character-type-nemesis:checked ~ .cc-armor .cc-rep-armor .cc-rep-header,
+.cc-character #cc-character-type-nemesis:checked ~ .cc-armor .cc-rep-armor fieldset,
+.cc-character #cc-character-type-nemesis:checked ~ .cc-armor .cc-rep-armor .repcontainer .repitem {
+  grid-template-columns: 1.6rem 1.5fr 1fr 2.5fr;
+}
+.cc-character #cc-character-type-trooper:checked ~ .cc-armor .cc-rep-armor .cc-npc-col,
+.cc-character #cc-character-type-toughened:checked ~ .cc-armor .cc-rep-armor .cc-npc-col,
+.cc-character #cc-character-type-nemesis:checked ~ .cc-armor .cc-rep-armor .cc-npc-col {
+  display: block;
+}
+.cc-character #cc-character-type-trooper:checked ~ .cc-armor .cc-rep-armor .cc-armor-apply.cc-npc-col,
+.cc-character #cc-character-type-toughened:checked ~ .cc-armor .cc-rep-armor .cc-armor-apply.cc-npc-col,
+.cc-character #cc-character-type-nemesis:checked ~ .cc-armor .cc-rep-armor .cc-armor-apply.cc-npc-col {
+  display: inline-block;
+}
+.cc-character #cc-character-type-trooper:checked ~ .cc-armor .cc-rep-armor .cc-armor-name-text,
+.cc-character #cc-character-type-toughened:checked ~ .cc-armor .cc-rep-armor .cc-armor-name-text,
+.cc-character #cc-character-type-nemesis:checked ~ .cc-armor .cc-rep-armor .cc-armor-name-text {
+  display: block;
+}
+.cc-character #cc-character-type-trooper:checked ~ .cc-armor .cc-rep-armor .cc-armor-name-select,
+.cc-character #cc-character-type-toughened:checked ~ .cc-armor .cc-rep-armor .cc-armor-name-select,
+.cc-character #cc-character-type-nemesis:checked ~ .cc-armor .cc-rep-armor .cc-armor-name-select {
+  display: none;
 }
 
 .cc-character .cc-rep-talents .cc-rep-header,
