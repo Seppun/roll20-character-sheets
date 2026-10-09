@@ -152,7 +152,11 @@ on('ready', () => {
   // Shows a pool on bar1 of any graphic on the current page named after it
   // ("Momentum Pool", optional) and as an entry in the Turn Order. max, if
   // given, is bar1's max, so the bar shows a fill fraction.
-  const showPool = (label, turnOrderId, value, max, poolDebug) => {
+  // The Turn Order entry is a custom one: Roll20 only shows an entry whose id
+  // is "-1" or a token's id, so the entry is found by its label. Versions
+  // before 1.0.0 used their own ids (legacyId), which Roll20 never showed;
+  // those entries are replaced.
+  const showPool = (label, legacyId, value, max, poolDebug) => {
     const campaign = Campaign();
     if (!campaign) { return; }
     const text = max ? `${value}/${max}` : `${value}`;
@@ -177,18 +181,28 @@ on('ready', () => {
     } catch (err) {
       turnOrder = [];
     }
-    const entry = {id: turnOrderId, pr: String(value), custom: label, formula: ''};
+    const entry = {id: '-1', pr: String(value), custom: label, formula: ''};
+    const isOurs = (item) => item && (item.id === legacyId ||
+      (String(item.id) === '-1' && String(item.custom || '').trim().toLowerCase() === label.toLowerCase()));
     // Update the entry in place, or add it at the end: the first entry is the
-    // current turn.
-    const index = turnOrder.findIndex((item) => item && item.id === turnOrderId);
+    // current turn. Any duplicates are dropped.
+    const index = turnOrder.findIndex(isOurs);
     poolDebug(`display: Turn Order entry ${index === -1 ? 'added' : 'updated'} (${entry.pr})`);
     if (index === -1) {
       turnOrder.push(entry);
     } else {
-      turnOrder[index] = entry;
+      turnOrder = turnOrder.filter((item, i) => i === index || !isOurs(item));
+      turnOrder[turnOrder.findIndex(isOurs)] = entry;
     }
     campaign.set('turnorder', JSON.stringify(turnOrder));
   };
+
+  // Each pool's refresh, so both entries come back when the GM opens the Turn
+  // Order (it may have been cleared since).
+  const poolRefreshers = [];
+  on('change:campaign:initiativepage', (campaign) => {
+    if (campaign.get('initiativepage')) { poolRefreshers.forEach((refresh) => refresh()); }
+  });
 
   // ===========================================================================
   // MOMENTUM POOL
@@ -206,7 +220,7 @@ on('ready', () => {
   // ===========================================================================
   {
     const debug = debugLog('CCMomentum');
-    const TURN_ORDER_ID = '-ccmomentum-pool';
+    const LEGACY_TURN_ORDER_ID = '-ccmomentum-pool';
     const LABEL = CONFIG.momentumLabel;
     const MAX_POOL = CONFIG.momentumMax;
 
@@ -216,7 +230,7 @@ on('ready', () => {
       store.momentum.pool = Math.min(MAX_POOL, Math.max(0, Math.round(Number(value) || 0)));
     };
 
-    const refreshDisplays = () => showPool(LABEL, TURN_ORDER_ID, getPool(), MAX_POOL, debug);
+    const refreshDisplays = () => showPool(LABEL, LEGACY_TURN_ORDER_ID, getPool(), MAX_POOL, debug);
 
     const announce = (note) => {
       const value = getPool();
@@ -344,6 +358,7 @@ on('ready', () => {
     });
 
     // Re-show the Turn Order entry and token on script load.
+    poolRefreshers.push(refreshDisplays);
     refreshDisplays();
   }
 
@@ -362,7 +377,7 @@ on('ready', () => {
   // ===========================================================================
   {
     const debug = debugLog('CCThreat');
-    const TURN_ORDER_ID = '-ccthreat-pool';
+    const LEGACY_TURN_ORDER_ID = '-ccthreat-pool';
     const LABEL = CONFIG.threatLabel;
 
     const getPool = () => Number(store.threat.pool) || 0;
@@ -371,7 +386,7 @@ on('ready', () => {
       store.threat.pool = Math.max(0, Math.round(Number(value) || 0));
     };
 
-    const refreshDisplays = () => showPool(LABEL, TURN_ORDER_ID, getPool(), 0, debug);
+    const refreshDisplays = () => showPool(LABEL, LEGACY_TURN_ORDER_ID, getPool(), 0, debug);
 
     const announce = (note) => {
       const value = getPool();
@@ -448,6 +463,7 @@ on('ready', () => {
     });
 
     // Re-show the Turn Order entry and token on script load.
+    poolRefreshers.push(refreshDisplays);
     refreshDisplays();
   }
 

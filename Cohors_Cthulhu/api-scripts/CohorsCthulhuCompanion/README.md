@@ -82,9 +82,11 @@ and the Complications.
 Every change is announced in chat. The pools also show in two places
 without opening chat:
 
-- the **Turn Order**, as a "Momentum Pool" and a "Threat Pool" entry (no
-  setup needed; added at the end and updated in place, so they never
-  change whose turn it is);
+- the **Turn Order**, as a "Momentum Pool" and a "Threat Pool" custom entry
+  (no setup needed; added at the end and updated in place, so they never
+  change whose turn it is). If the Turn Order is cleared, the entries come
+  back the next time the GM opens it or a pool changes (`!momentum` and
+  `!threat` also bring them back);
 - bar 1 of any token on the players' page named **Momentum Pool** or
   **Threat Pool** (optional; the names are in CONFIG).
 
