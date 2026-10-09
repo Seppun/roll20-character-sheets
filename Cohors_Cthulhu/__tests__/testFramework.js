@@ -2077,7 +2077,7 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
   // Shared 2d20 roll for attribute, skill and focus rolls. attributeExpr is a
   // literal rating or the packed ?{Attribute} query (see ccAttributeQuery).
   // critMax: the die value at or under which a die is a critical success (the
-  // skill's ranks with a focus, else 1).
+  // skill's ranks with a focus, at least 1; else 1).
   const runCcRoll = async ({attributes, skillLabel, focusLabel, attributeExpr, skillRanks, critMax}) => {
     const difficultyQuery = '?{Difficulty|1}';
     const complicationQuery = '?{Complication range (1-5)|1}';
@@ -2796,7 +2796,8 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
   };
   k.registerFuncs({initiateSkillRoll});
   
-  // Focus roll: crit on a die <= the skill's ranks.
+  // Focus roll: crit on a die <= the skill's ranks; a natural 1 always
+  // crits, even with 0 ranks.
   const initiateFocusRoll = async ({trigger, attributes}) => {
     const match = ccNormalizeName(trigger.name).match(/^(.+)_focus_(.+)_(?:roll|action)$/);
     if (!match) { return; }
@@ -2808,7 +2809,7 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
       focusLabel: ccCapitalize(focusSlug),
       attributeExpr: ccAttributeQuery(attributes),
       skillRanks,
-      critMax: skillRanks,
+      critMax: Math.max(1, skillRanks),
     });
   };
   k.registerFuncs({initiateFocusRoll});
@@ -2850,7 +2851,8 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
   // is added. An NPC's row holds the stat block total, so nothing is added.
   //
   // Crit range opens to Fighting's ranks when Focus is a known Fighting
-  // focus; mental attacks crit on a natural 1.
+  // focus (a natural 1 always crits, even with 0 ranks); mental attacks crit
+  // on a natural 1.
   //
   // Extra damage dice: each Momentum (Threat for an adversary) adds 1
   // Challenge Die on a hit, up to 3. They're asked for up front and always
@@ -2880,7 +2882,7 @@ registerFuncs({ kTabOnOpen },{type:['opener']});
     const fightingRanks = Number(attributes.fighting_ranks) || 0;
     const focusSlug = focusLower.replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
     const knownFocus = Boolean(!isMental && focusSlug && attributes[`fighting_focus_${focusSlug}_known`]);
-    const critMax = knownFocus ? fightingRanks : 1;
+    const critMax = knownFocus ? Math.max(1, fightingRanks) : 1;
   
     // Mental attacks: the option value is the chosen skill's ranks.
     const persuasionRanks = Number(attributes.persuasion_ranks) || 0;

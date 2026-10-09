@@ -194,7 +194,7 @@
   // Shared 2d20 roll for attribute, skill and focus rolls. attributeExpr is a
   // literal rating or the packed ?{Attribute} query (see ccAttributeQuery).
   // critMax: the die value at or under which a die is a critical success (the
-  // skill's ranks with a focus, else 1).
+  // skill's ranks with a focus, at least 1; else 1).
   const runCcRoll = async ({attributes, skillLabel, focusLabel, attributeExpr, skillRanks, critMax}) => {
     const difficultyQuery = '?{Difficulty|1}';
     const complicationQuery = '?{Complication range (1-5)|1}';
