@@ -1616,7 +1616,7 @@ body .ui-dialog .tab-content .charsheet .cc-character .cc-footer {
   opacity: 0.6;
 }
 body .ui-dialog .tab-content .charsheet .cc-character .cc-build-css::after {
-  content: "CSS build: 2026-10-09 00:11:48 UTC";
+  content: "CSS build: 2026-10-09 01:03:45 UTC";
 }
 body .ui-dialog .tab-content .charsheet .cc-character .cc-languages textarea {
   min-height: 4rem;
@@ -1726,6 +1726,13 @@ body .ui-dialog .tab-content .charsheet .cc-spells .cc-spell-block {
 body .ui-dialog .tab-content .charsheet .cc-spells .cc-spell-block textarea {
   min-height: 3rem;
   width: 100%;
+}
+body .ui-dialog .tab-content .charsheet .cc-spells .cc-spell-attack-marker,
+body .ui-dialog .tab-content .charsheet .cc-spells .cc-spell-damage {
+  display: none;
+}
+body .ui-dialog .tab-content .charsheet .cc-spells .cc-spell-attack-marker:checked ~ .cc-spell-damage {
+  display: flex;
 }
 body .ui-dialog .tab-content .charsheet .cc-spells .cc-tradition-marker-runic,
 body .ui-dialog .tab-content .charsheet .cc-spells .cc-tradition-marker-oracular,
@@ -2736,7 +2743,7 @@ body {
   opacity: 0.6;
 }
 .cc-character .cc-build-css::after {
-  content: "CSS build: 2026-10-09 00:11:48 UTC";
+  content: "CSS build: 2026-10-09 01:03:45 UTC";
 }
 .cc-character .cc-languages textarea {
   min-height: 4rem;
@@ -2847,6 +2854,13 @@ body {
 .cc-spells .cc-spell-block textarea {
   min-height: 3rem;
   width: 100%;
+}
+.cc-spells .cc-spell-attack-marker,
+.cc-spells .cc-spell-damage {
+  display: none;
+}
+.cc-spells .cc-spell-attack-marker:checked ~ .cc-spell-damage {
+  display: flex;
 }
 .cc-spells .cc-tradition-marker-runic,
 .cc-spells .cc-tradition-marker-oracular,

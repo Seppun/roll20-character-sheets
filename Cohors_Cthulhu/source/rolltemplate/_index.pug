@@ -1,6 +1,6 @@
 //- rolltemplate/_index.pug
 //- Chat card for 2d20 rolls: dice, target number, successes, complications
-//- and pass/fail with Momentum generated. Weapon rolls (is_weapon) add a
+//- and pass/fail with Momentum generated. Weapon rolls and attack spells (has_damage) add a
 //- Damage section and spell rolls (is_spell) a Cost section, rolled in the
 //- same message.
 +rolltemplate('ccskill')
@@ -14,7 +14,7 @@
     .cc-roll-body
       //- Fields set by finishRoll must be referenced as computed::field, and
       //- conditionals on them use rollGreater()/rollTotal(); {{#field}} only
-      //- tests that a field exists. difficulty and is_weapon are never
+      //- tests that a field exists. difficulty and has_damage are never
       //- overridden, so they stay plain.
       .cc-roll-row
         span Dice:
@@ -61,7 +61,7 @@
     +templateConditionalDisplay('mental')
       .cc-roll-row.cc-roll-note
         span Target must be aware of the attacker and within Medium range. Resisted by Courage + Morale.
-    +templateConditionalDisplay('is_weapon')
+    +templateConditionalDisplay('has_damage')
       +rollTotal({values: 'computed::outcome 1'})
         .cc-roll-header.cc-roll-damage-header
           span.cc-roll-skill Damage

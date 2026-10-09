@@ -260,8 +260,9 @@ reason or will): base Power 2 plus that attribute's bonus, unless
 `profile.power` gives a total. `tradition` is the spellbook the `spells`
 come from: `runic`, `oracular`, `celtic`, or the NPC-only Mythos tomes
 `cthulhu`, `mormo`, `nyarlathotep` and `yog_sothoth`. Spell names must
-match `source/data/spells.json`; their skill, difficulty, cost, duration and
-category fill in on first sheet open.
+match `source/data/spells.json`; their skill, difficulty, cost, duration,
+category and (for attack spells) damage and effects fill in on first sheet
+open.
 Rituals aren't battlefield spells, so they're recorded in the NPC's notes.
 Escalation options go into the NPC Profile panel, one per line. An
 escalation weapon should also be listed in `weapons`, named with

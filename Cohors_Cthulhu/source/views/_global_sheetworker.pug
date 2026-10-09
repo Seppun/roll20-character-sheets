@@ -351,10 +351,16 @@
     (sections.repeating_spell || []).forEach((rowId) => {
       const prefix = `repeating_spell_${rowId}_`;
       const profile = book[attributes[`${prefix}name`]];
-      if (!profile || attributes[`${prefix}skill`]) { return; }
-      Object.keys(profile).forEach((field) => {
-        attributes[`${prefix}${field}`] = profile[field];
-      });
+      if (profile && !attributes[`${prefix}skill`]) {
+        Object.keys(profile).forEach((field) => {
+          attributes[`${prefix}${field}`] = profile[field];
+        });
+      }
+      // Spells filled before Damage & Effects existed.
+      if (profile && profile.damage_effects && !attributes[`${prefix}damage_effects`]) {
+        attributes[`${prefix}damage_effects`] = profile.damage_effects;
+      }
+      ccSetSpellAttackMarker(attributes, prefix);
     });
     (sections.repeating_specialrule || []).forEach((rowId) => {
       const prefix = `repeating_specialrule_${rowId}_`;

@@ -38,6 +38,13 @@ below).
   many extra damage dice to buy (0-3): each adds one Challenge Die to the
   damage for 1 Momentum, counted and paid only if the attack hits. The
   Momentum the attack itself generates can pay for them.
+- **Attack spells**: a spell with a Damage & Effects entry rolls damage
+  with its casting roll, as a weapon does: the base rating in Challenge
+  Dice, plus the effects. The prompt "Extra Momentum spent on Spell
+  Effects" (Threat for an adversary) adds 1 Challenge Die per Momentum, up
+  to 3, counted and paid only if the spell succeeds. Spell damage is the
+  listed rating, with no attribute bonus damage. The Cost is rolled and paid
+  as for any spell.
 - **Casting with a magic focus**: a spell's casting roll counts as a focus
   roll when the caster has the magic focus of the spell's skill - Academia
   (Religion), Fighting (War Magic), Medicine (Faith Healing), Observation
@@ -225,6 +232,14 @@ run `npm run build` and re-paste `Cohors_Cthulhu.html` (and
    `cost` must start with the number of Challenge Dice, followed by the cost's
    damage effects - the casting roll rolls it. `difficulty` should start with
    the number; anything after it (e.g. an opposed test) is shown as text.
+
+   An **attack spell** (category "Attack spell") also gets a
+   `"damage_effects"`, in a weapon's format: the base rating in Challenge
+   Dice, then the effects ("4, Piercing 1"). Its row shows the field, and
+   the casting roll rolls the damage like a weapon attack (see "Using the
+   sheet"). `source/data/spells.schema.json` describes every field, and
+   `npm run build` checks `spells.json` against it, stopping with the
+   spell and field named, and listing attack spells with no damage yet.
 2. **`source/views/_spells.pug`**: add the name to that tradition's Spell
    Name dropdown - the `+select` with class `.cc-spell-name-<tradition>`.
    Options are written out one by one (a known k-scaffold bug breaks

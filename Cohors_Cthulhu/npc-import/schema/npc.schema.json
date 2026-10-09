@@ -406,7 +406,7 @@
       "items": {
         "type": "string"
       },
-      "description": "Spell names from spellcasting.tradition, spelled as in source/data/spells.json. Skill, Difficulty, Cost, Duration and Category fill in when the sheet is first opened."
+      "description": "Spell names from spellcasting.tradition, spelled as in source/data/spells.json. Skill, Difficulty, Cost, Duration, Category and (attack spells) Damage & Effects fill in when the sheet is first opened."
     },
     "rituals": {
       "type": "array",

@@ -143,6 +143,9 @@
       +fieldset({name: 'spell'})
         .cc-spell-block
           .cc-field-group
+            //- Hidden: set when the spell is an attack spell (see
+            //- ccUpdateSpellAttack), which shows the Damage & Effects field.
+            +checkbox({name: 'spell attack', value: 1}).cc-spell-attack-marker
             .cc-field
               span Name
               //- One <select> per tradition, all on the same "name" attribute
@@ -309,7 +312,12 @@
               +text({name: 'duration'})
             .cc-field
               span Category
-              +text({name: 'category'})
+              +text({name: 'category', trigger: {triggeredFuncs: ['ccUpdateSpellAttack']}})
+            //- Attack spells only. Same format as a weapon's Damage &
+            //- Effects: the base rating, then effects ("4, Piercing 1").
+            .cc-field.cc-spell-damage
+              span Damage &amp; Effects
+              +text({name: 'damage effects', trigger: {triggeredFuncs: ['ccUpdateSpellAttack']}})
           //- Effect and Momentum collapse behind the eagle toggle, a styled
           //- checkbox that is a sibling of the content, so no JS is needed.
           //- Per row, so each spell collapses on its own.
@@ -334,6 +342,16 @@
         min-height: 3rem;
         width: 100%;
       }
+    }
+
+    // Damage & Effects shows for attack spells only.
+    .cc-spell-attack-marker,
+    .cc-spell-damage {
+      display: none;
+    }
+
+    .cc-spell-attack-marker:checked ~ .cc-spell-damage {
+      display: flex;
     }
 
     // Tradition markers only matter for their :checked state.
@@ -558,8 +576,27 @@
     Object.keys(profile).forEach((field) => {
       attributes[`${prefix}${field}`] = profile[field];
     });
+    // A spell without damage clears the previous spell's.
+    if (!profile.damage_effects) { attributes[`${prefix}damage_effects`] = ''; }
+    ccSetSpellAttackMarker(attributes, prefix);
   };
   k.registerFuncs({ccApplySpellPreset});
+
+  // An attack spell has "attack" in its Category, or a Damage & Effects
+  // entry; its hidden marker shows the Damage & Effects field.
+  const ccSetSpellAttackMarker = (attributes, prefix) => {
+    const isAttack = /attack/i.test(attributes[`${prefix}category`] || '') ||
+      String(attributes[`${prefix}damage_effects`] || '').trim() !== '';
+    const marker = isAttack ? 1 : 0;
+    if (Number(attributes[`${prefix}spell_attack`]) !== marker) {
+      attributes[`${prefix}spell_attack`] = marker;
+    }
+  };
+  const ccUpdateSpellAttack = ({trigger, attributes}) => {
+    const [section, rowID] = k.parseRepeatName(trigger.name);
+    ccSetSpellAttackMarker(attributes, `${section}_${rowID}_`);
+  };
+  k.registerFuncs({ccUpdateSpellAttack});
 
   // The leading number of a free-text Difficulty.
   const ccParseLeadingNumber = (text) => {
@@ -620,6 +657,12 @@
   // Casting roll: Spellcasting Attribute + the spell's Skill vs its
   // Difficulty, with the Cost rolled in the same message. The cost is paid
   // whether or not the spell succeeds.
+  //
+  // Attack spells (a Damage & Effects entry) also roll damage like a weapon:
+  // the base rating plus effects, and each Momentum (Threat for an
+  // adversary) spent on Spell Effects adds 1 Challenge Die, up to 3. The
+  // dice are always rolled, but only shown, counted and paid on a pass. A
+  // spell's damage is its listed rating: no attribute bonus damage is added.
   const initiateSpellRoll = async ({trigger, attributes}) => {
     const [section, rowID] = k.parseRepeatName(trigger.name);
     const prefix = `${section}_${rowID}_`;
@@ -642,6 +685,8 @@
     const difficultyDefault = ccParseLeadingNumber(attributes[`${prefix}difficulty`]) || 1;
     const {diceCount: costDiceCount, effects: costEffects} = ccParseSpellCost(attributes[`${prefix}cost`]);
     const costDicePerMomentum = ccSpellMomentumCostDice[spellName] || 0;
+    const {baseRating: damageRating, effects: damageEffects} = ccParseDamageEffects(attributes[`${prefix}damage_effects`]);
+    const hasDamage = damageRating > 0;
 
     // A Dabbler may raise Power from 1 to 3 for a cast, at 1 Threat per
     // Effect (natural 1) on the casting roll, so it is settled after the
@@ -652,9 +697,12 @@
     const difficultyQuery = `?{Difficulty|${difficultyDefault}}`;
     const complicationQuery = '?{Complication range (1-5)|1}';
     const bonusDiceQuery = ccBonusDiceQuery(attributes);
-    // The same query text in extra_momentum and cost_dice: Roll20 asks once
-    // and reuses the answer.
-    const extraMomentumQuery = `?{Extra ${ccPoolName(attributes)} spent|0}`;
+    // The same query text in extra_momentum, cost_dice and damage_dice:
+    // Roll20 asks once and reuses the answer. An attack spell's Extra
+    // Momentum is what it spends on its Spell Effects (damage dice).
+    const extraMomentumQuery = hasDamage ?
+      `?{Extra ${ccPoolName(attributes)} spent on Spell Effects|0}` :
+      `?{Extra ${ccPoolName(attributes)} spent|0}`;
 
     const rollString = '&{template:ccskill} ' +
       `{{character_name=@{character_name}}} ` +
@@ -677,6 +725,14 @@
       `{{auto_successes=[[0]]}} ` +
       `{{pool=${ccPoolName(attributes)}}} ` +
       `{{is_spell=1}} ` +
+      (hasDamage ?
+        `{{has_damage=1}} ` +
+        `{{extra_damage=[[0]]}} ` +
+        `{{damage_dice=[[(${damageRating}+(${extraMomentumQuery}))d6]]}} ` +
+        `{{total_damage=[[0]]}} ` +
+        `{{effect_count=[[0]]}} ` +
+        `{{damage_dice_text=[[0]]}} ` +
+        `{{effects_summary=[[0]]}} ` : '') +
       `{{cost_dice=[[(${Math.max(0, costDiceCount)}+(${extraMomentumQuery})*${costDicePerMomentum})d6]]}} ` +
       `{{cost_total=[[0]]}} ` +
       `{{cost_effect_count=[[0]]}} ` +
@@ -710,7 +766,9 @@
 
       // Momentum is only spent on a pass, so a failure pays no Extra Momentum
       // and doesn't count Scrying's extra Cost dice.
-      const momentumSpent = passed ? extraMomentum : 0;
+      // An attack spell pays only for the damage dice it can add (3).
+      const extraDamageDice = hasDamage && passed ? Math.min(3, Math.max(0, extraMomentum)) : 0;
+      const momentumSpent = hasDamage ? extraDamageDice : (passed ? extraMomentum : 0);
       const rawCostDice = ccRollDice(roll.results.cost_dice);
       const countedCostDice = passed ? rawCostDice : rawCostDice.slice(0, Math.max(0, costDiceCount));
 
@@ -723,6 +781,14 @@
         'No Effects triggered';
       // Threat from the Cost's Effects is the GM's gain, so an adversary's
       // spell generates none.
+      const damageDice = hasDamage ?
+        ccRollDice(roll.results.damage_dice).slice(0, damageRating + extraDamageDice).map(ccChallengeDieFromD6) : [];
+      const damageEffectCount = damageDice.filter((c) => c.effect).length;
+      const totalDamage = damageDice.reduce((sum, c) => sum + c.pips, 0) +
+        damageEffectCount * ccViciousBonus(damageEffects);
+      const damageEffectsSummary = damageEffectCount > 0 ?
+        `${damageEffectCount}x Effect${damageEffects.length ? ` - ${damageEffects.join(', ')}` : ''}` :
+        'No Effects triggered';
       const costThreatGenerated = ccIsAdversary(attributes) ? 0 :
         effectCount * (ccSpellCostThreatPerEffect[spellName] || 0);
 
@@ -754,6 +820,13 @@
         cost_threat_generated: costThreatGenerated,
         cost_dice_text: converted.map((c) => c.symbol).join(' '),
         cost_effects_summary: effectsSummary,
+        ...(hasDamage ? {
+          extra_damage: extraDamageDice,
+          total_damage: totalDamage,
+          effect_count: damageEffectCount,
+          damage_dice_text: damageDice.map((c) => c.symbol).join(' '),
+          effects_summary: damageEffectsSummary,
+        } : {}),
       });
     } catch (err) {
       finishRoll(roll.rollId, {
@@ -766,6 +839,12 @@
         cost_effect_count: '?',
         cost_dice_text: `error: ${err.message}`,
         cost_effects_summary: '',
+        ...(hasDamage ? {
+          total_damage: '?',
+          effect_count: '?',
+          damage_dice_text: `error: ${err.message}`,
+          effects_summary: '',
+        } : {}),
       });
     }
   };
