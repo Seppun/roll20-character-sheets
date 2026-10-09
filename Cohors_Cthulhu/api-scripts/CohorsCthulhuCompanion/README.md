@@ -1,6 +1,6 @@
 # Cohors Cthulhu Companion
 
-Version 1.0.0 (2026-10-08), by Han Vanholder.
+Version 1.0.0 (2026-10-09), by Han Vanholder.
 
 `CohorsCthulhuCompanion.js` is an optional companion Mod (API script) for
 the Cohors Cthulhu character sheet. The sheet works without it; the script
@@ -43,6 +43,8 @@ change:
 | `momentumLabel`, `threatLabel` | `Momentum Pool`, `Threat Pool` | The pools' names in chat and the Turn Order, and the names of the tokens that show them |
 | `tokenImagesFolder` | `Token Images` | Journal folder the NPC import takes token images from |
 | `tokenLibraryPage` | `Token Library` | Page whose named tokens the NPC import can use |
+| `tokenMap` | `{}` | NPC name -> token image URL, looked up first (see "Tokens") |
+| `tokenMapHandout` | `Token Map` | Handout whose GM Notes hold more of the token map, as JSON |
 
 Everything the script keeps between sessions is in
 `state.CohorsCthulhuCompanion`.
@@ -143,19 +145,42 @@ If the game has a token image with the NPC's name (or the name in the
 JSON's `token` field), the import also sets the NPC's default token and
 avatar. It looks for the image, in order:
 
-1. in the Journal, in a folder named **Token Images** (see CONFIG) with a
+1. in the **token map**: stat block names and the URLs of their token
+   images, as a JSON object, in CONFIG's `tokenMap` or in the GM Notes of a
+   handout named **Token Map** (the handout adds to and overrides CONFIG):
+
+   ```json
+   {
+     "Deep_One_Shaman": "https://files.d20.io/images/.../max.webp?123",
+     "Roman_Centurion": "https://files.d20.io/images/.../max.webp?456"
+   }
+   ```
+
+   A name matches ignoring case, accents and extra spaces, and an underscore
+   matches a space, so `Deep_One_Shaman` is found for "Deep One Shaman". A
+   name ending in a note in brackets is also tried without it ("Sacerdos
+   (Priest)" finds `Sacerdos`). The URLs must be images uploaded to Roll20
+   (`files.d20.io`); any size works, the import uses the thumbnail. An image's
+   URL is in its context menu in the Art Library, or in a token's image
+   settings;
+2. in the Journal, in a folder named **Token Images** (see CONFIG) with a
    folder per token holding handouts that use the image as their avatar.
    This is ModifyTokenImage's layout, so its folders work as they are; you
    can also make them by hand. `size: 2` in such a handout's GM Notes makes
    the token 2 by 2 squares;
-2. among named tokens on a page called **Token Library** (see CONFIG);
-3. among custom token markers (uploading a folder of PNGs as a marker set
+3. among named tokens on a page called **Token Library** (see CONFIG);
+4. among custom token markers (uploading a folder of PNGs as a marker set
    names each image after its file).
 
 | Command (GM only) | Effect |
 | --- | --- |
-| `!ccimport tokens` | List the token images the import can find |
+| `!ccimport tokens` | List the token images the import can find, the token map's names first |
 | `!ccimport token\|<Character Name>[\|<Token Name>]` | Give an existing character its token |
+
+When no image is found, the import card says so and lists the names it
+looked for (with debug logging on, the API console also shows each lookup).
+Add the missing name to the token map, or give the NPC's JSON a `token`
+name that is in it.
 
 See the Token section of [`npc-import/FORMAT.md`](https://github.com/Roll20/roll20-character-sheets/tree/master/Cohors_Cthulhu/npc-import/FORMAT.md) for
 the JSON side.
@@ -190,7 +215,7 @@ on('ready', () => {
 
 ## Changelog
 
-- **1.0.0** (2026-10-08): first release.
+- **1.0.0** (2026-10-09): first release.
 
 ## License
 

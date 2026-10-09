@@ -3,7 +3,7 @@
 // character sheet (Roll20).
 //
 // Version:      1.0.0
-// Last updated: 2026-10-08
+// Last updated: 2026-10-09
 // Author:       Han Vanholder
 // Docs:         README.md in this script's folder; !cchelp in game
 //
@@ -37,7 +37,7 @@
 // The script's one global.
 var CohorsCthulhuCompanion = CohorsCthulhuCompanion || {}; // eslint-disable-line no-var
 CohorsCthulhuCompanion.version = '1.0.0';
-CohorsCthulhuCompanion.lastUpdated = '2026-10-08';
+CohorsCthulhuCompanion.lastUpdated = '2026-10-09';
 CohorsCthulhuCompanion.importHooks = CohorsCthulhuCompanion.importHooks || [];
 
 on('ready', () => {
@@ -57,6 +57,12 @@ on('ready', () => {
     // ModifyTokenImage makes them) and a page holding named tokens.
     tokenImagesFolder: 'Token Images',
     tokenLibraryPage: 'Token Library',
+    // NPC name -> token image URL (an image uploaded to Roll20), looked up
+    // before the folder, page and token markers. Underscores in a name match
+    // spaces. A handout with this name, holding the same JSON in its GM Notes
+    // (or Notes), adds to and overrides tokenMap.
+    tokenMap: {},
+    tokenMapHandout: 'Token Map',
   };
 
   // ===========================================================================
@@ -636,10 +642,12 @@ on('ready', () => {
   // A card whispered to the caller lists every NPC created and any warnings.
   //
   // TOKENS: each NPC gets a default token and avatar when an image with its
-  // name (or its JSON "token" name) is found: in ModifyTokenImage's Journal
-  // folders ("Token Images" > <token name> > handouts with the image as
-  // avatar), as a named token on a page called "Token Library", or as a
-  // custom token marker (the folder and page names are in CONFIG).
+  // name (or its JSON "token" name) is found: in the token map (CONFIG
+  // tokenMap and the "Token Map" handout: name -> image URL), in
+  // ModifyTokenImage's Journal folders ("Token Images" > <token name> >
+  // handouts with the image as avatar), as a named token on a page called
+  // "Token Library", or as a custom token marker (the names are in CONFIG).
+  // When none is found, the import card says which names it looked for.
   // !ccimport tokens lists the names found;
   // !ccimport token|<Character Name>[|<Token Name>] sets one for an existing
   // character.
@@ -839,6 +847,55 @@ on('ready', () => {
     // Lower case without spaces, for matching the Token Library page.
     const squash = (text) => String(text || '').toLowerCase().replace(/\s+/g, '');
 
+    // A token map name or NPC name as a lookup key: case, accents and extra
+    // spaces ignored, and an underscore matches a space ("Deep_One_Shaman" is
+    // "Deep One Shaman").
+    const tokenMapKey = (name) => String(name || '').normalize('NFD').replace(/[̀-ͯ]/g, '')
+      .replace(/_/g, ' ').replace(/\s+/g, ' ').trim().toLowerCase();
+
+    // The names to look up for a token: each name as given, then without a
+    // trailing "(...)" note ("Sacerdos (Priest)" also tries "Sacerdos").
+    const tokenMapCandidates = (names) => [...new Set(names.filter(Boolean).flatMap((name) => {
+      const text = String(name).trim();
+      return [text, text.replace(/\s*\([^()]*\)\s*$/, '')];
+    }).filter(Boolean))];
+
+    const readNotes = (handout, field) => new Promise((resolve) => {
+      handout.get(field, (notes) => resolve(notes || ''));
+    });
+
+    // CONFIG.tokenMap plus the "Token Map" handout's JSON (GM Notes, or Notes
+    // if those are empty), as a Map from tokenMapKey to {name, url, source}.
+    // Problems are logged and the rest of the map still loads.
+    const loadTokenMap = async () => {
+      const map = new Map();
+      const add = (object, source) => {
+        if (!object || typeof object !== 'object' || Array.isArray(object)) {
+          log(`[CCImport] token map from ${source} isn't a JSON object of "Name": "URL" pairs - ignored`);
+          return;
+        }
+        Object.keys(object).forEach((name) => {
+          const value = object[name];
+          const url = typeof value === 'string' ? value : (value && value.url);
+          if (!url) { return; }
+          map.set(tokenMapKey(name), Object.assign({name, url: String(url).trim(), source},
+            value && Number(value.size) > 0 ? {width: Number(value.size), height: Number(value.size)} : {}));
+        });
+      };
+      add(CONFIG.tokenMap || {}, 'CONFIG.tokenMap');
+      const handout = findObjs({_type: 'handout', name: CONFIG.tokenMapHandout})[0];
+      if (handout) {
+        const text = stripHtmlNotes(await readNotes(handout, 'gmnotes')) || stripHtmlNotes(await readNotes(handout, 'notes'));
+        try {
+          add(text ? JSON.parse(text) : {}, `handout "${CONFIG.tokenMapHandout}"`);
+        } catch (err) {
+          log(`[CCImport] token map handout "${CONFIG.tokenMapHandout}": JSON parse failed (${err.message}) - ignored`);
+        }
+      }
+      debug(`token map: ${map.size} names`);
+      return map;
+    };
+
     const loadTokenLibrary = async () => {
       const entries = await journalTokenEntries();
       findObjs({_type: 'page'})
@@ -864,6 +921,9 @@ on('ready', () => {
       return entries;
     };
 
+    // Everything setupToken looks in: {map, library}.
+    const loadTokens = async () => ({map: await loadTokenMap(), library: await loadTokenLibrary()});
+
     // The requested variant, else an unsuffixed or "standard" one, else any.
     const findTokenImage = (library, wanted, variant) => {
       const {key} = parseTokenName(wanted);
@@ -883,18 +943,37 @@ on('ready', () => {
 
     // Gives a character its default token and avatar. spec is the JSON
     // "token": a name, or {name, variant, image, size}; false skips it.
+    // tokens is loadTokens()'s result. Looks in the token map first (the JSON
+    // token name, then the NPC's name), then the other token images.
     // Returns a short description for the import card, or null; problems go
     // into warnings.
-    const setupToken = (character, spec, details, warnings, library) => {
+    const setupToken = (character, spec, details, warnings, tokens) => {
       if (spec === false) { return null; }
       const opts = typeof spec === 'string' ? {name: spec} : (spec && typeof spec === 'object' ? spec : {});
       const wanted = opts.name || details.name;
+      const lookFor = tokenMapCandidates([opts.name, details.name]);
+      const fromMap = () => {
+        for (const name of lookFor) {
+          const entry = tokens.map.get(tokenMapKey(name));
+          debug(`token: token map ${entry ? `has "${entry.name}" for` : 'has nothing for'} "${name}"`);
+          if (entry) { return entry; }
+        }
+        return null;
+      };
+      const fromLibrary = () => {
+        for (const name of lookFor) {
+          const entry = findTokenImage(tokens.library, name, opts.variant || 'standard');
+          if (entry) { return entry; }
+        }
+        return null;
+      };
       const found = opts.image ?
         {url: opts.image, name: wanted, source: 'JSON image'} :
-        findTokenImage(library, wanted, opts.variant || 'standard');
+        fromMap() || fromLibrary();
       if (!found) {
-        debug(`token: nothing named "${wanted}"`);
-        if (spec) { warnings.push(`no token image named "${wanted}" (see !ccimport tokens)`); }
+        const names = lookFor.map((name) => `"${name}"`).join(', ');
+        debug(`token: nothing found for ${names} (token map: ${tokens.map.size} names, other token images: ${tokens.library.length})`);
+        warnings.push(`no token found - looked for ${names} in the token map and token images (see !ccimport tokens)`);
         return null;
       }
       const imgsrc = thumbUrl(found.url);
@@ -948,7 +1027,7 @@ on('ready', () => {
     // Builds one character from one NPC object. Returns {name, warnings,
     // notes}; problems become warnings, not errors, since a partial import
     // beats none.
-    const importNpc = (npc, library) => {
+    const importNpc = (npc, tokens) => {
       const warnings = [];
       if (!npc || typeof npc !== 'object' || Array.isArray(npc)) {
         return {name: '(invalid entry)', warnings: ['not a JSON object - skipped entirely']};
@@ -1128,7 +1207,7 @@ on('ready', () => {
         stress: Number(npc.stress) || 0,
         stressMax: Math.max(0, stressMaxBase - fatigue),
         injuryLimit,
-      }, warnings, library);
+      }, warnings, tokens);
 
       // Token actions and other scripts' hooks (API-made rows don't fire the
       // attribute events).
@@ -1208,10 +1287,10 @@ on('ready', () => {
       }
       // One NPC failing mustn't hide the others' results, and a crash should
       // be reported.
-      const library = await loadTokenLibrary();
+      const tokens = await loadTokens();
       announceResults(who, npcs.map((npc) => {
         try {
-          return importNpc(npc, library);
+          return importNpc(npc, tokens);
         } catch (err) {
           log(`[CCImport] import of "${npc && npc.name}" failed: ${err.stack || err.message}`);
           return {name: (npc && npc.name) || '(unnamed)', warnings: [`IMPORT FAILED part-way (${err.message}) - delete this character and report the error`]};
@@ -1239,10 +1318,12 @@ on('ready', () => {
 
       // Lists the token names the import can use.
       if (rest === 'tokens') {
-        loadTokenLibrary().then((library) => {
+        loadTokens().then(({map, library}) => {
           const where = (e) => (e.source === 'token marker' ? '' : e.source.startsWith('page') ? ' (page)' : ' (folder)');
+          const mapped = [...map.values()].map((e) => e.name.replace(/_/g, ' ')).sort();
           const names = [...new Set(library.map((e) => `${e.name}${where(e)}`))].sort();
-          sendChat('CCImport', `/w "${whisperTo(msg.who)}" &{template:default} {{name=Token images (${names.length})}} ` +
+          sendChat('CCImport', `/w "${whisperTo(msg.who)}" &{template:default} {{name=Token images (${mapped.length + names.length})}} ` +
+            `{{Token map=${mapped.length ? mapped.join(', ') : `none - CONFIG.tokenMap, or a handout "${CONFIG.tokenMapHandout}" with "Name": "URL" JSON in its GM Notes`}}} ` +
             `{{Found=${names.length ? names.join(', ') : `none - add a Journal folder "${CONFIG.tokenImagesFolder}" with a folder per token (as for ModifyTokenImage), a page named "${CONFIG.tokenLibraryPage}" with named tokens, or a custom token marker set`}}}`);
         });
         return;
@@ -1261,7 +1342,7 @@ on('ready', () => {
           return obj ? obj.get('current') : '';
         };
         const warnings = [];
-        loadTokenLibrary().then((library) => {
+        loadTokens().then((tokens) => {
           const note = setupToken(character, tokenName || charName, {
             name: character.get('name'),
             npcType: attr('character_type'),
@@ -1269,7 +1350,7 @@ on('ready', () => {
             stress: Number(attr('stress')) || 0,
             stressMax: Number(attr('stress_max')) || 0,
             injuryLimit: Number(attr('injury_limit')) || 0,
-          }, warnings, library);
+          }, warnings, tokens);
           sendChat('CCImport', `/w "${whisperTo(msg.who)}" ${charName}: ${note || 'token not set'}${warnings.length ? ` (${warnings.join('; ')})` : ''}`);
         });
         return;

@@ -59,25 +59,32 @@ It can be switched on the sheet at any time.
 ```
 
 The import gives the NPC a default token and avatar when it finds an image
-with this name in the game, looking in three places, in this order:
+with this name (then the NPC's own name) in the game, looking in four
+places, in this order:
 
-1. **ModifyTokenImage's Journal folders**, if you use that Mod: a Journal
+1. **The Companion script's token map**: a JSON object of stat block names
+   and Roll20 image URLs, in the script's CONFIG (`tokenMap`) or a handout
+   named `Token Map` (see the script's README). Case, accents and extra
+   spaces are ignored, an underscore matches a space, and a name ending in a
+   note in brackets is also tried without it.
+2. **ModifyTokenImage's Journal folders**, if you use that Mod: a Journal
    folder named `Token Images`, with a folder per token (named like the
    token) holding handouts whose avatar is the image. A handout whose name
    ends in `light` (or `standard`) is that variant; `size: 2` (or
    `width:`/`height:`) in a handout's GM Notes sets the token size, as for
    ModifyTokenImage. The import doesn't need ModifyTokenImage installed, but
    its `--next`/`--set` commands work on tokens named like their folder.
-2. **Named tokens on a page called "Token Library".** Drag each image there
+3. **Named tokens on a page called "Token Library".** Drag each image there
    and give the token its name (token settings).
-3. **A custom token marker set** (Game Settings > Token Marker Library >
+4. **A custom token marker set** (Game Settings > Token Marker Library >
    Create Set > Add Images). Marker names come from the file names, so
    uploading the whole token folder names every image at once.
 
-Names match ignoring case, accents, punctuation, the file extension and a
+In places 2-4, names match ignoring case, accents, punctuation, the file extension and a
 trailing `standard`/`light`, so `Deep_One_Shaman_light.png` matches
 `"Deep One Shaman"` with `"variant": "light"`. Without `token`, the NPC's
-own name is looked up, and nothing happens if there's no match. `size` is in
+own name is looked up. If nothing matches, the import card lists the names
+it looked for. `size` is in
 grid squares (default 1, or the folder handout's size). `image` takes a Roll20 image URL directly instead
 of a lookup, and `"token": false` skips the token.
 
