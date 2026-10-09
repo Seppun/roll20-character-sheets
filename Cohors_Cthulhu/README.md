@@ -39,10 +39,10 @@ below).
   damage for 1 Momentum, counted and paid only if the attack hits. The
   Momentum the attack itself generates can pay for them.
 - **Spells**: choosing a spell fills in its mechanics and clears whatever
-  the row held for the previous spell, typed text included. The round "i"
-  button under a spell's fields shows its Effect and Momentum text: maroon
-  while open, light while closed (closed by default; printing always
-  shows them).
+  the row held for the previous spell, typed text included. The "i" icon
+  button beside a spell's fields folds its Effect and Momentum text in
+  and out: maroon and open by default, light when folded in (printing
+  always shows the text).
 - **Attack spells**: a spell with a Damage & Effects entry rolls damage
   with its casting roll, as a weapon does: the base rating in Challenge
   Dice, plus the effects. The prompt "Extra Momentum spent on Spell

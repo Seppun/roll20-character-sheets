@@ -318,13 +318,14 @@
             .cc-field.cc-spell-damage
               span Damage &amp; Effects
               +text({name: 'damage effects', trigger: {triggeredFuncs: ['ccUpdateSpellAttack']}})
-          //- Effect and Momentum show behind the info button. Its click
-          //- flips two hidden radio markers (ccToggleSpellInfo), which CSS
-          //- reads as siblings, so the button and the text follow the state:
-          //- open = maroon button, text shown; closed (default) = light
-          //- button, text hidden. Per row, so each spell opens on its own.
-          +radio({name: 'effect open', value: 'closed', checked: ''}).cc-spell-info-closed
-          +radio({name: 'effect open', value: 'open'}).cc-spell-info-open
+          //- Effect and Momentum fold behind the info button (the Pictos
+          //- "i"). Its click flips two hidden radio markers
+          //- (ccToggleSpellInfo), which CSS reads as siblings, so the button
+          //- and the text follow the state: open (default) = maroon button,
+          //- text shown; pressed = folded in, light button, text hidden. Per
+          //- row, so each spell folds on its own.
+          +radio({name: 'effect open', value: 'open', checked: ''}).cc-spell-info-open
+          +radio({name: 'effect open', value: 'closed'}).cc-spell-info-closed
           +action({
             name: 'effect toggle',
             class: 'cc-spell-info-toggle',
@@ -487,9 +488,9 @@
       }
     }
 
-    // Info button: the circled-i icon (U+24D8) drawn from the font. Closed =
-    // light, Effect and Momentum hidden; open = solid maroon, shown. The
-    // hidden radio markers carry the state.
+    // Info button: the Pictos "i" icon (a font Roll20 provides). Open
+    // (default) = maroon, Effect and Momentum shown; folded in = light, text
+    // hidden. The hidden radio markers carry the state.
     .cc-spell-info-closed,
     .cc-spell-info-open {
       display: none;
@@ -501,13 +502,16 @@
       padding: 0;
       background: none;
       border: none;
-      color: var(--cc-rule-soft);
+      color: var(--cc-banner);
       cursor: pointer;
       font-size: 1.3rem;
       line-height: 1;
 
       &:before {
-        content: '\24D8';
+        content: 'i';
+        font-family: pictos;
+        font-style: normal;
+        font-weight: normal;
       }
 
       &:hover {
@@ -515,16 +519,12 @@
       }
     }
 
-    .cc-spell-info-open:checked ~ .cc-spell-info-toggle {
-      color: var(--cc-banner);
+    .cc-spell-info-closed:checked ~ .cc-spell-info-toggle {
+      color: var(--cc-rule-soft);
     }
 
-    .cc-spell-collapse-content {
+    .cc-spell-info-closed:checked ~ .cc-spell-collapse-content {
       display: none;
-    }
-
-    .cc-spell-info-open:checked ~ .cc-spell-collapse-content {
-      display: block;
     }
 
     .cc-spell-textarea {
@@ -616,11 +616,12 @@
   };
   k.registerFuncs({ccUpdateSpellAttack});
 
-  // The info button: flips the row's open/closed marker.
+  // The info button: folds the row's Effect and Momentum in or out (open by
+  // default).
   const ccToggleSpellInfo = ({trigger, attributes}) => {
     const [section, rowID] = k.parseRepeatName(trigger.name);
     const key = `${section}_${rowID}_effect_open`;
-    attributes[key] = attributes[key] === 'open' ? 'closed' : 'open';
+    attributes[key] = attributes[key] === 'closed' ? 'open' : 'closed';
   };
   k.registerFuncs({ccToggleSpellInfo});
 

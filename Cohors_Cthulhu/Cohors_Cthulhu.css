@@ -1626,7 +1626,7 @@ body .ui-dialog .tab-content .charsheet .cc-character .cc-footer {
   opacity: 0.6;
 }
 body .ui-dialog .tab-content .charsheet .cc-character .cc-build-css::after {
-  content: "CSS build: 2026-10-09 02:44:21 UTC";
+  content: "CSS build: 2026-10-09 02:46:39 UTC";
 }
 body .ui-dialog .tab-content .charsheet .cc-character .cc-languages textarea {
   min-height: 4rem;
@@ -1843,25 +1843,25 @@ body .ui-dialog .tab-content .charsheet .cc-spells .cc-spell-info-toggle {
   padding: 0;
   background: none;
   border: none;
-  color: var(--cc-rule-soft);
+  color: var(--cc-banner);
   cursor: pointer;
   font-size: 1.3rem;
   line-height: 1;
 }
 body .ui-dialog .tab-content .charsheet .cc-spells .cc-spell-info-toggle:before {
-  content: "ⓘ";
+  content: "i";
+  font-family: pictos;
+  font-style: normal;
+  font-weight: normal;
 }
 body .ui-dialog .tab-content .charsheet .cc-spells .cc-spell-info-toggle:hover {
   color: var(--cc-rule);
 }
-body .ui-dialog .tab-content .charsheet .cc-spells .cc-spell-info-open:checked ~ .cc-spell-info-toggle {
-  color: var(--cc-banner);
+body .ui-dialog .tab-content .charsheet .cc-spells .cc-spell-info-closed:checked ~ .cc-spell-info-toggle {
+  color: var(--cc-rule-soft);
 }
-body .ui-dialog .tab-content .charsheet .cc-spells .cc-spell-collapse-content {
+body .ui-dialog .tab-content .charsheet .cc-spells .cc-spell-info-closed:checked ~ .cc-spell-collapse-content {
   display: none;
-}
-body .ui-dialog .tab-content .charsheet .cc-spells .cc-spell-info-open:checked ~ .cc-spell-collapse-content {
-  display: block;
 }
 body .ui-dialog .tab-content .charsheet .cc-spells .cc-spell-textarea {
   font-size: 12px;
@@ -2790,7 +2790,7 @@ body {
   opacity: 0.6;
 }
 .cc-character .cc-build-css::after {
-  content: "CSS build: 2026-10-09 02:44:21 UTC";
+  content: "CSS build: 2026-10-09 02:46:39 UTC";
 }
 .cc-character .cc-languages textarea {
   min-height: 4rem;
@@ -3008,25 +3008,25 @@ body {
   padding: 0;
   background: none;
   border: none;
-  color: var(--cc-rule-soft);
+  color: var(--cc-banner);
   cursor: pointer;
   font-size: 1.3rem;
   line-height: 1;
 }
 .cc-spells .cc-spell-info-toggle:before {
-  content: "ⓘ";
+  content: "i";
+  font-family: pictos;
+  font-style: normal;
+  font-weight: normal;
 }
 .cc-spells .cc-spell-info-toggle:hover {
   color: var(--cc-rule);
 }
-.cc-spells .cc-spell-info-open:checked ~ .cc-spell-info-toggle {
-  color: var(--cc-banner);
+.cc-spells .cc-spell-info-closed:checked ~ .cc-spell-info-toggle {
+  color: var(--cc-rule-soft);
 }
-.cc-spells .cc-spell-collapse-content {
+.cc-spells .cc-spell-info-closed:checked ~ .cc-spell-collapse-content {
   display: none;
-}
-.cc-spells .cc-spell-info-open:checked ~ .cc-spell-collapse-content {
-  display: block;
 }
 .cc-spells .cc-spell-textarea {
   font-size: 12px;
