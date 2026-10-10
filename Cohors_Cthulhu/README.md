@@ -77,6 +77,11 @@ below).
   boxes are greyed out and disabled once Fatigue reaches that limit.
   "Max" shows the character's raw Stress capacity; "Current Max" shows
   that same number reduced by current Fatigue.
+- **Resist Fatigue**: the Resist button rolls the higher of Brawn or Will
+  plus Resilience. A success removes 1 Fatigue, plus 1 per Momentum spent
+  (the roll asks), and updates the Fatigue track and Current Max itself.
+  Ignore Fatigue, next to it, keeps Fatigue from lowering Current Max
+  without clearing the track.
 - **Identity**: Culture, Caste and Archetype are dropdowns, and the
   Specialization dropdown offers the two specializations of the chosen
   archetype.

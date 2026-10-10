@@ -59,7 +59,14 @@
             value,
             trigger: {calculation: 'calcStressMaxBase'}
           }).cc-fatigue-max-marker
-      .cc-field.cc-fatigue-ignore
+      //- Resist, with the smaller Ignore Fatigue toggle on the same row.
+      .cc-fatigue-actions
+        +roller({
+          name: 'fatigue resist',
+          class: 'cc-fatigue-resist',
+          trigger: {triggeredFuncs: ['initiateFatigueResistRoll']}
+        })
+          | Resist
         //- Ignore Fatigue: stops Fatigue reducing Max Stress without clearing
         //- it. A hidden checkbox whose label is styled as a sticky push-
         //- button.
@@ -72,12 +79,6 @@
         label.cc-fatigue-ignore-toggle(for='cc-fatigue-ignored')
           span.cc-fatigue-ignore-off Ignore Fatigue
           span.cc-fatigue-ignore-on Fatigue Ignored
-      +roller({
-        name: 'fatigue resist',
-        class: 'cc-fatigue-resist',
-        trigger: {triggeredFuncs: ['initiateFatigueResistRoll'], affects: ['stress_max', 'stress_max_marker']}
-      })
-        | Resist
   .cc-vitals-courage-armor
     .cc-field
       .cc-banner Courage
@@ -254,7 +255,10 @@
       }
     }
 
-    .cc-fatigue-ignore {
+    .cc-fatigue-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
       margin-top: 0.3rem;
     }
 
@@ -276,8 +280,8 @@
       color: var(--cc-ink);
       border: 1px solid var(--cc-rule);
       border-radius: 4px;
-      padding: 0.15rem 0.5rem;
-      font-size: 0.7rem;
+      padding: 0.05rem 0.35rem;
+      font-size: 0.55rem;
       text-transform: uppercase;
       letter-spacing: 0.03em;
       cursor: pointer;
@@ -312,7 +316,6 @@
       border: 1px solid var(--cc-rule);
       border-radius: 4px;
       padding: 0.15rem 0.5rem;
-      margin-top: 0.3rem;
       font-family: var(--cc-body-font);
       font-weight: bold;
       font-size: 0.7rem;
@@ -426,6 +429,10 @@
   // Fatigue resist: difficulty 1, the higher of Brawn or Will + Resilience. A
   // pass removes 1 fatigue, plus 1 per Momentum spent. The Momentum is a
   // query, charged like a spell's Extra Momentum and only applied on a pass.
+  //
+  // k-scaffold saves the sheet when this function returns its promise, before
+  // the roll comes back, so the new Fatigue and the Current Max it changes
+  // are saved here with attributes.set().
   const initiateFatigueResistRoll = async ({attributes}) => {
     const brawnRating = Number(attributes.brawn_rating) || 0;
     const willRating = Number(attributes.will_rating) || 0;
@@ -480,8 +487,11 @@
       // Remove fatigue on a pass, floored at 0.
       const momentumSpent = passed ? extraMomentum : 0;
       const fatigueRemoved = passed ? 1 + momentumSpent : 0;
-      if (fatigueRemoved > 0) {
-        attributes.fatigue = Math.max(0, (Number(attributes.fatigue) || 0) - fatigueRemoved);
+      const fatigueBefore = Number(attributes.fatigue) || 0;
+      if (fatigueRemoved > 0 && fatigueBefore > 0) {
+        attributes.fatigue = Math.max(0, fatigueBefore - fatigueRemoved);
+        attributes.queue.push('stress_max', 'stress_max_marker');
+        attributes.set();
       }
 
       // ccSettleRoll is in views/_global_sheetworker.pug.

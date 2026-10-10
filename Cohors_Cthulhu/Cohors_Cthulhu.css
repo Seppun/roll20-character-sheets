@@ -1626,7 +1626,7 @@ body .ui-dialog .tab-content .charsheet .cc-character .cc-footer {
   opacity: 0.6;
 }
 body .ui-dialog .tab-content .charsheet .cc-character .cc-build-css::after {
-  content: "CSS build: 2026-10-10 04:40:03 UTC";
+  content: "CSS build: 2026-10-10 15:18:54 UTC";
 }
 body .ui-dialog .tab-content .charsheet .cc-character .cc-languages textarea {
   min-height: 4rem;
@@ -2093,7 +2093,10 @@ body .ui-dialog .tab-content .charsheet .cc-character .cc-fatigue-track .cc-fati
 body .ui-dialog .tab-content .charsheet .cc-character .cc-fatigue-track .cc-fatigue-max-marker:checked ~ .cc-track-box-extra {
   display: none;
 }
-body .ui-dialog .tab-content .charsheet .cc-character .cc-fatigue-ignore {
+body .ui-dialog .tab-content .charsheet .cc-character .cc-fatigue-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
   margin-top: 0.3rem;
 }
 body .ui-dialog .tab-content .charsheet .cc-character .cc-fatigue-ignore-checkbox {
@@ -2109,8 +2112,8 @@ body .ui-dialog .tab-content .charsheet .cc-character .cc-fatigue-ignore-toggle 
   color: var(--cc-ink);
   border: 1px solid var(--cc-rule);
   border-radius: 4px;
-  padding: 0.15rem 0.5rem;
-  font-size: 0.7rem;
+  padding: 0.05rem 0.35rem;
+  font-size: 0.55rem;
   text-transform: uppercase;
   letter-spacing: 0.03em;
   cursor: pointer;
@@ -2139,7 +2142,6 @@ body .ui-dialog .tab-content .charsheet .cc-character .cc-fatigue-resist {
   border: 1px solid var(--cc-rule);
   border-radius: 4px;
   padding: 0.15rem 0.5rem;
-  margin-top: 0.3rem;
   font-family: var(--cc-body-font);
   font-weight: bold;
   font-size: 0.7rem;
@@ -2790,7 +2792,7 @@ body {
   opacity: 0.6;
 }
 .cc-character .cc-build-css::after {
-  content: "CSS build: 2026-10-10 04:40:03 UTC";
+  content: "CSS build: 2026-10-10 15:18:54 UTC";
 }
 .cc-character .cc-languages textarea {
   min-height: 4rem;
@@ -3262,7 +3264,10 @@ body {
 .cc-character .cc-fatigue-track .cc-fatigue-max-marker:checked ~ .cc-track-box-extra {
   display: none;
 }
-.cc-character .cc-fatigue-ignore {
+.cc-character .cc-fatigue-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
   margin-top: 0.3rem;
 }
 .cc-character .cc-fatigue-ignore-checkbox {
@@ -3278,8 +3283,8 @@ body {
   color: var(--cc-ink);
   border: 1px solid var(--cc-rule);
   border-radius: 4px;
-  padding: 0.15rem 0.5rem;
-  font-size: 0.7rem;
+  padding: 0.05rem 0.35rem;
+  font-size: 0.55rem;
   text-transform: uppercase;
   letter-spacing: 0.03em;
   cursor: pointer;
@@ -3308,7 +3313,6 @@ body {
   border: 1px solid var(--cc-rule);
   border-radius: 4px;
   padding: 0.15rem 0.5rem;
-  margin-top: 0.3rem;
   font-family: var(--cc-body-font);
   font-weight: bold;
   font-size: 0.7rem;
