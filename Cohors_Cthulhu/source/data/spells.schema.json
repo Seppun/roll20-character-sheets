@@ -39,7 +39,7 @@
           "type": "string"
         },
         "damage_effects": {
-          "description": "Attack spells: the damage the spell does, in the format of a weapon's Damage & Effects: the base rating in Challenge Dice, then the damage effects, comma-separated (\"4, Piercing 1\"; \"3, Vicious 2\"). The casting roll rolls it with the casting roll, like a weapon's damage; each Momentum spent on Spell Effects adds a die, up to 3. Leave it out for spells that do no damage.",
+          "description": "Attack spells: the damage the spell does, in the format of a weapon's Damage & Effects: the base rating in Challenge Dice, then the damage effects, comma-separated (\"2, Piercing 1\"; \"2, Stun\"). The casting roll rolls the caster's Power plus this rating in Challenge Dice, like a weapon's damage; each Momentum spent on Spell Effects adds a die, up to 3. Leave it out for spells that do no damage.",
           "type": "string",
           "pattern": "^\\d+(\\s*,\\s*[^,\\s][^,]*)*$"
         }

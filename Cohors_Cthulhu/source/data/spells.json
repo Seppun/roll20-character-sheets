@@ -19,14 +19,16 @@
       "difficulty": "2",
       "cost": "5 Drain",
       "duration": "Instant",
-      "category": "Attack spell"
+      "category": "Attack spell",
+      "damage_effects": "2, Stun"
     },
     "Hammer of Thunraz": {
       "skill": "Fighting",
       "difficulty": "2",
       "cost": "4 Drain, Piercing 1",
       "duration": "Instant",
-      "category": "Attack spell"
+      "category": "Attack spell",
+      "damage_effects": "2, Area"
     },
     "Ravens of Wodan": {
       "skill": "Academia",
@@ -114,7 +116,8 @@
       "difficulty": "2 (target opposes with Will + Resilience)",
       "cost": "5 Drain, Stun",
       "duration": "Instant",
-      "category": "Attack spell"
+      "category": "Attack spell",
+      "damage_effects": "2, Intense"
     },
     "Gift of Arduinna": {
       "skill": "Survival",
@@ -135,7 +138,8 @@
       "difficulty": "3",
       "cost": "5 Drain, Piercing 1",
       "duration": "Instant",
-      "category": "Banishment spell"
+      "category": "Banishment spell",
+      "damage_effects": "2, Drain, Piercing 2"
     },
     "Roots of the Earth": {
       "skill": "Survival",
@@ -149,7 +153,8 @@
       "difficulty": "3",
       "cost": "5 Drain, Piercing 1",
       "duration": "Instant",
-      "category": "Attack spell"
+      "category": "Attack spell",
+      "damage_effects": "2, Piercing 3"
     }
   },
   "cthulhu": {
@@ -165,7 +170,8 @@
       "difficulty": "2",
       "cost": "4 Drain, Piercing 1",
       "duration": "Instant",
-      "category": "Attack spell"
+      "category": "Attack spell",
+      "damage_effects": "2, Stun, Piercing 1"
     },
     "Echo of the Ocean": {
       "skill": "Persuasion",
@@ -209,14 +215,14 @@
       "difficulty": "3",
       "cost": "6 Drain, Piercing 2",
       "duration": "-",
-      "category": ""
+      "category": "Transmutation spell"
     },
     "Black Goat's Blessing": {
       "skill": "Resilience",
       "difficulty": "3",
       "cost": "4 Drain",
       "duration": "Rest of the scene",
-      "category": ""
+      "category": "Blessing spell"
     },
     "Call the Corpse Eaters": {
       "skill": "Persuasion",
@@ -230,14 +236,15 @@
       "difficulty": "3",
       "cost": "4 Drain",
       "duration": "Rest of the scene",
-      "category": ""
+      "category": "Curse spell"
     },
     "Necrophagus": {
       "skill": "Medicine",
       "difficulty": "4",
       "cost": "5 Drain",
       "duration": "Instant",
-      "category": ""
+      "category": "Attack spell",
+      "damage_effects": "2"
     },
     "Sacrificial Rebirth": {
       "skill": "Survival",
@@ -251,7 +258,7 @@
       "difficulty": "2",
       "cost": "3 Drain",
       "duration": "Rest of the scene",
-      "category": ""
+      "category": "Summoning spell"
     }
   },
   "nyarlathotep": {
@@ -281,7 +288,8 @@
       "difficulty": "3",
       "cost": "5 Drain, Piercing 1",
       "duration": "Instant",
-      "category": "Attack spell"
+      "category": "Attack spell",
+      "damage_effects": "2, Piercing 1, Snare"
     },
     "The Nameless Mists": {
       "skill": "Academia",
@@ -296,6 +304,14 @@
       "cost": "4 Drain, Piercing 1",
       "duration": "Power rating in rounds",
       "category": "Blessing spell"
+    },
+    "Touch of the Black Sun": {
+      "skill": "Fighting",
+      "difficulty": "2",
+      "cost": "4 Drain, Piercing 1",
+      "duration": "Instant",
+      "category": "Attack spell",
+      "damage_effects": "2, Area, Persistent 4"
     }
   },
   "yog_sothoth": {
@@ -304,35 +320,32 @@
       "difficulty": "2",
       "cost": "5 Drain",
       "duration": "Instant",
-      "category": "Control spell"
-    },
-    "Touch of the Black Sun": {
-      "skill": "Fighting",
-      "difficulty": "2",
-      "cost": "4 Drain, Piercing 1",
-      "duration": "Instant",
-      "category": "Attack spell"
+      "category": "Control spell",
+      "damage_effects": "2, Snare"
     },
     "Foetid Touch of Aforgomon": {
       "skill": "Fighting",
       "difficulty": "3 (target opposes with Agility + Fighting, difficulty 3)",
       "cost": "7 Drain",
       "duration": "Instant",
-      "category": "Attack spell"
+      "category": "Attack spell",
+      "damage_effects": "1, Persistent 3"
     },
     "Gaze of the Multiverse": {
       "skill": "Academia",
       "difficulty": "3",
       "cost": "5 Drain, Piercing 2",
       "duration": "Instant",
-      "category": "Attack spell"
+      "category": "Attack spell",
+      "damage_effects": "2, Stun"
     },
     "Loathsome Bond of 'Umr at-Tawil": {
       "skill": "Persuasion",
       "difficulty": "2",
       "cost": "4 Drain",
       "duration": "Instant",
-      "category": "Attack spell"
+      "category": "Attack spell",
+      "damage_effects": "2, Drain, Piercing 1"
     },
     "Way of the Gatekeeper": {
       "skill": "Academia",
@@ -346,7 +359,8 @@
       "difficulty": "Number of spheres (1-3)",
       "cost": "5 Drain",
       "duration": "Instant",
-      "category": "Attack spell"
+      "category": "Attack spell",
+      "damage_effects": "2, Drain, Stun"
     }
   }
 }

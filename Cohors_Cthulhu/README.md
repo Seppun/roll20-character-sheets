@@ -44,12 +44,13 @@ below).
   and out: maroon and open by default, light when folded in (printing
   always shows the text).
 - **Attack spells**: a spell with a Damage & Effects entry rolls damage
-  with its casting roll, as a weapon does: the base rating in Challenge
-  Dice, plus the effects. The prompt "Extra Momentum spent on Spell
-  Effects" (Threat for an adversary) adds 1 Challenge Die per Momentum, up
-  to 3, counted and paid only if the spell succeeds. Spell damage is the
-  listed rating, with no attribute bonus damage. The Cost is rolled and paid
-  as for any spell.
+  with its casting roll, as a weapon does: the caster's Power plus the
+  listed rating in Challenge Dice, with the listed effects (a Dabbler's
+  Power uses the 1 or 3 they choose for the cast). The prompt "Extra
+  Momentum spent on Spell Effects" (Threat for an adversary) adds 1
+  Challenge Die per Momentum, up to 3, counted and paid only if the spell
+  succeeds. No attribute bonus damage is added; it is already in Power. The
+  Cost is rolled and paid as for any spell.
 - **Casting with a magic focus**: a spell's casting roll counts as a focus
   roll when the caster has the magic focus of the spell's skill - Academia
   (Religion), Fighting (War Magic), Medicine (Faith Healing), Observation
@@ -242,9 +243,9 @@ run `npm run build` and re-paste `Cohors_Cthulhu.html` (and
 
    An **attack spell** (category "Attack spell") also gets a
    `"damage_effects"`, in a weapon's format: the base rating in Challenge
-   Dice, then the effects ("4, Piercing 1"). Its row shows the field, and
-   the casting roll rolls the damage like a weapon attack (see "Using the
-   sheet"). `source/data/spells.schema.json` describes every field, and
+   Dice, then the effects ("2, Piercing 1"). Its row shows the field, and
+   the casting roll rolls the caster's Power plus that rating, like a weapon
+   attack (see "Using the sheet"). `source/data/spells.schema.json` describes every field, and
    `npm run build` checks `spells.json` against it, stopping with the
    spell and field named, and listing attack spells with no damage yet.
 2. **`source/views/_spells.pug`**: add the name to that tradition's Spell

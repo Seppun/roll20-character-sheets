@@ -69,6 +69,11 @@
           .cc-roll-row
             span Challenge Dice:
             span.cc-roll-dice-result {{computed::damage_dice_text}}
+          //- An attack spell's Power; already in the dice above.
+          +rollGreater({values: 'computed::spell_power_damage 0'})
+            .cc-roll-row
+              span Power:
+              span +{{computed::spell_power_damage}}
           //- Extra damage dice bought on the hit; already in the dice above.
           +rollGreater({values: 'computed::extra_damage 0'})
             .cc-roll-row
