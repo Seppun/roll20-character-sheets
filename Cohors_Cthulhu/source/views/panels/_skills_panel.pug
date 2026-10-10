@@ -1,88 +1,170 @@
 //- views/panels/_skills_panel.pug
-//- Skills table (+skill, source/components/_skill.pug) with their Focuses.
-//- Resilience's extraAffects reruns the Max Stress calculations.
+//- Skills (+skill, source/components/_skill.pug) in two columns, each row a
+//- skill's roll button, Ranks and learned Focuses. Edit Focuses shows every
+//- Focus with its checkbox, one skill per row. Resilience's extraAffects
+//- reruns the Max Stress calculations.
 .cc-panel.cc-skills
-  .cc-banner Skills
-  table.cc-table.cc-skills-table
-    thead
-      tr
-        th Skill
-        th Ranks
-        th Focuses
-    tbody
-      +skill('academia', ['Finance', 'History', 'Linguistics', 'Philosophy', 'Religion'])
-      +skill('athletics', ['Climbing', 'Lifting', 'Physical Training', 'Running', 'Swimming'])
-      +skill('crafting', ['Armorsmithing', 'Cooking', 'Tailoring', 'Weaponsmithing'])
-      +skill('engineering', ['Architecture', 'Defenses', 'Demolition', 'Infrastructure', 'Siege Engines'])
-      +skill('fighting', ['Archery', 'Melee Weapons', 'Thrown Weapons', 'Unarmed', 'War Magic'])
-      +skill('medicine', ['Contagion', 'Faith Healing', 'Field Treatment', 'Pharmacia', 'Surgery'])
-      +skill('observation', ['Hearing', 'Instincts', 'Sight', 'Smell and Taste'])
-      +skill('persuasion', ['Charm', 'Deception', 'Innuendo', 'Intimidation', 'Invocation', 'Negotiation', 'Rhetoric'])
-      +skill('resilience', ['Discipline', 'Fortitude', 'Immunity'], ['stress_max_base', 'stress_max', 'stress_max_marker', 'fatigue_max_marker'])
-      +skill('stealth', ['Concealment', 'Disguise', 'Escape Artistry', 'Lock Picking', 'Sleight of Hand', 'Sneak'])
-      +skill('survival', ['Animal Handling', 'Boating', 'Foraging', 'Hunting', 'Mysticism', 'Navigation', 'Tracking', 'Woodcraft'])
-      +skill('tactics', ['Cavalry', 'Infantry', 'Leadership', 'Navy', 'Omen Reading', 'Scouting'])
+  //- Edit mode marker (1 while editing), set by the Edit Focuses button. The
+  //- header and grid below follow it with ~ selectors.
+  +checkbox({name: 'skills edit', value: 1}).cc-skills-edit-marker
+  .cc-skills-header
+    .cc-banner Skills
+    +action({
+      name: 'skills edit toggle',
+      class: 'cc-skills-edit-toggle',
+      trigger: {triggeredFuncs: ['ccToggleSkillsEdit']}
+    })
+      span.cc-skills-edit-off Edit Focuses
+      span.cc-skills-edit-on Done
+  .cc-skills-grid
+    +skill('academia', ['Finance', 'History', 'Linguistics', 'Philosophy', 'Religion'])
+    +skill('athletics', ['Climbing', 'Lifting', 'Physical Training', 'Running', 'Swimming'])
+    +skill('crafting', ['Armorsmithing', 'Cooking', 'Tailoring', 'Weaponsmithing'])
+    +skill('engineering', ['Architecture', 'Defenses', 'Demolition', 'Infrastructure', 'Siege Engines'])
+    +skill('fighting', ['Archery', 'Melee Weapons', 'Thrown Weapons', 'Unarmed', 'War Magic'])
+    +skill('medicine', ['Contagion', 'Faith Healing', 'Field Treatment', 'Pharmacia', 'Surgery'])
+    +skill('observation', ['Hearing', 'Instincts', 'Sight', 'Smell and Taste'])
+    +skill('persuasion', ['Charm', 'Deception', 'Innuendo', 'Intimidation', 'Invocation', 'Negotiation', 'Rhetoric'])
+    +skill('resilience', ['Discipline', 'Fortitude', 'Immunity'], ['stress_max_base', 'stress_max', 'stress_max_marker', 'fatigue_max_marker'])
+    +skill('stealth', ['Concealment', 'Disguise', 'Escape Artistry', 'Lock Picking', 'Sleight of Hand', 'Sneak'])
+    +skill('survival', ['Animal Handling', 'Boating', 'Foraging', 'Hunting', 'Mysticism', 'Navigation', 'Tracking', 'Woodcraft'])
+    +skill('tactics', ['Cavalry', 'Infantry', 'Leadership', 'Navy', 'Omen Reading', 'Scouting'])
 
 +scss.
   .cc-character {
-    .cc-skills-table {
-      th,
-      td {
-        vertical-align: middle;
-        min-height: 2.6rem;
+    .cc-skills-edit-marker {
+      display: none;
+    }
+
+    .cc-skills-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+
+    // Same chip as Ignore Fatigue: light when off, maroon while editing.
+    .cc-skills-edit-toggle {
+      display: inline-flex;
+      align-items: center;
+      background: var(--cc-editable-fill);
+      color: var(--cc-ink);
+      border: 1px solid var(--cc-rule);
+      border-radius: 4px;
+      padding: 0.05rem 0.4rem;
+      font-family: var(--cc-body-font);
+      font-size: 0.6rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      cursor: pointer;
+
+      .cc-skills-edit-on {
+        display: none;
+      }
+    }
+
+    .cc-skills-edit-marker:checked ~ .cc-skills-header .cc-skills-edit-toggle {
+      background: var(--cc-banner);
+      color: var(--cc-banner-text);
+      border-color: var(--cc-banner);
+      box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.4);
+
+      .cc-skills-edit-off {
+        display: none;
       }
 
-      // No divider under the Ranks column.
-      td.cc-skill-ranks-cell {
-        border-bottom: none;
+      .cc-skills-edit-on {
+        display: inline;
       }
+    }
 
-      // Same button treatment as .cc-attribute-roll, at a fixed width that
-      // fits the longest skill name.
-      .cc-skill-name-roll {
-        display: inline-flex;
-        align-items: center;
-        justify-content: flex-start;
-        gap: 0.3rem;
-        width: 8.5rem;
-        background: rgba(255, 255, 255, 0.15);
-        border: 1px solid var(--cc-banner-text);
-        border-radius: 4px;
-        padding: 0.15rem 0.5rem;
-        color: inherit;
-        font: inherit;
-        text-transform: inherit;
-        letter-spacing: inherit;
-        white-space: nowrap;
-        cursor: pointer;
+    // Two columns, filled top to bottom (Academia-Medicine, then
+    // Observation-Tactics).
+    .cc-skills-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: repeat(6, auto);
+      grid-auto-flow: column;
+      column-gap: 0.8rem;
+      margin-top: 0.3rem;
+    }
 
-        &:hover {
-          background: var(--cc-banner-text);
-          color: var(--cc-banner);
-        }
+    // Editing: one skill per row, so every Focus has room.
+    .cc-skills-edit-marker:checked ~ .cc-skills-grid {
+      grid-template-columns: 1fr;
+      grid-template-rows: none;
+      grid-auto-flow: row;
+    }
 
-        &:before {
-          content: '0';
-          font-size: 1.5em;
-          opacity: 1;
-        }
-      }
+    .cc-skill-row {
+      display: grid;
+      grid-template-columns: 7.5rem 2.2rem 1fr;
+      align-items: center;
+      column-gap: 0.4rem;
+      min-height: 1.6rem;
+      padding: 0.1rem 0;
+      border-bottom: 1px solid var(--cc-rule-soft);
+    }
 
-      // Always player-entered.
-      .cc-skill-ranks {
-        width: 3rem;
-        text-align: center;
-        background: var(--cc-editable-fill);
-        border: 1px solid var(--cc-rule);
+    // Maroon chip with the d20 glyph, at a fixed width that fits the longest
+    // skill name.
+    .cc-skill-name-roll {
+      display: inline-flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 0.3rem;
+      width: 100%;
+      box-sizing: border-box;
+      background: var(--cc-banner);
+      color: var(--cc-banner-text);
+      border: 1px solid var(--cc-banner);
+      border-radius: 4px;
+      padding: 0 0.4rem;
+      font-family: var(--cc-body-font);
+      font-weight: bold;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      white-space: nowrap;
+      cursor: pointer;
+
+      &:hover {
+        background: var(--cc-parchment);
         color: var(--cc-ink);
       }
 
-      td.cc-skill-focuses {
-        display: flex;
-        flex-wrap: wrap;
-        align-content: center;
-        align-items: center;
-        gap: 0.15rem 0.6rem;
+      // '0' is the d20 glyph in Roll20's dicefontd20 font.
+      &:before {
+        content: '0';
+        font-size: 1.3em;
+      }
+    }
+
+    // Always player-entered.
+    .cc-skill-ranks {
+      width: 100%;
+      box-sizing: border-box;
+      height: 1.3rem;
+      text-align: center;
+      background: var(--cc-editable-fill);
+      border: 1px solid var(--cc-rule);
+      color: var(--cc-ink);
+    }
+
+    // Spacing is a margin on each Focus rather than a flex gap, so hidden
+    // (unlearned) Focuses leave no gaps.
+    .cc-skill-focuses {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      row-gap: 0.15rem;
+    }
+
+    // Not editing: only learned Focuses, without their checkboxes.
+    .cc-skills-edit-marker:not(:checked) ~ .cc-skills-grid {
+      .cc-focus-checkbox,
+      .cc-focus-checkbox:not(:checked) + .cc-focus-roll {
+        display: none !important;
       }
     }
 
@@ -90,8 +172,13 @@
       display: inline-flex;
       align-items: center;
       gap: 0.2rem;
-      font-size: 0.8rem;
+      font-size: 0.72rem;
       white-space: nowrap;
+
+      // The spacing between Focuses (see .cc-skill-focuses).
+      .cc-focus-roll {
+        margin-right: 0.35rem;
+      }
 
       // k-scaffold's checkbox border doesn't apply; set it here.
       .cc-focus-checkbox {
@@ -135,7 +222,7 @@
         box-shadow:
           inset 0 1px 0 rgba(255, 255, 255, 0.45),
           0 1px 1px rgba(0, 0, 0, 0.2);
-        padding: 0.05rem 0.35rem;
+        padding: 0 0.3rem;
         color: var(--cc-ink);
         font-size: inherit;
         font-family: inherit;
@@ -194,3 +281,9 @@
     });
   };
   k.registerFuncs({initiateFocusRoll});
+
+  // Edit Focuses / Done: switches the skills_edit marker.
+  const ccToggleSkillsEdit = ({attributes}) => {
+    attributes.skills_edit = Number(attributes.skills_edit) === 1 ? 0 : 1;
+  };
+  k.registerFuncs({ccToggleSkillsEdit});

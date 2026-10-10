@@ -380,10 +380,11 @@
   /* Print styles: sheet workers can't print or download, so this makes the
      browser's Print / Save as PDF produce the whole sheet without UI chrome. */
   @media print {
-    /* Hide tab navigation, the Player/NPC switch, repeating-section controls
-       and the build footer. */
+    /* Hide tab navigation, the Player/NPC switch, Edit Focuses,
+       repeating-section controls and the build footer. */
     .tabs__header,
     .cc-sheet-mode,
+    .cc-skills-edit-toggle,
     .repcontrol_add,
     .repcontrol_edit,
     .cc-footer {

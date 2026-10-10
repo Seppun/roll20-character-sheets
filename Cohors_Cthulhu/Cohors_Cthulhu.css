@@ -1546,11 +1546,12 @@ body .ui-dialog .tab-content .charsheet {
 }
 @media print {
   body .ui-dialog .tab-content .charsheet {
-    /* Hide tab navigation, the Player/NPC switch, repeating-section controls
-       and the build footer. */
+    /* Hide tab navigation, the Player/NPC switch, Edit Focuses,
+       repeating-section controls and the build footer. */
   }
   body .ui-dialog .tab-content .charsheet .tabs__header,
   body .ui-dialog .tab-content .charsheet .cc-sheet-mode,
+  body .ui-dialog .tab-content .charsheet .cc-skills-edit-toggle,
   body .ui-dialog .tab-content .charsheet .repcontrol_add,
   body .ui-dialog .tab-content .charsheet .repcontrol_edit,
   body .ui-dialog .tab-content .charsheet .cc-footer {
@@ -1626,7 +1627,7 @@ body .ui-dialog .tab-content .charsheet .cc-character .cc-footer {
   opacity: 0.6;
 }
 body .ui-dialog .tab-content .charsheet .cc-character .cc-build-css::after {
-  content: "CSS build: 2026-10-10 15:18:54 UTC";
+  content: "CSS build: 2026-10-10 15:34:40 UTC";
 }
 body .ui-dialog .tab-content .charsheet .cc-character .cc-languages textarea {
   min-height: 4rem;
@@ -2219,60 +2220,122 @@ body .ui-dialog .tab-content .charsheet .cc-character .cc-attributes-table .cc-a
   height: 1.6rem;
   border: 1px dashed var(--cc-parchment-dark);
 }
-body .ui-dialog .tab-content .charsheet .cc-character .cc-skills-table th,
-body .ui-dialog .tab-content .charsheet .cc-character .cc-skills-table td {
-  vertical-align: middle;
-  min-height: 2.6rem;
+body .ui-dialog .tab-content .charsheet .cc-character .cc-skills-edit-marker {
+  display: none;
 }
-body .ui-dialog .tab-content .charsheet .cc-character .cc-skills-table td.cc-skill-ranks-cell {
-  border-bottom: none;
+body .ui-dialog .tab-content .charsheet .cc-character .cc-skills-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
 }
-body .ui-dialog .tab-content .charsheet .cc-character .cc-skills-table .cc-skill-name-roll {
+body .ui-dialog .tab-content .charsheet .cc-character .cc-skills-edit-toggle {
+  display: inline-flex;
+  align-items: center;
+  background: var(--cc-editable-fill);
+  color: var(--cc-ink);
+  border: 1px solid var(--cc-rule);
+  border-radius: 4px;
+  padding: 0.05rem 0.4rem;
+  font-family: var(--cc-body-font);
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+}
+body .ui-dialog .tab-content .charsheet .cc-character .cc-skills-edit-toggle .cc-skills-edit-on {
+  display: none;
+}
+body .ui-dialog .tab-content .charsheet .cc-character .cc-skills-edit-marker:checked ~ .cc-skills-header .cc-skills-edit-toggle {
+  background: var(--cc-banner);
+  color: var(--cc-banner-text);
+  border-color: var(--cc-banner);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+body .ui-dialog .tab-content .charsheet .cc-character .cc-skills-edit-marker:checked ~ .cc-skills-header .cc-skills-edit-toggle .cc-skills-edit-off {
+  display: none;
+}
+body .ui-dialog .tab-content .charsheet .cc-character .cc-skills-edit-marker:checked ~ .cc-skills-header .cc-skills-edit-toggle .cc-skills-edit-on {
+  display: inline;
+}
+body .ui-dialog .tab-content .charsheet .cc-character .cc-skills-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: repeat(6, auto);
+  grid-auto-flow: column;
+  column-gap: 0.8rem;
+  margin-top: 0.3rem;
+}
+body .ui-dialog .tab-content .charsheet .cc-character .cc-skills-edit-marker:checked ~ .cc-skills-grid {
+  grid-template-columns: 1fr;
+  grid-template-rows: none;
+  grid-auto-flow: row;
+}
+body .ui-dialog .tab-content .charsheet .cc-character .cc-skill-row {
+  display: grid;
+  grid-template-columns: 7.5rem 2.2rem 1fr;
+  align-items: center;
+  column-gap: 0.4rem;
+  min-height: 1.6rem;
+  padding: 0.1rem 0;
+  border-bottom: 1px solid var(--cc-rule-soft);
+}
+body .ui-dialog .tab-content .charsheet .cc-character .cc-skill-name-roll {
   display: inline-flex;
   align-items: center;
   justify-content: flex-start;
   gap: 0.3rem;
-  width: 8.5rem;
-  background: rgba(255, 255, 255, 0.15);
-  border: 1px solid var(--cc-banner-text);
+  width: 100%;
+  box-sizing: border-box;
+  background: var(--cc-banner);
+  color: var(--cc-banner-text);
+  border: 1px solid var(--cc-banner);
   border-radius: 4px;
-  padding: 0.15rem 0.5rem;
-  color: inherit;
-  font: inherit;
-  text-transform: inherit;
-  letter-spacing: inherit;
+  padding: 0 0.4rem;
+  font-family: var(--cc-body-font);
+  font-weight: bold;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
   white-space: nowrap;
   cursor: pointer;
 }
-body .ui-dialog .tab-content .charsheet .cc-character .cc-skills-table .cc-skill-name-roll:hover {
-  background: var(--cc-banner-text);
-  color: var(--cc-banner);
+body .ui-dialog .tab-content .charsheet .cc-character .cc-skill-name-roll:hover {
+  background: var(--cc-parchment);
+  color: var(--cc-ink);
 }
-body .ui-dialog .tab-content .charsheet .cc-character .cc-skills-table .cc-skill-name-roll:before {
+body .ui-dialog .tab-content .charsheet .cc-character .cc-skill-name-roll:before {
   content: "0";
-  font-size: 1.5em;
-  opacity: 1;
+  font-size: 1.3em;
 }
-body .ui-dialog .tab-content .charsheet .cc-character .cc-skills-table .cc-skill-ranks {
-  width: 3rem;
+body .ui-dialog .tab-content .charsheet .cc-character .cc-skill-ranks {
+  width: 100%;
+  box-sizing: border-box;
+  height: 1.3rem;
   text-align: center;
   background: var(--cc-editable-fill);
   border: 1px solid var(--cc-rule);
   color: var(--cc-ink);
 }
-body .ui-dialog .tab-content .charsheet .cc-character .cc-skills-table td.cc-skill-focuses {
+body .ui-dialog .tab-content .charsheet .cc-character .cc-skill-focuses {
   display: flex;
   flex-wrap: wrap;
-  align-content: center;
   align-items: center;
-  gap: 0.15rem 0.6rem;
+  row-gap: 0.15rem;
+}
+body .ui-dialog .tab-content .charsheet .cc-character .cc-skills-edit-marker:not(:checked) ~ .cc-skills-grid .cc-focus-checkbox,
+body .ui-dialog .tab-content .charsheet .cc-character .cc-skills-edit-marker:not(:checked) ~ .cc-skills-grid .cc-focus-checkbox:not(:checked) + .cc-focus-roll {
+  display: none !important;
 }
 body .ui-dialog .tab-content .charsheet .cc-character .cc-focus-item {
   display: inline-flex;
   align-items: center;
   gap: 0.2rem;
-  font-size: 0.8rem;
+  font-size: 0.72rem;
   white-space: nowrap;
+}
+body .ui-dialog .tab-content .charsheet .cc-character .cc-focus-item .cc-focus-roll {
+  margin-right: 0.35rem;
 }
 body .ui-dialog .tab-content .charsheet .cc-character .cc-focus-item .cc-focus-checkbox {
   margin: 0;
@@ -2293,7 +2356,7 @@ body .ui-dialog .tab-content .charsheet .cc-character .cc-focus-item .cc-focus-r
   border: 1px solid var(--cc-stone-bezel);
   border-radius: 4px;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45), 0 1px 1px rgba(0, 0, 0, 0.2);
-  padding: 0.05rem 0.35rem;
+  padding: 0 0.3rem;
   color: var(--cc-ink);
   font-size: inherit;
   font-family: inherit;
@@ -2792,7 +2855,7 @@ body {
   opacity: 0.6;
 }
 .cc-character .cc-build-css::after {
-  content: "CSS build: 2026-10-10 15:18:54 UTC";
+  content: "CSS build: 2026-10-10 15:34:40 UTC";
 }
 .cc-character .cc-languages textarea {
   min-height: 4rem;
@@ -3392,60 +3455,122 @@ body {
   border: 1px dashed var(--cc-parchment-dark);
 }
 
-.cc-character .cc-skills-table th,
-.cc-character .cc-skills-table td {
-  vertical-align: middle;
-  min-height: 2.6rem;
+.cc-character .cc-skills-edit-marker {
+  display: none;
 }
-.cc-character .cc-skills-table td.cc-skill-ranks-cell {
-  border-bottom: none;
+.cc-character .cc-skills-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
 }
-.cc-character .cc-skills-table .cc-skill-name-roll {
+.cc-character .cc-skills-edit-toggle {
+  display: inline-flex;
+  align-items: center;
+  background: var(--cc-editable-fill);
+  color: var(--cc-ink);
+  border: 1px solid var(--cc-rule);
+  border-radius: 4px;
+  padding: 0.05rem 0.4rem;
+  font-family: var(--cc-body-font);
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+}
+.cc-character .cc-skills-edit-toggle .cc-skills-edit-on {
+  display: none;
+}
+.cc-character .cc-skills-edit-marker:checked ~ .cc-skills-header .cc-skills-edit-toggle {
+  background: var(--cc-banner);
+  color: var(--cc-banner-text);
+  border-color: var(--cc-banner);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+.cc-character .cc-skills-edit-marker:checked ~ .cc-skills-header .cc-skills-edit-toggle .cc-skills-edit-off {
+  display: none;
+}
+.cc-character .cc-skills-edit-marker:checked ~ .cc-skills-header .cc-skills-edit-toggle .cc-skills-edit-on {
+  display: inline;
+}
+.cc-character .cc-skills-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: repeat(6, auto);
+  grid-auto-flow: column;
+  column-gap: 0.8rem;
+  margin-top: 0.3rem;
+}
+.cc-character .cc-skills-edit-marker:checked ~ .cc-skills-grid {
+  grid-template-columns: 1fr;
+  grid-template-rows: none;
+  grid-auto-flow: row;
+}
+.cc-character .cc-skill-row {
+  display: grid;
+  grid-template-columns: 7.5rem 2.2rem 1fr;
+  align-items: center;
+  column-gap: 0.4rem;
+  min-height: 1.6rem;
+  padding: 0.1rem 0;
+  border-bottom: 1px solid var(--cc-rule-soft);
+}
+.cc-character .cc-skill-name-roll {
   display: inline-flex;
   align-items: center;
   justify-content: flex-start;
   gap: 0.3rem;
-  width: 8.5rem;
-  background: rgba(255, 255, 255, 0.15);
-  border: 1px solid var(--cc-banner-text);
+  width: 100%;
+  box-sizing: border-box;
+  background: var(--cc-banner);
+  color: var(--cc-banner-text);
+  border: 1px solid var(--cc-banner);
   border-radius: 4px;
-  padding: 0.15rem 0.5rem;
-  color: inherit;
-  font: inherit;
-  text-transform: inherit;
-  letter-spacing: inherit;
+  padding: 0 0.4rem;
+  font-family: var(--cc-body-font);
+  font-weight: bold;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
   white-space: nowrap;
   cursor: pointer;
 }
-.cc-character .cc-skills-table .cc-skill-name-roll:hover {
-  background: var(--cc-banner-text);
-  color: var(--cc-banner);
+.cc-character .cc-skill-name-roll:hover {
+  background: var(--cc-parchment);
+  color: var(--cc-ink);
 }
-.cc-character .cc-skills-table .cc-skill-name-roll:before {
+.cc-character .cc-skill-name-roll:before {
   content: "0";
-  font-size: 1.5em;
-  opacity: 1;
+  font-size: 1.3em;
 }
-.cc-character .cc-skills-table .cc-skill-ranks {
-  width: 3rem;
+.cc-character .cc-skill-ranks {
+  width: 100%;
+  box-sizing: border-box;
+  height: 1.3rem;
   text-align: center;
   background: var(--cc-editable-fill);
   border: 1px solid var(--cc-rule);
   color: var(--cc-ink);
 }
-.cc-character .cc-skills-table td.cc-skill-focuses {
+.cc-character .cc-skill-focuses {
   display: flex;
   flex-wrap: wrap;
-  align-content: center;
   align-items: center;
-  gap: 0.15rem 0.6rem;
+  row-gap: 0.15rem;
+}
+.cc-character .cc-skills-edit-marker:not(:checked) ~ .cc-skills-grid .cc-focus-checkbox,
+.cc-character .cc-skills-edit-marker:not(:checked) ~ .cc-skills-grid .cc-focus-checkbox:not(:checked) + .cc-focus-roll {
+  display: none !important;
 }
 .cc-character .cc-focus-item {
   display: inline-flex;
   align-items: center;
   gap: 0.2rem;
-  font-size: 0.8rem;
+  font-size: 0.72rem;
   white-space: nowrap;
+}
+.cc-character .cc-focus-item .cc-focus-roll {
+  margin-right: 0.35rem;
 }
 .cc-character .cc-focus-item .cc-focus-checkbox {
   margin: 0;
@@ -3466,7 +3591,7 @@ body {
   border: 1px solid var(--cc-stone-bezel);
   border-radius: 4px;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45), 0 1px 1px rgba(0, 0, 0, 0.2);
-  padding: 0.05rem 0.35rem;
+  padding: 0 0.3rem;
   color: var(--cc-ink);
   font-size: inherit;
   font-family: inherit;

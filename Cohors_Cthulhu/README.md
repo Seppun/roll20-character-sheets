@@ -65,6 +65,10 @@ below).
 - **Momentum and Threat**: each roll card shows the Momentum the roll
   generated and spent, and its Complications, so the group can keep the
   pools by hand. The companion API script can keep them automatically.
+- **Skills**: two columns, each skill with its Ranks and the Focuses the
+  character has learned, as roll buttons. Press **Edit Focuses** (beside
+  the Skills banner) to show every Focus with a checkbox, one skill per
+  row; tick the ones the character knows, then press **Done**.
 - **Macro bar**: drag any roll button (Attribute, Skill, Focus, Fatigue
   resist, Weapon or Spell) onto the macro bar to roll it from there. A
   weapon or spell added since the sheet was last opened is draggable once
