@@ -51,6 +51,10 @@ below).
   Challenge Die per Momentum, up to 3, counted and paid only if the spell
   succeeds. No attribute bonus damage is added; it is already in Power. The
   Cost is rolled and paid as for any spell.
+- **Dabblers** choose the spell's Power when casting: 1, or 3 (both plus
+  their Will bonus). At 3, every Effect rolled on the spell's Cost dice, and
+  on its Damage dice if it succeeds, generates 1 Threat; the card shows the
+  total.
 - **Casting with a magic focus**: a spell's casting roll counts as a focus
   roll when the caster has the magic focus of the spell's skill - Academia
   (Religion), Fighting (War Magic), Medicine (Faith Healing), Observation
